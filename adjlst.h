@@ -70,9 +70,7 @@ int checkEdge(Graph* graph, int s, int d)
     return 0;
 }
 
-
-// Generate random graph
-Graph* genGraph(int N, double* masses, double* radii)
+Graph* createGraph(int N)
 {
     // Allocate graph
     Graph* graph = malloc( sizeof(Graph) );
@@ -84,15 +82,51 @@ Graph* genGraph(int N, double* masses, double* radii)
     // Initialization
     for ( int i=0 ; i<N ; i++ )
         graph->adjlst[i] = NULL;
+    
+    return graph;
+}
+
+
+// Generate random graph
+Graph* genRandGraph(int N)
+{
+    Graph* graph = createGraph(N);
 
     int maxEdges = N * (N-1) / 2; // Random graph method
-    int nEdges = maxEdges/2 ;     // Arbitrary
+    int nEdges = maxEdges ;     // Arbitrary
 
     // Pour chaque élément
     for(int i=0 ; i<nEdges ; i++){
         int p = rand()%N ;
         int q = rand()%N;
-        addEdge(graph, p, q);
+        if( (p!=q) & !checkEdge(graph, p,q)) addEdge(graph, p, q);
     }
+    return graph;
+}
+
+// Generate a graph that represent a H2O molecule
+Graph* H2O()
+{
+    Graph* graph = createGraph(3);
+
+    // 0   --> Oxygen
+    // 1,2 --> Hydrogen
+    addEdge(graph, 0, 1);
+    addEdge(graph, 0, 2);
+
+    return graph;
+}
+
+
+// Generate a graph that represent a methane molecule
+Graph* Methane()
+{
+    Graph* graph = createGraph(5);
+
+    // 0       --> Carbon
+    // 1,2,3,4 --> Hydrogene
+    addEdge(graph, 0, 1); addEdge(graph, 0, 2);
+    addEdge(graph, 0, 3); addEdge(graph, 0, 4);
+
     return graph;
 }
