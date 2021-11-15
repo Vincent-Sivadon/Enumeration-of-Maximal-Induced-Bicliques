@@ -1,5 +1,5 @@
 #include <stdbool.h>
-
+#include <limits.h>
 
 // Vertex struct
 typedef struct Vertex {
@@ -63,6 +63,7 @@ int checkEdge(Graph* graph, int s, int d)
     }
 
     // Check Edge (d, s)
+    // Will be removed if we only study undirected graph
     tmp = graph->adjlst[d]; 
     while( tmp ){
         if( tmp->index == s ) return 1;

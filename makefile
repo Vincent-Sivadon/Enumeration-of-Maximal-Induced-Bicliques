@@ -1,5 +1,15 @@
 CC=gcc
 LDFLAGS=-lcmocka
+VFLAGS=`sdl2-config --cflags --libs` -lm
+
+# VISUALIZATION
+visualization: visualization.c genFile.c adjlst.h
+	$(CC) -o $@ $< $(VFLAGS)
+	$(CC) -o genFile genFile.c
+plot: visualization.c genFile.c adjlst.h
+	./genFile graph
+	./visualization graph
+
 
 # RUN TESTS
 check: test_adjlst
