@@ -97,7 +97,7 @@ Graph* genRandGraph(int N)
     Graph* graph = createGraph(N);
 
     int maxEdges = N * (N-1) / 2; // Random graph method
-    int nEdges = maxEdges ;     // Arbitrary
+    int nEdges = maxEdges / 4 ;     // Arbitrary
 
     // Pour chaque élément
     for(int i=0 ; i<nEdges ; i++){
