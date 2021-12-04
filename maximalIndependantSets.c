@@ -45,15 +45,15 @@ dyn_array *independantSets(Graph *graph)
   dyn_array set;
   init_dynarray(&set, 1);
   dyn_array *set_ptr = malloc(sizeof(dyn_array) * v);
-  for (int i = 0; i < N; i++)
+  for (int i = 0; i <= N; i++)
   {
-    for (int j = 0; j < v; j++)
+    for (int j = 0; j <= v; j++)
     {
-      if (checkEdge(graph, i, j)==1)
+      if (checkEdge(graph, i, j)==0)
       {
         for (size_t k = 0; k < N; k++)
         {
-          append_dynarray(&set_ptr[k], k);
+          append_dynarray(&set_ptr[k], j);
         }
       }
     }
@@ -65,7 +65,7 @@ void printSet(dyn_array *set)
 {
   for (int v = 0; v < set->size; v++)
   {
-    printf("%ld \t", set->vertices[v]);
+    printf("%ld ", set->vertices[v]);
   }
 };
 
