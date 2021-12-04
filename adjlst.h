@@ -1,5 +1,8 @@
 #include <stdbool.h>
 #include <limits.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <stdio.h>
 
 // Vertex struct
 typedef struct Vertex {
