@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "../subgraph.h"
 
@@ -50,11 +51,36 @@ static void test_dijkstra ( void **state )
 
 }
 
+//
+static void test_genSubgraph ( void **state )
+{
+  //
+  Graph* graph = H2O();
+  Graph* graph2 = Hexagone();
+  addEdge(graph2, 0, 3);
+  addEdge(graph2, 4, 2);
+
+  // TEST 1
+  Graph* subgraph1 = genSubgraph(graph, 0);
+  assert_false(checkEdge(subgraph1, 0, 1));
+  assert_false(checkEdge(subgraph1, 0, 2));
+  assert_false(checkEdge(subgraph1, 1, 2));
+
+  // TEST 2
+  Graph* subgraph2 = genSubgraph(graph2, 0);
+  for (int i=0 ; i<graph2->size ; i++)
+    for (int j=i+1 ; j<graph2->size ; j++) {
+      if ( (i==2 && j==4) || (i==2 && j==5) || (i==1 && j==4)) assert_true(checkEdge(subgraph2, i, j));
+      else assert_false(checkEdge(subgraph2, i, j));
+    }
+}
+
 int main(void) {
   int result = 0;
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(test_dijkstra),
       cmocka_unit_test(test_minDist),
+      cmocka_unit_test(test_genSubgraph),
   };
   result |= cmocka_run_group_tests_name("Adjacency List", tests, NULL, NULL);
 

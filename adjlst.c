@@ -35,24 +35,16 @@ void printGraph(Graph* graph) {
 }
 
 // Check if an edge can be placed between 2 vertices s and d
-int checkEdge(Graph* graph, int s, int d)
+bool checkEdge(Graph* graph, int s, int d)
 {
     // Check Edge (s, d)
     Vertex* tmp = graph->adjlst[s]; 
     while( tmp ){
-        if( tmp->index == d ) return 1;
+        if( tmp->index == d ) return true;
         tmp = tmp->next;
     }
 
-    // Check Edge (d, s)
-    // Will be removed if we only study undirected graph
-    tmp = graph->adjlst[d]; 
-    while( tmp ){
-        if( tmp->index == s ) return 1;
-        tmp = tmp->next;
-    }
-
-    return 0;
+    return false;
 }
 
 // Declare a graph

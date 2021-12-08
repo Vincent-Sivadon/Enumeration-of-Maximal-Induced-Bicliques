@@ -16,13 +16,13 @@ static void test_checkEdges ( void **state )
   Graph* graph1 = H2O();
   Graph* graph2 = Methane();
 
-  assert_int_equal(1, checkEdge(graph1, 0,1));
-  assert_int_equal(1, checkEdge(graph1, 0,2));
-  assert_int_equal(0, checkEdge(graph1, 2,1));
+  assert_true(checkEdge(graph1, 0,1));
+  assert_true(checkEdge(graph1, 0,2));
+  assert_false(checkEdge(graph1, 2,1));
 
-  assert_int_equal(1, checkEdge(graph2, 0,1));
-  assert_int_equal(1, checkEdge(graph2, 0,3));
-  assert_int_equal(0, checkEdge(graph2, 2,4));
+  assert_true(checkEdge(graph2, 0,1));
+  assert_true(checkEdge(graph2, 0,3));
+  assert_false(checkEdge(graph2, 2,4));
 
 }
 
