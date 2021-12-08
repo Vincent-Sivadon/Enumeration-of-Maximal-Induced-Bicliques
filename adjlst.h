@@ -1,5 +1,10 @@
 #pragma once
 
+#include <stdbool.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 // Vertex struct
 typedef struct Vertex {
     int index;
@@ -17,21 +22,17 @@ typedef struct {
 // Create a Vertex
 Vertex* createVertex(int i);
 
-
 // Add edge between two vertices s and d
 void addEdge(Graph* graph, int s, int d);
 
-
 // Print the graph in terminal
 void printGraph(Graph* graph);
-
 
 // Check if an edge can be placed between 2 vertices s and d
 int checkEdge(Graph* graph, int s, int d);
 
 // Declare a graph
 Graph* createGraph(int N);
-
 
 // Generate random graph
 Graph* genRandGraph(int N);
@@ -43,15 +44,5 @@ Graph* genRandGraph(int N);
 Graph* H2O();
 // Generate a graph that represent a methane molecule (to test checkEdge)
 Graph* Methane();
-
-
-// DIJKSTRA'S ALGORITHM -----------------------------------------------------
-
-// A utility function to find the vertex with minimum distance value
-int minDist(int* dist, bool* visited, int N);
-
-//
-void printPath(int* dist, int N);
-
-//
-int* dijkstra(Graph* graph, int src);
+// Generate a graph that represent an hexagone
+Graph* Hexagone();
