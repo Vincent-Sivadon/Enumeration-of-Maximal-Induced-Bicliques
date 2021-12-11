@@ -10,7 +10,7 @@ CFLAGS=-O3
 INC=-I ./include
 
 # OBJECT FILES
-OBJ=graph.o main.o
+OBJ=graph.o main.o visualisation.o
 
 # TESTS
 TESTS=graphtests
@@ -26,6 +26,9 @@ main.o: src/main.cpp
 	$(CC) $(CFLAGS) -c $(INC) $<
 
 graph.o: src/graph.cpp
+	$(CC) $(CFLAGS) -c $(INC) $<
+
+visualisation.o: src/visualisation.cpp
 	$(CC) $(CFLAGS) -c $(INC) $<
 
 ######################################
@@ -49,4 +52,4 @@ graphtests: tests/graph_tests.cpp graph.o
 ######################################
 
 clean:
-	rm *.o bin/*
+	rm *.o bin/* *.dat
