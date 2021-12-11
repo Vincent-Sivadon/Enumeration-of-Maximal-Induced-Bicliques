@@ -12,6 +12,9 @@ INC=-I ./include
 # OBJECT FILES
 OBJ=graph.o main.o
 
+# TESTS
+TESTS=graphtests
+
 ######################################
 ############## Makefile ##############
 ######################################
@@ -29,8 +32,19 @@ graph.o: src/graph.cpp
 ################ Runs ################
 ######################################
 
-run_prog:
+runprog:
 	bin/prog
+
+check: $(TESTS)
+	bin/graphtests
+
+
+######################################
+############### Tests ###############
+######################################
+
+graphtests: tests/graph_tests.cpp graph.o
+	$(CC) -o bin/$@ $(INC) graph.o $<
 
 ######################################
 
