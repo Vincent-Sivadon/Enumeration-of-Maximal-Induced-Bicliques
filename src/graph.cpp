@@ -1,3 +1,4 @@
+#include "visualisation.hpp"
 #include "graph.hpp"
 
 // connect 2 vertices i and j
@@ -23,6 +24,12 @@ bool Graph::areConnected(u64 i, u64 j) {
         if (vertex == j) return true;
     return false;
 }
+
+
+void Graph::draw() {
+    drawGraph(*this);
+}
+
 
 // Generate a graph that represent a H2O molecule (for testing purposes)
 Graph H2O() {

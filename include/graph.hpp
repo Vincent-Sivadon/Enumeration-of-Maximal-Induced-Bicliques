@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 typedef unsigned long long u64;
 
@@ -17,6 +18,12 @@ struct Graph {
     void connect(u64 i, u64 j);
     // return true if i and j are neighboors
     bool areConnected(u64 i, u64 j);
+    // write graph (edges) in filename file
+    std::vector<int> getAdjMatrix();
+    // draw the graph
+    void draw();
+
+
 };
 
 Graph H2O();

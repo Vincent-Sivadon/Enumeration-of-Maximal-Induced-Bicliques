@@ -7,6 +7,13 @@
 
 #include "graph.hpp"
 
-void writeGraph(Graph& graph, std::string filename);
+struct Vector {
+    double x;
+    double y;
+    Vector() {}
+    Vector(double x, double y) :x(x), y(y) {} 
+};
 
 std::vector<int> readGraph(std::string filename);
+
+void drawGraph(Graph& graph);
