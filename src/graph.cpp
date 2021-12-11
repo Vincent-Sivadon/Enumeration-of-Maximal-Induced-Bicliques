@@ -57,9 +57,3 @@ Graph Hexagone() {
     
     return graph;
 }
-
-int main() {
-    Graph hex = Hexagone();
-    hex.print();
-    return 0;
-}
