@@ -1,12 +1,10 @@
 #include "SDL2/SDL.h"
 
 #include "graph.hpp"
-#include "visualisation.hpp"
 
 int main() {
-    Graph hex = Hexagone();
-    Graph methane = Methane();
-    methane.draw();
+    Graph graph = genRandGraph(10);
+    graph.draw();
 
     return 0;
 }

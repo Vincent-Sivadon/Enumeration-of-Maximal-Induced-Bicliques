@@ -36,7 +36,7 @@ visualisation.o: src/visualisation.cpp
 ################ Runs ################
 ######################################
 
-runprog:
+run:
 	bin/prog
 
 check: $(TESTS)

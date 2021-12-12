@@ -1,8 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <iostream>
-#include <fstream>
 
 typedef unsigned long long u64;
 
@@ -25,6 +23,9 @@ struct Graph {
 
 
 };
+
+//
+Graph genRandGraph(u64 N);
 
 Graph H2O();
 

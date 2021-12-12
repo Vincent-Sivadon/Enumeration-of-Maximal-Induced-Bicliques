@@ -1,3 +1,7 @@
+#include <vector>
+#include <iostream>
+#include <fstream>
+
 #include "visualisation.hpp"
 #include "graph.hpp"
 
@@ -8,7 +12,7 @@ void Graph::connect(u64 i, u64 j) {
 }
 
 void Graph::print() {
-    for (int v = 0; v < N; ++v)
+    for (u64 v = 0; v < N; ++v)
     {
         std::cout << "\n Neighboors of vertex "
              << v << "\n ";
@@ -28,6 +32,18 @@ bool Graph::areConnected(u64 i, u64 j) {
 
 void Graph::draw() {
     drawGraph(*this);
+}
+
+Graph genRandGraph(u64 N) {
+    Graph graph(N);
+
+    for(u64 i=0 ; i<N ; i++)
+        for(u64 j=0 ; j<N ; j++) {
+            double r = (double) rand() / (double) RAND_MAX;
+            if (r < 0.5) graph.connect(i, j);
+        }
+    
+    return graph;
 }
 
 
