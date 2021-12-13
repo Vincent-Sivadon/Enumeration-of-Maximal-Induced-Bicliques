@@ -1,11 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <stdlib.h>
 
 typedef unsigned long long u64;
 
 struct Graph {
     u64 N = 0;  // size
+    int id = rand();
     std::vector<std::vector<u64>> adj;
     Graph() {};
     Graph(u64 n) {adj.resize(n) ; N=n;}
@@ -16,12 +18,8 @@ struct Graph {
     void connect(u64 i, u64 j);
     // return true if i and j are neighboors
     bool areConnected(u64 i, u64 j);
-    // write graph (edges) in filename file
-    std::vector<int> getAdjMatrix();
     // draw the graph
     void draw();
-
-
 };
 
 //
