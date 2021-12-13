@@ -6,6 +6,7 @@
 
 #include "graph.hpp"
 
+// Insert graph in the graphTable unordered_map
 void insertGraph(std::unordered_map<int, Graph>& graphTable, Graph& graph) {
     if (graphTable.find(graph.id) != graphTable.end()) {
         graph.id = rand();
@@ -26,6 +27,7 @@ int main() {
     insertGraph(graphTable, rgraph);
     insertGraph(graphTable, h2o);
     insertGraph(graphTable, hex);
+    
     std::cout << "--------BEFORE--------" << std::endl;
     std::cout << rgraph.id << std::endl;
     std::cout << h2o.id << std::endl;
@@ -36,6 +38,8 @@ int main() {
         Graph graph = pair.second;
         std::cout << graph.id << std::endl;
     }
+
+    hex.draw();
     
 
     return 0;

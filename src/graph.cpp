@@ -6,13 +6,13 @@
 #include "graph.hpp"
 
 // connect 2 vertices i and j
-void Graph::connect(u64 i, u64 j) {
+void Graph::connect(int i, int j) {
     adj[i].push_back(j);
     adj[j].push_back(i);
 }
 
 void Graph::print() {
-    for (u64 v = 0; v < N; ++v)
+    for (int v = 0; v < N; ++v)
     {
         std::cout << "\n Neighboors of vertex "
              << v << "\n ";
@@ -23,7 +23,7 @@ void Graph::print() {
 }
 
 // Check if an edge can be placed between 2 vertices s and d
-bool Graph::areConnected(u64 i, u64 j) {
+bool Graph::areConnected(int i, int j) {
     for (auto& vertex : adj[i])
         if (vertex == j) return true;
     return false;
@@ -34,16 +34,22 @@ void Graph::draw() {
     drawGraph(*this);
 }
 
-Graph genRandGraph(u64 N) {
+Graph genRandGraph(int N) {
     Graph graph(N);
 
-    for(u64 i=0 ; i<N ; i++)
-        for(u64 j=0 ; j<N ; j++) {
+    for(int i=0 ; i<N ; i++)
+        for(int j=0 ; j<N ; j++) {
             double r = (double) rand() / (double) RAND_MAX;
             if (r < 0.5) graph.connect(i, j);
         }
     
     return graph;
+}
+
+bool Graph::isProper(std::set<int> set) {
+    for (int i=0 ; i<N ; i++) 
+        if(set.find(i) == set.end()) return true;
+    return false;
 }
 
 

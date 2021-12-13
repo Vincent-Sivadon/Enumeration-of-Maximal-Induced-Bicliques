@@ -47,8 +47,8 @@ check: $(TESTS)
 ############### Tests ###############
 ######################################
 
-graphtests: tests/graph_tests.cpp graph.o
-	$(CC) -o bin/$@ $(INC) graph.o $<
+graphtests: tests/graph_tests.cpp graph.o visualisation.o
+	$(CC) -o bin/$@ $(INC) graph.o visualisation.o $< $(sdllib) -lm
 
 ######################################
 

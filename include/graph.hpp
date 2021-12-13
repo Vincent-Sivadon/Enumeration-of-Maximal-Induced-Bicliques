@@ -2,33 +2,37 @@
 
 #include <vector>
 #include <stdlib.h>
+#include <set>
 
-typedef unsigned long long u64;
 
 struct Graph {
-    u64 N = 0;  // size
+    int N = 0;  // size
     int id = rand();
-    std::vector<std::vector<u64>> adj;
+    std::vector<std::vector<int>> adj;
     Graph() {};
-    Graph(u64 n) {adj.resize(n) ; N=n;}
+    Graph(int n) {adj.resize(n) ; N=n;}
 
     // Print the graph in terminal
     void print();
     // connect two vertices i and j
-    void connect(u64 i, u64 j);
+    void connect(int i, int j);
     // return true if i and j are neighboors
-    bool areConnected(u64 i, u64 j);
+    bool areConnected(int i, int j);
     // draw the graph
     void draw();
+    // is the set proper to Graph ?
+    bool isProper(std::set<int> set);
 };
 
-//
-Graph genRandGraph(u64 N);
+// Generates a graph in wich two vertices has a 50% chance of beeing connected
+Graph genRandGraph(int N);
+
+// Generate a graph that represent a water molecule (for testing purposes)
 
 Graph H2O();
 
 // Generate a graph that represent a methane molecule (for testing purposes)
 Graph Methane();
 
-// Generate a graph that represent an hexagone
+// Generate a graph that represent an hexagone (for testing purposes)
 Graph Hexagone();
