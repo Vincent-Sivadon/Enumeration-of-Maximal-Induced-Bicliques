@@ -90,12 +90,30 @@ void test_genSubgraph() {
         }
 }
 
+void test_getBicliques() {
+    Graph hex = Hexagone();
+    hex.connect(0, 3);
+    hex.connect(4, 2);
+    hex.connect(0, 2);
+    /* Should have the max induced bicliques
+        0 ----- 2
+          -   - 
+            -
+          -   -
+        4 ----- 3
+    */
+
+   std::set<std::set<int>> hex_bicliques =  hex.getBicliques();
+
+}
+
 int main() {
     test_areConnected();
     test_isProper();
     test_minDist();
     test_shortestPaths();
     test_genSubgraph();
+    test_getBicliques();
 
     std::cout << "\n##########################\n### GRAPH TESTS PASSED ###\n##########################\n" << std::endl;
     return 0;

@@ -30,6 +30,10 @@ struct Graph {
     // Get the shortest path from src to any vertex
     std::vector<int> shortestPaths(int src);
     Graph genSubgraph(int i);
+
+    // Generate all the maximal induced bicliques of Graph according to the paper
+    std::set<std::set<int>> getBicliques();
+
 };
 
 // Generates a graph in wich two vertices has a 50% chance of beeing connected
