@@ -1,46 +1,48 @@
 #include <iostream>
 #include <unordered_map>
 #include <stdlib.h>
+#include <set>
 
 #include "SDL2/SDL.h"
 
 #include "graph.hpp"
 
-// Insert graph in the graphTable unordered_map
-void insertGraph(std::unordered_map<int, Graph>& graphTable, Graph& graph) {
-    if (graphTable.find(graph.id) != graphTable.end()) {
-        graph.id = rand();
-        insertGraph(graphTable, graph);
+void insertProperSuffixes(std::set<int> maxIndSet, std::set<std::set<int>> bicliques) {
+    std::set<int> properSuffixes;
+    for(auto& el : maxIndSet) {
+        properSuffixes.insert(el);
+        bicliques.insert(properSuffixes);
     }
-    graphTable.insert({graph.id, graph});
 }
 
 int main() {
-    // Store graphs
-    std::unordered_map<int, Graph> graphTable;
+    // Size
+    int N = 10;
+
+    // Store sets
+    std::set<std::set<int>> bicliques;
 
     // Define some graph
-    Graph rgraph = genRandGraph(10);
-    Graph h2o = H2O();
-    Graph hex = Hexagone();
+    Graph g = genRandGraph(10);
+    
+    //
+    int id_acc = 0;
+    for(int i=0 ; i<N ; i++) {
+        // Construct the subgraph G_i
+        Graph subgraph_i = g.genSubgraph(i);
 
-    insertGraph(graphTable, rgraph);
-    insertGraph(graphTable, h2o);
-    insertGraph(graphTable, hex);
-    
-    std::cout << "--------BEFORE--------" << std::endl;
-    std::cout << rgraph.id << std::endl;
-    std::cout << h2o.id << std::endl;
-    std::cout << hex.id << std::endl;
-    
-    std::cout << "--------AFTER--------" << std::endl;
-    for( auto& pair : graphTable) {
-        Graph graph = pair.second;
-        std::cout << graph.id << std::endl;
+        // Get all maximal independent sets of G_i
+        std::set<std::set<int>> maxIndSets = subgraph_i.getMaxIndSets();
+
+        for(auto& maxIndSet : maxIndSets) {
+            if (subgraph_i.isProper(maxIndSet)) {
+                // Search if maxIndSet is already in bicliques
+                if (bicliques.find(maxIndSet) == bicliques.end())
+                    insertProperSuffixes(maxIndSet, bicliques);
+            }
+        }
+
     }
-
-    hex.draw();
-    
 
     return 0;
 }

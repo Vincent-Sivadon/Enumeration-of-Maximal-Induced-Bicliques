@@ -14,14 +14,22 @@ struct Graph {
 
     // Print the graph in terminal
     void print();
+    // draw the graph
+    void draw();
+
+    // EDGES
     // connect two vertices i and j
     void connect(int i, int j);
     // return true if i and j are neighboors
     bool areConnected(int i, int j);
-    // draw the graph
-    void draw();
+
     // is the set proper to Graph ?
     bool isProper(std::set<int> set);
+
+    // Subgrpah generation
+    // Get the shortest path from src to any vertex
+    std::vector<int> shortestPaths(int src);
+    Graph genSubgraph(int i);
 };
 
 // Generates a graph in wich two vertices has a 50% chance of beeing connected
@@ -36,3 +44,6 @@ Graph Methane();
 
 // Generate a graph that represent an hexagone (for testing purposes)
 Graph Hexagone();
+
+// Get the vertex for wich the dist to src is minimal (used)
+int minDist(std::vector<int>& dist, std::vector<bool>& visited);

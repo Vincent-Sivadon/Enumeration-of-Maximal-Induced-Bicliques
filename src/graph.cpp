@@ -1,6 +1,8 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <set>
+# define INF 0x3f3f3f3f
 
 #include "visualisation.hpp"
 #include "graph.hpp"
@@ -50,6 +52,82 @@ bool Graph::isProper(std::set<int> set) {
     for (int i=0 ; i<N ; i++) 
         if(set.find(i) == set.end()) return true;
     return false;
+}
+
+int minDist(std::vector<int>& dist, std::vector<bool>& visited) {
+    // On initialisa la distance minimal à l'infini et l'index du noeud pour lequel la distance est minimal
+    int min = INF, min_index=0;
+
+    for(int v=0 ; v<dist.size() ; v++)
+        if (!visited[v] && dist[v]<=min)
+            min = dist[v], min_index = v;
+
+    return min_index;
+}
+
+std::vector<int> Graph::shortestPaths(int src) {    
+    /* On crée un tableau dynamique pour stocker les distances et on et 
+    initialise toutes les distances à l'infini.
+    Et on crée un ensemble pour dire si les sommets ont été visités */
+    std::vector<int> dist(N, INF);
+    std::vector<bool> visited(N, false);
+
+    // On intialise ça distance à 0
+    dist[src] = 0;
+
+    // On fera au maximum N iterations
+    for(int j=0 ; j<N ; j++)
+    {
+        // On calcul l'index du noeud pour lequel la distance est minimal 
+        // On le supprime donc de l'ensemble
+        int u = minDist(dist, visited);
+        visited[u] = true;
+
+        // On vérifie que u ne dépasse pas la distance souhaitée
+        if (dist[u] >= 2) break;
+
+        // On boucle sur tous les voisins contenues dans adj
+        for(auto& v : adj[u])
+        {
+
+            // On met à jour la plus courte distance si besoin
+            if (dist[v] > dist[u] + 1 && !visited[v])
+                dist[v] = dist[u] + 1;
+        }
+    }
+
+    return dist;
+}
+
+Graph Graph::genSubgraph(int i) {
+    //Déclariation
+    Graph subgraph(N);
+
+    // Obtenir les distances au le sommet i
+    std::vector<int> dist = shortestPaths(i);
+
+    //
+    for (int x = 0 ; x < N - 1 ; x++)
+        for (int y = x+1 ; y < N ; y++) {
+            bool are_connected = areConnected(x, y);
+
+            // Vérification des distances
+            bool x_dist1 = ( dist[x]==1 ? true : false );
+            bool y_dist1 = ( dist[y]==1 ? true : false );
+            bool x_dist2 = ( dist[x]==2 ? true : false );
+            bool y_dist2 = ( dist[y]==2 ? true : false ); 
+
+            // Conditions  de construction des arretes
+            bool cond1 = x_dist1 && y_dist1 && are_connected ;
+            bool cond2 = x_dist2 && y_dist2 && are_connected ;
+            bool cond3 = x_dist1 && y_dist2 && !are_connected ;
+            bool cond4 = x_dist2 && y_dist1 && !are_connected ;
+
+            // Ajouter une arrete si l'une des conditions est vérifiée
+            if ( cond1 || cond2 || cond3 || cond4 ) subgraph.connect(x, y);
+        }
+
+    return subgraph;
 }
 
 
