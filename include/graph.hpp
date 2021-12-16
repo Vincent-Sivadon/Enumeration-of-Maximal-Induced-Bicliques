@@ -31,6 +31,9 @@ struct Graph {
     std::vector<int> shortestPaths(int src);
     Graph genSubgraph(int i);
 
+    bool isNotConnectedToSet(int vertex, std::set<int> set);
+    std::set<std::set<int>> getMaxIndSets();
+
     // Generate all the maximal induced bicliques of Graph according to the paper
     std::set<std::set<int>> getBicliques();
 

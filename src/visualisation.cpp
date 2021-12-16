@@ -81,8 +81,6 @@ void compute_accelerations(Graph& graph, std::vector<Vector>& pos, std::vector<V
             acc[i].x = acc[i].x - repX;
             acc[i].y = acc[i].y - repY;
 
-            std::cout << rMod << std::endl;
-
             if ( graph.areConnected(i,j) ) {
                 acc[i].x = acc[i].x - attX;
                 acc[i].y = acc[i].y - attY;

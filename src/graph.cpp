@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <utility>
 # define INF 0x3f3f3f3f
 
 #include "visualisation.hpp"
@@ -100,11 +101,13 @@ std::vector<int> Graph::shortestPaths(int src) {
 }
 
 Graph Graph::genSubgraph(int i) {
-    //Déclariation
-    Graph subgraph(N);
 
     // Obtenir les distances au le sommet i
     std::vector<int> dist = shortestPaths(i);
+
+    //
+    std::vector<std::pair<int,int>> connections;
+    std::set<int> vertices;
 
     //
     for (int x = 0 ; x < N - 1 ; x++)
@@ -124,15 +127,65 @@ Graph Graph::genSubgraph(int i) {
             bool cond4 = x_dist2 && y_dist1 && !are_connected ;
 
             // Ajouter une arrete si l'une des conditions est vérifiée
-            if ( cond1 || cond2 || cond3 || cond4 ) subgraph.connect(x, y);
+            if ( cond1 || cond2 || cond3 || cond4 ) {
+                vertices.insert(x); vertices.insert(y);
+                connections.push_back(std::make_pair(x, y));
+            }
         }
+
+    Graph subgraph(vertices.size());
+    subgraph.connect(1,4);
+    /*
+    for (auto& pair : connections) {
+        subgraph.connect(pair.first, pair.second);
+    }
+    */
+   std::cout << "IS OK \n";
+    std::cout << subgraph.areConnected(1, 4) << "\n";
 
     return subgraph;
 }
 
 
+bool Graph::isNotConnectedToSet(int v, std::set<int> set)
+{
+    for (auto u : set){
+        if (areConnected(v, u)) return false;
+    }
+    return true;
+}
+
+std::set<std::set<int>> Graph::getMaxIndSets() {
+    std::vector<std::set<int>> IndSets(N);
+    std::set<std::set<int>> maxIndSets;
+
+    // Maximal set size
+    int maxSize = 0;
+
+    // Get maximal independent sets from the starting node i
+    for (int i=0 ; i<N ; i++) {
+        IndSets[i].insert(i);
+        for (int j=0 ; j<N ; j++) {
+            if(i==j) continue;
+            if ( isNotConnectedToSet(j, IndSets[i]) ) {
+                IndSets[i].insert(j);
+            }
+        }
+        if(IndSets[i].size() > maxSize ) maxSize = IndSets[i].size();
+    }
+
+    // keep only the real maximal sets
+    for (int i=0 ; i<N ; i++)
+        if (IndSets[i].size() == maxSize) maxIndSets.insert(IndSets[i]);
+
+
+    return maxIndSets;
+}
+
+
+
 // Utility function
-void insertProperSuffixes(std::set<int> maxIndSet, std::set<std::set<int>> bicliques) {
+void insertProperSuffixes(std::set<int> const& maxIndSet, std::set<std::set<int>>& bicliques) {
     std::set<int> properSuffixes;
     for(auto& el : maxIndSet) {
         properSuffixes.insert(el);
@@ -140,13 +193,13 @@ void insertProperSuffixes(std::set<int> maxIndSet, std::set<std::set<int>> bicli
     }
 }
 
+
 std::set<std::set<int>> Graph::getBicliques() {
 
     // Store bicliques
     std::set<std::set<int>> bicliques;
     
     //
-    int id_acc = 0;
     for(int i=0 ; i<N ; i++) {
         // Construct the subgraph G_i
         Graph subgraph_i = this->genSubgraph(i);
@@ -163,6 +216,8 @@ std::set<std::set<int>> Graph::getBicliques() {
         }
 
     }
+
+    return bicliques;
 }
 
 
