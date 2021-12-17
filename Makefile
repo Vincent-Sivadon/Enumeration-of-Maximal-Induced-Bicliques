@@ -4,7 +4,7 @@
 
 # COMPILER
 CC=g++
-CFLAGS=-O3
+CFLAGS=-O3 -std=c++17
 sdllib=`sdl2-config --cflags --libs`
 
 # DIRECTORIES

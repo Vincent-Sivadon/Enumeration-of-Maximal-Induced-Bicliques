@@ -10,24 +10,24 @@
 
 // connect 2 vertices i and j
 void Graph::connect(int i, int j) {
-    adj[i].push_back(j);
-    adj[j].push_back(i);
+    adj[i].insert(j);
+    adj[j].insert(i);
 }
 
 void Graph::print() {
-    for (int v = 0; v < N; ++v)
+    for(const auto& [vertex, vertexNeighboors] : adj)
     {
-        std::cout << "\n Neighboors of vertex "
-             << v << "\n ";
-        for (auto x : adj[v])
-           std::cout << "-> " << x;
-        printf("\n");
+        std::cout << "\n Neighboors of vertex " << vertex << " :\n";
+        for(const auto& i : vertexNeighboors)
+            std::cout << " -> " << i;
+        std::cout << "\n";
+            
     }
 }
 
 // Check if an edge can be placed between 2 vertices s and d
 bool Graph::areConnected(int i, int j) {
-    for (auto& vertex : adj[i])
+    for(const auto& vertex : adj[i])
         if (vertex == j) return true;
     return false;
 }
@@ -38,7 +38,7 @@ void Graph::draw() {
 }
 
 Graph genRandGraph(int N) {
-    Graph graph(N);
+    Graph graph;
 
     for(int i=0 ; i<N ; i++)
         for(int j=0 ; j<N ; j++) {
@@ -47,12 +47,6 @@ Graph genRandGraph(int N) {
         }
     
     return graph;
-}
-
-bool Graph::isProper(std::set<int> set) {
-    for (int i=0 ; i<N ; i++) 
-        if(set.find(i) == set.end()) return true;
-    return false;
 }
 
 int minDist(std::vector<int>& dist, std::vector<bool>& visited) {
@@ -70,6 +64,7 @@ std::vector<int> Graph::shortestPaths(int src) {
     /* On crée un tableau dynamique pour stocker les distances et on et 
     initialise toutes les distances à l'infini.
     Et on crée un ensemble pour dire si les sommets ont été visités */
+    int N = adj.size();
     std::vector<int> dist(N, INF);
     std::vector<bool> visited(N, false);
 
@@ -101,20 +96,23 @@ std::vector<int> Graph::shortestPaths(int src) {
 }
 
 Graph Graph::genSubgraph(int i) {
+    // Get number of vertices
+    int N = adj.size();
 
-    // Obtenir les distances au le sommet i
+    // Obtenir les distances au sommet i
     std::vector<int> dist = shortestPaths(i);
 
     //
-    std::vector<std::pair<int,int>> connections;
-    std::set<int> vertices;
+    Graph subgraph;
 
-    //
-    for (int x = 0 ; x < N - 1 ; x++)
-        for (int y = x+1 ; y < N ; y++) {
+    for(const auto& [x, xNeighboors] : adj)
+        for(const auto& [y, yNeighboors] : adj)
+        {
+            if(x==y) continue;
+
             bool are_connected = areConnected(x, y);
 
-            // Vérification des distances
+            // Conditions  de construction des arretes
             bool x_dist1 = ( dist[x]==1 ? true : false );
             bool y_dist1 = ( dist[y]==1 ? true : false );
             bool x_dist2 = ( dist[x]==2 ? true : false );
@@ -128,20 +126,9 @@ Graph Graph::genSubgraph(int i) {
 
             // Ajouter une arrete si l'une des conditions est vérifiée
             if ( cond1 || cond2 || cond3 || cond4 ) {
-                vertices.insert(x); vertices.insert(y);
-                connections.push_back(std::make_pair(x, y));
+                subgraph.connect(x, y);
             }
         }
-
-    Graph subgraph(vertices.size());
-    subgraph.connect(1,4);
-    /*
-    for (auto& pair : connections) {
-        subgraph.connect(pair.first, pair.second);
-    }
-    */
-   std::cout << "IS OK \n";
-    std::cout << subgraph.areConnected(1, 4) << "\n";
 
     return subgraph;
 }
@@ -156,28 +143,33 @@ bool Graph::isNotConnectedToSet(int v, std::set<int> set)
 }
 
 std::set<std::set<int>> Graph::getMaxIndSets() {
-    std::vector<std::set<int>> IndSets(N);
+    // Number of vertices
+    int N = adj.size();
+
+    //
+    std::map<int, std::set<int>> IndSets;
     std::set<std::set<int>> maxIndSets;
 
     // Maximal set size
     int maxSize = 0;
 
     // Get maximal independent sets from the starting node i
-    for (int i=0 ; i<N ; i++) {
-        IndSets[i].insert(i);
-        for (int j=0 ; j<N ; j++) {
+    for(const auto& [i, iNeighboors] : adj)
+    {
+        IndSets.insert({i, {i}});
+        for(const auto& [j, jNeighboors] : adj)
+        {
             if(i==j) continue;
-            if ( isNotConnectedToSet(j, IndSets[i]) ) {
+            if( isNotConnectedToSet(j, IndSets[i]) )
                 IndSets[i].insert(j);
-            }
         }
+        // update the max ind set size
         if(IndSets[i].size() > maxSize ) maxSize = IndSets[i].size();
     }
 
     // keep only the real maximal sets
-    for (int i=0 ; i<N ; i++)
-        if (IndSets[i].size() == maxSize) maxIndSets.insert(IndSets[i]);
-
+    for(const auto& [v, IndSet] : IndSets)
+        if (IndSet.size() == maxSize) maxIndSets.insert(IndSet);
 
     return maxIndSets;
 }
@@ -195,24 +187,30 @@ void insertProperSuffixes(std::set<int> const& maxIndSet, std::set<std::set<int>
 
 
 std::set<std::set<int>> Graph::getBicliques() {
+    // Number of vertices
+    int N = adj.size();
 
     // Store bicliques
     std::set<std::set<int>> bicliques;
     
     //
-    for(int i=0 ; i<N ; i++) {
+    for (const auto& [i, iNeighboors] : adj)
+    {
         // Construct the subgraph G_i
-        Graph subgraph_i = this->genSubgraph(i);
+        Graph subgraph_i = genSubgraph(i);
 
         // Get all maximal independent sets of G_i
         std::set<std::set<int>> maxIndSets = subgraph_i.getMaxIndSets();
 
-        for(auto& maxIndSet : maxIndSets) {
+        for(auto& maxIndSet : maxIndSets)
+        {
+            /*
             if (subgraph_i.isProper(maxIndSet)) {
                 // Search if maxIndSet is already in bicliques
                 if (bicliques.find(maxIndSet) == bicliques.end())
                     insertProperSuffixes(maxIndSet, bicliques);
             }
+            */
         }
 
     }
@@ -225,7 +223,7 @@ std::set<std::set<int>> Graph::getBicliques() {
 
 // Generate a graph that represent a H2O molecule (for testing purposes)
 Graph H2O() {
-    Graph graph(3);
+    Graph graph;
     graph.connect(0, 1);
     graph.connect(0, 2);
 
@@ -234,7 +232,7 @@ Graph H2O() {
 
 // Generate a graph that represent a methane molecule (for testing purposes)
 Graph Methane() {
-    Graph graph(5);
+    Graph graph;
     graph.connect(0, 1);
     graph.connect(0, 2);
     graph.connect(0, 3);
@@ -245,7 +243,7 @@ Graph Methane() {
 
 // Generate a graph that represent an hexagone
 Graph Hexagone() {
-    Graph graph(6);
+    Graph graph;
 
     graph.connect(0, 1);
     graph.connect(1, 2);

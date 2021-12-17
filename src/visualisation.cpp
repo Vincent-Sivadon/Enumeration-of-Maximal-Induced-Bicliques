@@ -53,7 +53,7 @@ void drawParticle(SDL_Renderer* renderer, Vector center) {
 
 void compute_accelerations(Graph& graph, std::vector<Vector>& pos, std::vector<Vector>& acc, double l0) {
     // Get number of vertices
-    int N = graph.N;
+    int N = graph.adj.size();
 
     // Compute the force between i and j
     for(int i=0 ; i<N ; i++) {
@@ -91,7 +91,7 @@ void compute_accelerations(Graph& graph, std::vector<Vector>& pos, std::vector<V
 
 void compute_positions(Graph& graph, std::vector<Vector>& pos, std::vector<Vector> vel, std::vector<Vector>& acc, int w, int h) {
     int limits = 20;
-    for (int i = 0; i<graph.N ; i++) {
+    for (int i = 0; i<graph.adj.size() ; i++) {
         double tmpX = pos[i].x;
         double tmpY = pos[i].y;
 
@@ -105,11 +105,9 @@ void compute_positions(Graph& graph, std::vector<Vector>& pos, std::vector<Vecto
 }
 
 void simulate(Graph& graph, std::vector<Vector>& pos, std::vector<Vector> vel, std::vector<Vector>& acc, double l0, int w, int h) {
-    int N = graph.N;
+    int N = graph.adj.size();
     compute_accelerations(graph, pos, acc, l0);
     for(int i=0 ; i<N ; i++) {
-        //vel[i].x = vel[i].x * 2;
-        //vel[i].y = vel[i].y * 2;
         vel[i].x = vel[i].x + acc[i].x;
         vel[i].y = vel[i].y + acc[i].y;
     }
@@ -124,7 +122,7 @@ void drawGraph(Graph& graph) {
     int width = 800, height = 800;
     int timeSteps = 300;
     double l0 = 50;  // Spring size
-    int N = graph.N;
+    int N = graph.adj.size();
 
     // Physicals variables
     std::vector<Vector> pos(N), vel(N), acc(N);

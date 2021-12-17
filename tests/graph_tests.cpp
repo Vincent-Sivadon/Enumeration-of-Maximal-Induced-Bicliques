@@ -19,20 +19,6 @@ void test_areConnected() {
     assert(false == methane.areConnected(2, 4));
 }
 
-void test_isProper() {
-    Graph h2o = H2O();
-    Graph methane = Methane();
-    std::set<int> s1 = {0,1};
-    std::set<int> s2 = {0,1,2};
-    std::set<int> s3 = {0,3};
-    std::set<int> s4 = {0,1,2,3,4};
-
-    assert(true == h2o.isProper(s1));
-    assert(false == h2o.isProper(s2));
-    
-    assert(true == methane.isProper(s3));
-    assert(false == methane.isProper(s4));
-}
 
 void test_minDist() {
     // First test
@@ -74,7 +60,7 @@ void test_genSubgraph() {
     hex.connect(4, 2);
 
     // TEST 1
-    /*
+/*    
     Graph subgraph_h2o0 = h2o.genSubgraph(0);
     assert(subgraph_h2o0.adj.size() == 0);
 */
@@ -141,12 +127,11 @@ void test_getBicliques() {
 
 int main() {
     test_areConnected();
-    test_isProper();
     test_minDist();
     test_shortestPaths();
     test_genSubgraph();
-    //test_getMaxIndSets();
-    //test_getBicliques();
+    test_getMaxIndSets();
+    test_getBicliques();
 
     std::cout << "\n##########################\n### GRAPH TESTS PASSED ###\n##########################\n" << std::endl;
     return 0;

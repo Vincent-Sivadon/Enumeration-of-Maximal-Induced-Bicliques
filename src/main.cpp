@@ -9,7 +9,8 @@
 
 
 int main() {
-    Graph g = genRandGraph(10);
+    Graph g = Hexagone();
+    g.draw();
 
     std::set<std::set<int>> bicliques = g.getBicliques();
 

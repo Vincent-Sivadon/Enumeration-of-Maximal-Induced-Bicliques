@@ -3,14 +3,12 @@
 #include <vector>
 #include <stdlib.h>
 #include <set>
+#include <map>
 
 
 struct Graph {
-    int N = 0;  // size
     int id = rand();
-    std::vector<std::vector<int>> adj;
-    Graph() {};
-    Graph(int n) {adj.resize(n) ; N=n;}
+    std::map<int, std::set<int>> adj;
 
     // Print the graph in terminal
     void print();
