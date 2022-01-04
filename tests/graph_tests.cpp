@@ -53,6 +53,23 @@ void test_shortestPaths() {
     assert(dist3 == expected3);
 }
 
+//test of isProper function
+
+void test_isProper(){
+    Graph hex = Hexagone();
+    Graph methane = Methane();
+    
+    // TEST 1
+    assert(false == methane.isProper({1,2,3,4}));
+    assert(true == methane.isProper({0,1,4}));
+    assert(true ==methane.isProper({0,1,3}));
+    assert(false == methane.isProper({1,2,3}));
+    
+    // TEST 2
+    assert(false == hex.isProper({0,4,2}));
+    assert(true == hex.isProper({1,2,3,4,5}));
+}
+
 void test_genSubgraph() {
     Graph h2o = H2O();
     Graph hex = Hexagone();
