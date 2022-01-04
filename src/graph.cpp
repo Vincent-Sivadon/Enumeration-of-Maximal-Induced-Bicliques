@@ -25,6 +25,8 @@ void Graph::print() {
     }
 }
 
+
+
 // Check if an edge can be placed between 2 vertices s and d
 bool Graph::areConnected(int i, int j) {
     for(const auto& vertex : adj[i])
@@ -174,7 +176,16 @@ std::set<std::set<int>> Graph::getMaxIndSets() {
     return maxIndSets;
 }
 
-
+// for checking if a set is Proper or not
+bool Graph::isProper(std::set<int> set)
+{
+    for (auto i = set.begin(); i!= set.end();i++)
+        for(auto j = set.begin(); j!=set.end();j++)
+            if( i!=j)                
+                if ( areConnected(*i,*j)) 
+                    return true;
+    return false;
+}
 
 // Utility function
 void insertProperSuffixes(std::set<int> const& maxIndSet, std::set<std::set<int>>& bicliques) {
