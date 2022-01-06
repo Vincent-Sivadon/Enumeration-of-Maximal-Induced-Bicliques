@@ -12,7 +12,7 @@ int main() {
     Graph g = Hexagone();
     g.draw();
 
-    std::set<std::set<int>> bicliques = g.getBicliques();
+    std::set<std::set<u64>> bicliques = g.getBicliques();
 
     return 0;
 }

@@ -22,12 +22,12 @@ void test_areConnected() {
 
 void test_minDist() {
     // First test
-    std::vector<int> dist = {0, 1, 2, 3};
+    std::vector<u64> dist = {0, 1, 2, 3};
     std::vector<bool> visited = {true, true, false, false};
     assert(2 == minDist(dist,visited));
 
     // Second test
-    std::vector<int> dist2 = {4, 3, 2, 3};
+    std::vector<u64> dist2 = {4, 3, 2, 3};
     std::vector<bool> visited2 = {false, true, true, true};
     assert(0 == minDist(dist2,visited2));
 }
@@ -38,24 +38,24 @@ void test_shortestPaths() {
     Graph hex = Hexagone();
 
     // TEST 1
-    std::vector<int> dist = methane.shortestPaths(1);
-    std::vector<int> expected = {1, 0, 2, 2, 2};
+    std::vector<u64> dist = methane.shortestPaths(1);
+    std::vector<u64> expected = {1, 0, 2, 2, 2};
     assert(dist == expected);
 
     // TEST 2
-    std::vector<int> dist2 = h2o.shortestPaths(1);
-    std::vector<int> expected2 = {1, 0, 2};
+    std::vector<u64> dist2 = h2o.shortestPaths(1);
+    std::vector<u64> expected2 = {1, 0, 2};
     assert(dist2 == expected2);
 
     // TEST 3
-    std::vector<int> dist3 = hex.shortestPaths(0);
-    std::vector<int> expected3 = {0, 1, 2, INF, 2, 1};
+    std::vector<u64> dist3 = hex.shortestPaths(0);
+    std::vector<u64> expected3 = {0, 1, 2, INF, 2, 1};
     assert(dist3 == expected3);
 }
 
 //test of isProper function
 
-void test_isProper(){
+void test_isProper() {
     Graph hex = Hexagone();
     Graph methane = Methane();
     
@@ -95,7 +95,7 @@ void test_genSubgraph() {
     assert(!subgraph_hex0.areConnected(4, 5));
 }
 
-void printSets(std::set<std::set<int>> sets)
+void printSets(std::set<std::set<u64>> sets)
 {
     for(auto& set : sets) {
         for(auto& i : set) {
@@ -109,8 +109,8 @@ void test_getMaxIndSets()
 {
     // TEST 1
     Graph hex = Hexagone();
-    std::set<std::set<int>> maxIndSets = hex.getMaxIndSets();
-    std::set<std::set<int>> expected = 
+    std::set<std::set<u64>> maxIndSets = hex.getMaxIndSets();
+    std::set<std::set<u64>> expected = 
         {
             {0, 2, 4}, {1, 3, 5}
         };
@@ -119,8 +119,8 @@ void test_getMaxIndSets()
 
     // TEST 2
     Graph meth = Methane();
-    std::set<std::set<int>> maxIndSets2 = meth.getMaxIndSets();
-    std::set<int> expected2 = {1, 2, 3, 4};
+    std::set<std::set<u64>> maxIndSets2 = meth.getMaxIndSets();
+    std::set<u64> expected2 = {1, 2, 3, 4};
     for(auto& set : maxIndSets2)
         assert(set == expected2);
 }
@@ -130,7 +130,7 @@ void test_getBicliques() {
     hex.connect(0, 3);
     hex.connect(4, 2);
     hex.connect(0, 2);
-    std::set<std::set<int>> hex_bicliques = hex.getBicliques();
+    std::set<std::set<u64>> hex_bicliques = hex.getBicliques();
     printSets(hex_bicliques);
     /* Should have the max induced bicliques
         0 ----- 2
@@ -149,6 +149,7 @@ int main() {
     test_genSubgraph();
     test_getMaxIndSets();
     test_getBicliques();
+    test_isProper();
 
     std::cout << "\n##########################\n### GRAPH TESTS PASSED ###\n##########################\n" << std::endl;
     return 0;

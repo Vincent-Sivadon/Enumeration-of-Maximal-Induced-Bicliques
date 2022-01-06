@@ -17,7 +17,7 @@ struct Vector {
 };
 
 // Random positions generator
-int randxy(int plage, int centre)
+u64 randxy(u64 plage, u64 centre)
 {
   return centre - 0.5*plage + rand()%plage; 
 }
@@ -30,7 +30,7 @@ void drawParticle(SDL_Renderer* renderer, Vector center) {
     SDL_SetRenderDrawColor ( renderer, 250, 250, 250, 255 );
     SDL_RenderDrawPoint( renderer, xc+x, yc-y );
 
-    int p = 3 - (2*5);
+    u64 p = 3 - (2*5);
 
     for ( x=0 ; x<=y ; x++ )
     {
@@ -53,12 +53,12 @@ void drawParticle(SDL_Renderer* renderer, Vector center) {
 
 void compute_accelerations(Graph& graph, std::vector<Vector>& pos, std::vector<Vector>& acc, double l0) {
     // Get number of vertices
-    int N = graph.adj.size();
+    u64 N = graph.adj.size();
 
     // Compute the force between i and j
-    for(int i=0 ; i<N ; i++) {
+    for(u64 i=0 ; i<N ; i++) {
         acc[i].x = 0 ; acc[i].y = 0;
-        for(int j=0 ; j<N ; j++) {
+        for(u64 j=0 ; j<N ; j++) {
             if(i==j) continue;
             // Position Vector beetween i and j
             double rx = pos[j].x - pos[i].x;
@@ -89,9 +89,9 @@ void compute_accelerations(Graph& graph, std::vector<Vector>& pos, std::vector<V
     }
 }
 
-void compute_positions(Graph& graph, std::vector<Vector>& pos, std::vector<Vector> vel, std::vector<Vector>& acc, int w, int h) {
-    int limits = 20;
-    for (int i = 0; i<graph.adj.size() ; i++) {
+void compute_positions(Graph& graph, std::vector<Vector>& pos, std::vector<Vector> vel, std::vector<Vector>& acc, u64 w, u64 h) {
+    u64 limits = 20;
+    for (u64 i = 0; i<graph.adj.size() ; i++) {
         double tmpX = pos[i].x;
         double tmpY = pos[i].y;
 
@@ -104,10 +104,10 @@ void compute_positions(Graph& graph, std::vector<Vector>& pos, std::vector<Vecto
     }
 }
 
-void simulate(Graph& graph, std::vector<Vector>& pos, std::vector<Vector> vel, std::vector<Vector>& acc, double l0, int w, int h) {
-    int N = graph.adj.size();
+void simulate(Graph& graph, std::vector<Vector>& pos, std::vector<Vector> vel, std::vector<Vector>& acc, double l0, u64 w, u64 h) {
+    u64 N = graph.adj.size();
     compute_accelerations(graph, pos, acc, l0);
-    for(int i=0 ; i<N ; i++) {
+    for(u64 i=0 ; i<N ; i++) {
         vel[i].x = vel[i].x + acc[i].x;
         vel[i].y = vel[i].y + acc[i].y;
     }
@@ -119,16 +119,16 @@ void drawGraph(Graph& graph) {
     srand(getpid());
 
     // Parameters
-    int width = 800, height = 800;
-    int timeSteps = 300;
+    u64 width = 800, height = 800;
+    u64 timeSteps = 300;
     double l0 = 50;  // Spring size
-    int N = graph.adj.size();
+    u64 N = graph.adj.size();
 
     // Physicals variables
     std::vector<Vector> pos(N), vel(N), acc(N);
 
     // Initialize Random Positions and Velocities
-    for(int i=0 ; i<N ; i++) {
+    for(u64 i=0 ; i<N ; i++) {
         pos[i].x = randxy(200, 400);
         pos[i].y = randxy(200, 400);
 
@@ -143,15 +143,15 @@ void drawGraph(Graph& graph) {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_CreateWindowAndRenderer(800, 800, SDL_WINDOW_OPENGL, &window, &renderer);
 
-    for(int t=0 ; t<timeSteps ; t++) {
+    for(u64 t=0 ; t<timeSteps ; t++) {
         simulate(graph, pos, vel, acc, l0, width, height);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        for(int i=0 ; i<N ; i++) {
+        for(u64 i=0 ; i<N ; i++) {
             drawParticle(renderer, pos[i]);
-            for(int j=0 ; j<N ; j++) 
+            for(u64 j=0 ; j<N ; j++) 
                 if (graph.areConnected(i,j))
                     SDL_RenderDrawLine(renderer, pos[i].x, pos[i].y, pos[j].x, pos[j].y);
         }

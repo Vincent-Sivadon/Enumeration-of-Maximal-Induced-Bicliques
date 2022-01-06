@@ -5,10 +5,10 @@
 #include <set>
 #include <map>
 
+typedef unsigned long long u64;
 
 struct Graph {
-    int id = rand();
-    std::map<int, std::set<int>> adj;
+    std::map<u64, std::set<u64>> adj;
 
     // Print the graph in terminal
     void print();
@@ -17,28 +17,28 @@ struct Graph {
 
     // EDGES
     // connect two vertices i and j
-    void connect(int i, int j);
+    void connect(u64 i, u64 j);
     // return true if i and j are neighboors
-    bool areConnected(int i, int j);
+    bool areConnected(u64 i, u64 j);
 
     // is the set proper to Graph ?
-    bool isProper(std::set<int> set);
+    bool isProper(std::set<u64> set);
 
     // Subgrpah generation
     // Get the shortest path from src to any vertex
-    std::vector<int> shortestPaths(int src);
-    Graph genSubgraph(int i);
+    std::vector<u64> shortestPaths(u64 src);
+    Graph genSubgraph(u64 i);
 
-    bool isNotConnectedToSet(int vertex, std::set<int> set);
-    std::set<std::set<int>> getMaxIndSets();
+    bool isNotConnectedToSet(u64 vertex, std::set<u64> set);
+    std::set<std::set<u64>> getMaxIndSets();
 
     // Generate all the maximal induced bicliques of Graph according to the paper
-    std::set<std::set<int>> getBicliques();
+    std::set<std::set<u64>> getBicliques();
 
 };
 
 // Generates a graph in wich two vertices has a 50% chance of beeing connected
-Graph genRandGraph(int N);
+Graph genRandGraph(u64 N);
 
 // Generate a graph that represent a water molecule (for testing purposes)
 
@@ -51,4 +51,4 @@ Graph Methane();
 Graph Hexagone();
 
 // Get the vertex for wich the dist to src is minimal (used)
-int minDist(std::vector<int>& dist, std::vector<bool>& visited);
+u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited);

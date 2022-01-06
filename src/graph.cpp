@@ -9,7 +9,7 @@
 #include "graph.hpp"
 
 // connect 2 vertices i and j
-void Graph::connect(int i, int j) {
+void Graph::connect(u64 i, u64 j) {
     adj[i].insert(j);
     adj[j].insert(i);
 }
@@ -28,7 +28,7 @@ void Graph::print() {
 
 
 // Check if an edge can be placed between 2 vertices s and d
-bool Graph::areConnected(int i, int j) {
+bool Graph::areConnected(u64 i, u64 j) {
     for(const auto& vertex : adj[i])
         if (vertex == j) return true;
     return false;
@@ -39,11 +39,11 @@ void Graph::draw() {
     drawGraph(*this);
 }
 
-Graph genRandGraph(int N) {
+Graph genRandGraph(u64 N) {
     Graph graph;
 
-    for(int i=0 ; i<N ; i++)
-        for(int j=0 ; j<N ; j++) {
+    for(u64 i=0 ; i<N ; i++)
+        for(u64 j=0 ; j<N ; j++) {
             double r = (double) rand() / (double) RAND_MAX;
             if (r < 0.5) graph.connect(i, j);
         }
@@ -51,34 +51,34 @@ Graph genRandGraph(int N) {
     return graph;
 }
 
-int minDist(std::vector<int>& dist, std::vector<bool>& visited) {
+u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited) {
     // On initialisa la distance minimal à l'infini et l'index du noeud pour lequel la distance est minimal
-    int min = INF, min_index=0;
+    u64 min = INF, min_index=0;
 
-    for(int v=0 ; v<dist.size() ; v++)
+    for(u64 v=0 ; v<dist.size() ; v++)
         if (!visited[v] && dist[v]<=min)
             min = dist[v], min_index = v;
 
     return min_index;
 }
 
-std::vector<int> Graph::shortestPaths(int src) {    
+std::vector<u64> Graph::shortestPaths(u64 src) {    
     /* On crée un tableau dynamique pour stocker les distances et on et 
     initialise toutes les distances à l'infini.
     Et on crée un ensemble pour dire si les sommets ont été visités */
-    int N = adj.size();
-    std::vector<int> dist(N, INF);
+    u64 N = adj.size();
+    std::vector<u64> dist(N, INF);
     std::vector<bool> visited(N, false);
 
     // On intialise ça distance à 0
     dist[src] = 0;
 
     // On fera au maximum N iterations
-    for(int j=0 ; j<N ; j++)
+    for(u64 j=0 ; j<N ; j++)
     {
         // On calcul l'index du noeud pour lequel la distance est minimal 
         // On le supprime donc de l'ensemble
-        int u = minDist(dist, visited);
+        u64 u = minDist(dist, visited);
         visited[u] = true;
 
         // On vérifie que u ne dépasse pas la distance souhaitée
@@ -97,12 +97,12 @@ std::vector<int> Graph::shortestPaths(int src) {
     return dist;
 }
 
-Graph Graph::genSubgraph(int i) {
+Graph Graph::genSubgraph(u64 i) {
     // Get number of vertices
-    int N = adj.size();
+    u64 N = adj.size();
 
     // Obtenir les distances au sommet i
-    std::vector<int> dist = shortestPaths(i);
+    std::vector<u64> dist = shortestPaths(i);
 
     //
     Graph subgraph;
@@ -136,7 +136,7 @@ Graph Graph::genSubgraph(int i) {
 }
 
 
-bool Graph::isNotConnectedToSet(int v, std::set<int> set)
+bool Graph::isNotConnectedToSet(u64 v, std::set<u64> set)
 {
     for (auto u : set){
         if (areConnected(v, u)) return false;
@@ -144,16 +144,16 @@ bool Graph::isNotConnectedToSet(int v, std::set<int> set)
     return true;
 }
 
-std::set<std::set<int>> Graph::getMaxIndSets() {
+std::set<std::set<u64>> Graph::getMaxIndSets() {
     // Number of vertices
-    int N = adj.size();
+    u64 N = adj.size();
 
     //
-    std::map<int, std::set<int>> IndSets;
-    std::set<std::set<int>> maxIndSets;
+    std::map<u64, std::set<u64>> IndSets;
+    std::set<std::set<u64>> maxIndSets;
 
     // Maximal set size
-    int maxSize = 0;
+    u64 maxSize = 0;
 
     // Get maximal independent sets from the starting node i
     for(const auto& [i, iNeighboors] : adj)
@@ -177,7 +177,7 @@ std::set<std::set<int>> Graph::getMaxIndSets() {
 }
 
 // for checking if a set is Proper or not
-bool Graph::isProper(std::set<int> set)
+bool Graph::isProper(std::set<u64> set)
 {
     for (auto i = set.begin(); i!= set.end();i++)
         for(auto j = set.begin(); j!=set.end();j++)
@@ -188,8 +188,8 @@ bool Graph::isProper(std::set<int> set)
 }
 
 // Utility function
-void insertProperSuffixes(std::set<int> const& maxIndSet, std::set<std::set<int>>& bicliques) {
-    std::set<int> properSuffixes;
+void insertProperSuffixes(std::set<u64> const& maxIndSet, std::set<std::set<u64>>& bicliques) {
+    std::set<u64> properSuffixes;
     for(auto& el : maxIndSet) {
         properSuffixes.insert(el);
         bicliques.insert(properSuffixes);
@@ -197,12 +197,12 @@ void insertProperSuffixes(std::set<int> const& maxIndSet, std::set<std::set<int>
 }
 
 
-std::set<std::set<int>> Graph::getBicliques() {
+std::set<std::set<u64>> Graph::getBicliques() {
     // Number of vertices
-    int N = adj.size();
+    u64 N = adj.size();
 
     // Store bicliques
-    std::set<std::set<int>> bicliques;
+    std::set<std::set<u64>> bicliques;
     
     //
     for (const auto& [i, iNeighboors] : adj)
@@ -210,20 +210,28 @@ std::set<std::set<int>> Graph::getBicliques() {
         // Construct the subgraph G_i
         Graph subgraph_i = genSubgraph(i);
 
-        // Get all maximal independent sets of G_i
-        std::set<std::set<int>> maxIndSets = subgraph_i.getMaxIndSets();
+        std::cout << " ------------------New Subgraph from " << i << " ------------------ " << std::endl;
+        //subgraph_i.print();
 
-        for(auto& maxIndSet : maxIndSets)
+        // Get all maximal independent sets of G_i
+        std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
+
+        for(const auto& maxIndSet : maxIndSets)
         {
-            /*
-            if (subgraph_i.isProper(maxIndSet)) {
+            if (isProper(maxIndSet)) 
+            {
+                std::cout << "Is proper : ";
+                for(const auto& k : maxIndSet) std::cout << k << " ";
                 // Search if maxIndSet is already in bicliques
-                if (bicliques.find(maxIndSet) == bicliques.end())
+                if (bicliques.find(maxIndSet) == bicliques.end()) 
                     insertProperSuffixes(maxIndSet, bicliques);
             }
-            */
+            else {
+                std::cout << "Is not proper : ";
+                for(const auto& k : maxIndSet) std::cout << k << " ";
+            }
+            std::cout << "\n" ;
         }
-
     }
 
     return bicliques;

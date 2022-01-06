@@ -50,6 +50,18 @@ check: $(TESTS)
 graphtests: tests/graph_tests.cpp graph.o visualisation.o
 	$(CC) -o bin/$@ $(INC) graph.o visualisation.o $< $(sdllib) -lm
 
+
+######################################
+############### Perf ###############
+######################################
+
+genPerf: src/genPerf.cpp graph.o
+	$(CC) -o bin/$@ $(INC) graph.o visualisation.o $< $(sdllib) -lm -fopenmp
+	bin/genPerf > data/perf.dat
+plot: data/perf.dat data/gnu_script.gp
+	gnuplot -c data/gnu_script.gp
+	eog perf.png
+
 ######################################
 
 clean:
