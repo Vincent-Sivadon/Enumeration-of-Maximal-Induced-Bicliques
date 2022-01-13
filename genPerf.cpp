@@ -4,15 +4,13 @@
 #include <set>
 #include <omp.h>
 
-#include "graph.hpp"
-
+#include "graphes.hpp"
 
 int main() {
-
     // SET SIZES
     // ------------------------------------
     int N = 10; // number of mesures
-    u64 minSize = 10, maxSize = 100;
+    u64 minSize = 10, maxSize = 500;
     u64 sizes[N];
     for(int i=0 ; i<N ; i++)
         sizes[i] = minSize + i*(maxSize-minSize)/N;

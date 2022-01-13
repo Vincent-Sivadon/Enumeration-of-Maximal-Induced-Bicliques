@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "stdio.h": "c",
-        "limits.h": "c",
-        "subgraph.h": "c",
-        "adjlst.h": "c"
-    }
-}

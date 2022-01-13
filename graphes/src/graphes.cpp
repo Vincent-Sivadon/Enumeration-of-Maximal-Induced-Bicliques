@@ -6,51 +6,65 @@
 # define INF 0x3f3f3f3f
 
 #include "visualisation.hpp"
-#include "graph.hpp"
+#include "graphes.hpp"
 
-// connect 2 vertices i and j
+// Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void Graph::connect(u64 i, u64 j) {
-    adj[i].insert(j);
-    adj[j].insert(i);
+    adj[i].insert(j);   // insère i dans la liste des voisins de j
+    adj[j].insert(i);   // insère j dans la liste des voisins de i
 }
 
+// Affiche le graphe dans le terminal (à des fins de debug)
 void Graph::print() {
+    // Pour chaque sommet 'vertex' et sa liste de voisin 'vertexNeighboors'
     for(const auto& [vertex, vertexNeighboors] : adj)
     {
+        //
         std::cout << "\n Neighboors of vertex " << vertex << " :\n";
+
+        // affiche l'indice de chaque sommet de la liste de voisins
         for(const auto& i : vertexNeighboors)
             std::cout << " -> " << i;
+
+        //
         std::cout << "\n";
             
     }
 }
 
-
-
-// Check if an edge can be placed between 2 vertices s and d
+// Retourne un booléen indiquant si les sommets i et j sont connectés
 bool Graph::areConnected(u64 i, u64 j) {
+    // pour chaque sommet 'vertex' de la liste des voisins de i
     for(const auto& vertex : adj[i])
         if (vertex == j) return true;
     return false;
 }
 
-
+// dessine le graphe à l'écran
 void Graph::draw() {
+    // Appel à l'implémentation de "visualisation.cpp"
     drawGraph(*this);
 }
 
+// Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
 Graph genRandGraph(u64 N) {
+    // Déclaration d'un nouveau graphe
     Graph graph;
 
+    // On ajoute une arrête entre i et j avec une probabilité de 50%
     for(u64 i=0 ; i<N ; i++)
         for(u64 j=0 ; j<N ; j++) {
+            // Nombre aléatoire entre 0 et 1
             double r = (double) rand() / (double) RAND_MAX;
+
+            // Connecte i et j si r<0.5
             if (r < 0.5) graph.connect(i, j);
         }
     
     return graph;
 }
 
+// Recherche du sommet avec la distance minimale
 u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited) {
     // On initialisa la distance minimal à l'infini et l'index du noeud pour lequel la distance est minimal
     u64 min = INF, min_index=0;
@@ -62,6 +76,7 @@ u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited) {
     return min_index;
 }
 
+// Donne la longueur du plus court chemin depuis src pour chaque sommet
 std::vector<u64> Graph::shortestPaths(u64 src) {    
     /* On crée un tableau dynamique pour stocker les distances et on et 
     initialise toutes les distances à l'infini.
@@ -97,6 +112,7 @@ std::vector<u64> Graph::shortestPaths(u64 src) {
     return dist;
 }
 
+// Génère les sous-graphes d'après le papier
 Graph Graph::genSubgraph(u64 i) {
     // Get number of vertices
     u64 N = adj.size();
@@ -136,6 +152,7 @@ Graph Graph::genSubgraph(u64 i) {
 }
 
 
+// Indique si vertex est connecté au set
 bool Graph::isNotConnectedToSet(u64 v, std::set<u64> set)
 {
     for (auto u : set){
@@ -144,6 +161,7 @@ bool Graph::isNotConnectedToSet(u64 v, std::set<u64> set)
     return true;
 }
 
+// Enumère tout les sets indépendants maximaux du graphe
 std::set<std::set<u64>> Graph::getMaxIndSets() {
     // Number of vertices
     u64 N = adj.size();
@@ -176,7 +194,7 @@ std::set<std::set<u64>> Graph::getMaxIndSets() {
     return maxIndSets;
 }
 
-// for checking if a set is Proper or not
+// Retourn un booléen indiquant si un set est propre par rapport au graphe
 bool Graph::isProper(std::set<u64> set)
 {
     for (auto i = set.begin(); i!= set.end();i++)
@@ -196,7 +214,7 @@ void insertProperSuffixes(std::set<u64> const& maxIndSet, std::set<std::set<u64>
     }
 }
 
-
+// Enumère tout les bicliques maximales du graphe
 std::set<std::set<u64>> Graph::getBicliques() {
     // Number of vertices
     u64 N = adj.size();
@@ -210,27 +228,15 @@ std::set<std::set<u64>> Graph::getBicliques() {
         // Construct the subgraph G_i
         Graph subgraph_i = genSubgraph(i);
 
-        std::cout << " ------------------New Subgraph from " << i << " ------------------ " << std::endl;
-        //subgraph_i.print();
-
         // Get all maximal independent sets of G_i
         std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
 
         for(const auto& maxIndSet : maxIndSets)
         {
             if (isProper(maxIndSet)) 
-            {
-                std::cout << "Is proper : ";
-                for(const auto& k : maxIndSet) std::cout << k << " ";
                 // Search if maxIndSet is already in bicliques
                 if (bicliques.find(maxIndSet) == bicliques.end()) 
                     insertProperSuffixes(maxIndSet, bicliques);
-            }
-            else {
-                std::cout << "Is not proper : ";
-                for(const auto& k : maxIndSet) std::cout << k << " ";
-            }
-            std::cout << "\n" ;
         }
     }
 
@@ -240,7 +246,7 @@ std::set<std::set<u64>> Graph::getBicliques() {
 
 
 
-// Generate a graph that represent a H2O molecule (for testing purposes)
+// Génère un graphe qui représente une molecule d'eau (à des fins de tests majoritairement)
 Graph H2O() {
     Graph graph;
     graph.connect(0, 1);
@@ -249,7 +255,7 @@ Graph H2O() {
     return graph;
 }
 
-// Generate a graph that represent a methane molecule (for testing purposes)
+// Génère un graphe qui représente une molecule de méthane (à des fins de tests majoritairement)
 Graph Methane() {
     Graph graph;
     graph.connect(0, 1);
@@ -260,7 +266,7 @@ Graph Methane() {
     return graph;
 }
 
-// Generate a graph that represent an hexagone
+// Génère un graphe qui représente une molecule en forme d'hexagone (à des fins de tests majoritairement)
 Graph Hexagone() {
     Graph graph;
 

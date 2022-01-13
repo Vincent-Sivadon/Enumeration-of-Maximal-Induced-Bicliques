@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <set>
 
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 
-#include "graph.hpp"
+#include "graphes.hpp"
 
-
+// Dessine un hexagone
 int main() {
     Graph g = Hexagone();
     g.draw();
