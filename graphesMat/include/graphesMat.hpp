@@ -12,8 +12,11 @@ namespace GM {
 
 // Structure représentatant un Graphe
 struct Graph {
-    // Liste d'adjacence du graphe
-    std::map<u64, std::set<u64>> adj;
+    std::vector<int> adj;   // Liste d'adjacence du graphe
+    u64 N;                  // Nombre de Sommets
+
+    // Constructeur
+    Graph(u64 N) : N(N) {adj.resize(N*N) ;}
 
     // Affiche le graphe dans le terminal (à des fins de debug)
     void print();
