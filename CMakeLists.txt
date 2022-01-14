@@ -36,7 +36,7 @@ find_package(SDL2 REQUIRED)
 
 # Génère les mesures de performances moyénnées de la fonction getBicliques pour des tailles variables
 add_executable(genPerf ${CMAKE_SOURCE_DIR}/genPerf.cpp)
-target_link_libraries(genPerf graphes OpenMP::OpenMP_CXX SDL2)
+target_link_libraries(genPerf graphes graphesMat OpenMP::OpenMP_CXX SDL2)
 target_compile_options(genPerf PUBLIC -std=c++17)
 
 

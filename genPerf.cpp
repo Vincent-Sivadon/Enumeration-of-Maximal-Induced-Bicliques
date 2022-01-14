@@ -5,6 +5,7 @@
 #include <omp.h>
 
 #include "graphes.hpp"
+#include "graphesMat.hpp"
 
 int main(int argc, char** argv) {
     // Tailles des graphes utilisés pour les mesures de performances :
@@ -25,24 +26,31 @@ int main(int argc, char** argv) {
     for(const auto& n : sizes)
     {
         // Va stocker la moyenne du temps d'execution pour les 10 samples
-        double tmp = 0;
+        double tmpLst = 0;
+        double tmpMat = 0;
 
         // On moyenne sur 10 samples
         for(int i=0 ; i<10 ; i++)
         {
             // Initialization d'un nouveau graphe aléatoire
-            GL::Graph g = GL::genRandGraph(n);
+            GL::Graph gLst = GL::genRandGraph(n);  // version liste d'adjacence
+            GM::Graph gMat = GM::genRandGraph(n);  // version matrice d'adjacence
 
-            double before = omp_get_wtime();
-            std::set<std::set<u64>> bicliques = g.getBicliques();
-            double after  = omp_get_wtime();
+            double beforeLst = omp_get_wtime();
+            std::set<std::set<u64>> bicliques = gLst.getBicliques();
+            double afterLst  = omp_get_wtime();
+
+            double beforeMat = omp_get_wtime();
+            std::set<std::set<u64>> bicliques = gMat.getBicliques();
+            double afterMat  = omp_get_wtime();
 
             //
-            tmp += (after-before);
+            tmpLst += (afterLst - beforeLst);
+            tmpMat += (afterMat - beforeMat);            
         }
 
         // Temps moyen d'execution pour une taille n  :  tmp/10
-        std::cout << n << " " << tmp/10.0 << std::endl;
+        std::cout << n << " " << tmpLst/10.0 << " " << tmpMat/10.0 << std::endl;
     }
 
     return 0;
