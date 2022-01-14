@@ -21,7 +21,7 @@ int main() {
         double tmp = 0;
         for(int i=0 ; i<10 ; i++)
         {
-            Graph g = genRandGraph(n);
+            GL::Graph g = GL::genRandGraph(n);
 
             double before = omp_get_wtime();
             std::set<std::set<u64>> bicliques = g.getBicliques();

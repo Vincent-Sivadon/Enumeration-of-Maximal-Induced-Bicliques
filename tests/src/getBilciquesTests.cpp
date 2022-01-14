@@ -1,10 +1,9 @@
 #include <assert.h>
 
 #include "graphes.hpp"
-#include "../graph_tests.hpp"
 
-void getBicliquesTests() {
-    Graph hex = Hexagone();
+int main() {
+    GL::Graph hex = GL::Hexagone();
     hex.connect(0, 3);
     hex.connect(4, 2);
     hex.connect(0, 2);
@@ -16,4 +15,6 @@ void getBicliquesTests() {
           -   -
         4 ----- 3
     */
+
+   return 0;
 }

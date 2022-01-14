@@ -7,9 +7,9 @@
 
 #include <SDL2/SDL.h>
 
-#include "visualisation.hpp"
+#include "visualisationMat.hpp"
 
-namespace GL {
+namespace GM {
 
 
 // Structures permettant la représentation des positions, vitesses, et accélérations de chaque sommet
@@ -203,4 +203,4 @@ void drawGraph(Graph& graph) {
 }
 
 
-} // end namespace GL
+} // end namespace GM

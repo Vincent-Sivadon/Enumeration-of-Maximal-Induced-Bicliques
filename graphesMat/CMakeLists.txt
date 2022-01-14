@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 # Notre projet est étiqueté mylib
-project(graphes)
+project(graphesMat)
 
 # SDL : bibliothèque graphique 2D
 find_package(SDL2 REQUIRED)
@@ -16,7 +16,7 @@ file(GLOB HEADERS
 	"include/*.hpp"
 )
 
-add_library(graphes STATIC ${SRCS} ${HEADERS})
-target_link_libraries(graphes SDL)
-target_include_directories(graphes PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_compile_options(graphes PUBLIC -std=c++17)
+add_library(graphesMat STATIC ${SRCS} ${HEADERS})
+target_link_libraries(graphesMat SDL)
+target_include_directories(graphesMat PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_compile_options(graphesMat PUBLIC -std=c++17)

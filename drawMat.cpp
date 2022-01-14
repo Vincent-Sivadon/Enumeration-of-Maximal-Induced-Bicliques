@@ -5,11 +5,11 @@
 
 #include <SDL2/SDL.h>
 
-#include "graphes.hpp"
+#include "graphesMat.hpp"
 
 // Dessine un hexagone
 int main() {
-    GL::Graph g = GL::Hexagone();
+    GM::Graph g = GM::Hexagone();
     g.draw();
 
     std::set<std::set<u64>> bicliques = g.getBicliques();

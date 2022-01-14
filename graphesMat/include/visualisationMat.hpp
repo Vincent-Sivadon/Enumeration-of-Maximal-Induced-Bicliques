@@ -1,12 +1,12 @@
 #pragma once
 
-#include "graphes.hpp"
+#include "graphesMat.hpp"
 
-namespace GL {
+namespace GM {
 
 
 // Dessine un graphe à l'écran
 void drawGraph(Graph& graph);
 
 
-} // end namespace GL
+} // end namespace GM

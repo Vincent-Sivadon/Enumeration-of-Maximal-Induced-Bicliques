@@ -1,13 +1,23 @@
-# Fichiers sources
-file(GLOB SRCS
-    "src/*.cpp"
-	"*.cpp"
-)
+file( GLOB TEST_SRCS "src/*.cpp" )
 
-# Crée l'executable "tests"
-add_executable(tests ${SRCS} graph_tests.cpp)
-target_link_libraries(tests graphes SDL2)
-target_compile_options(tests PUBLIC -std=c++17)
-add_custom_command(TARGET tests POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --magenta
-                    "============== TESTS BIEN GENERES -taper ctest pour les executer- ==============")
+# pour chaque TEST
+foreach( testsourcefile ${TEST_SRCS} )
+    # file ( GLOB ... ) donne les path absolu, on le transform en relative path
+    # exemple : 
+    # "/home/vincents/Documents/Projet/Enumeration-of-Maximal-Induced-Bicliques/tests/src/areConnectedTests"
+    # transformé en :
+    # "areConnectedTests"
+    string( REPLACE ".cpp" "" testname ${testsourcefile} )
+    string( REPLACE ${CMAKE_CURRENT_SOURCE_DIR}/src/ "" testname ${testname} )
+
+    # on créé l'executable
+    add_executable( ${testname} ${testsourcefile} )
+
+    # on link les librairies
+    target_link_libraries( ${testname} graphes SDL2 )
+    target_compile_options(${testname} PUBLIC -std=c++17)
+
+    # on ajoute cet executable à la liste des tests
+    add_test(${testname} ${testname})
+
+endforeach( testsourcefile ${TEST_SRCS} )

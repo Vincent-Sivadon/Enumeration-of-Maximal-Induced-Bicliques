@@ -4,12 +4,11 @@
 #define INF 0x3f3f3f3f
 
 #include "graphes.hpp"
-#include "../graph_tests.hpp"
 
-void shortestPathTests() {
-    Graph methane = Methane();
-    Graph h2o = H2O();
-    Graph hex = Hexagone();
+int main() {
+    GL::Graph methane = GL::Methane();
+    GL::Graph h2o = GL::H2O();
+    GL::Graph hex = GL::Hexagone();
 
     // TEST 1
     std::vector<u64> dist = methane.shortestPaths(1);
@@ -25,4 +24,6 @@ void shortestPathTests() {
     std::vector<u64> dist3 = hex.shortestPaths(0);
     std::vector<u64> expected3 = {0, 1, 2, INF, 2, 1};
     assert(dist3 == expected3);
+
+    return 0;
 }

@@ -7,8 +7,8 @@
 
 typedef unsigned long long u64;
 
-namespace GL {
-
+namespace GM {
+    
 
 // Structure représentatant un Graphe
 struct Graph {
@@ -62,4 +62,4 @@ Graph Hexagone();
 // Get the vertex for wich the dist to src is minimal (used)
 u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited);
 
-} // end namespace GL
+} // end namespace GM

@@ -5,12 +5,12 @@
 #include <utility>
 # define INF 0x3f3f3f3f
 
-#include "visualisation.hpp"
-#include "graphes.hpp"
+#include "visualisationMat.hpp"
+#include "graphesMat.hpp"
 
-namespace GL {
+namespace GM {
 
-
+    
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void Graph::connect(u64 i, u64 j) {
     adj[i].insert(j);   // insère i dans la liste des voisins de j
@@ -283,4 +283,5 @@ Graph Hexagone() {
     return graph;
 }
 
-} // end namespace GL
+
+} // end namespace GM
