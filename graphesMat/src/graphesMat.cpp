@@ -194,7 +194,7 @@ std::set<std::set<u64>> Graph::getMaxIndSets() {
     // On garde uniquement les sets de taille maximale
     for(const auto& set : IndSets)
         if (set.size() == maxSize) maxIndSets.insert(set);
-        
+
     return maxIndSets;
 }
 
@@ -284,5 +284,14 @@ Graph Hexagone() {
     return graph;
 }
 
+void printSets(std::set<std::set<u64>> sets)
+{
+    for(auto& set : sets) {
+        for(auto& i : set) {
+            std::cout << i << " ";
+        }
+        std::cout << "\n";
+    }
+}
 
 } // end namespace GM

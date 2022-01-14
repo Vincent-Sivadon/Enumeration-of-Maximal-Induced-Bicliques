@@ -4,15 +4,6 @@
 
 #include "graphesMat.hpp"
 
-void printSets(std::set<std::set<u64>> sets)
-{
-    for(auto& set : sets) {
-        for(auto& i : set) {
-            std::cout << i << " ";
-        }
-        std::cout << "\n";
-    }
-}
 
 int main()
 {

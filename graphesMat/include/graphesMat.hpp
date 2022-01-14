@@ -66,4 +66,8 @@ Graph Hexagone();
 // Get the vertex for wich the dist to src is minimal (used)
 u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited);
 
+// Affiche dans le terminal un set de set
+void printSets(std::set<std::set<u64>> sets);
+
+
 } // end namespace GM
