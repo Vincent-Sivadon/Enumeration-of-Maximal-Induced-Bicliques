@@ -148,42 +148,53 @@ Graph Graph::genSubgraph(u64 i) {
 
 
 // Indique si vertex est connecté au set dans le graphe
-bool Graph::isNotConnectedToSet(u64 v, std::set<u64> set)
+bool Graph::isConnectedToSet(u64 v, std::set<u64> set)
 {
-    for (auto u : set){
-        if (areConnected(v, u)) return false;
+    for (const auto& u : set){
+        if (areConnected(v, u)) return true;
     }
-    return true;
+    return false;
+}
+
+// Enumère tout les set indépendants
+void Graph::getIndSets(std::set<std::set<u64>>& IndSets, std::set<u64>& tmpSet, u64 i)
+{
+    for(u64 j=i ; j<N ; j++)
+    {
+        // On ajoute j au tmpSet si il n'est connecté à aucun k de tmpSet 
+        if ( isConnectedToSet(j, tmpSet)) continue;
+        
+        // Si on a passé le test, on insert j
+        tmpSet.insert(j);
+
+        // on refait la procédure à partir de j+1
+        getIndSets(IndSets, tmpSet, j+1);        
+
+        // Puisqu'on a construit le set indépendants qui partait de j, on le supprime du tmpSet
+        tmpSet.erase(j);
+    }
+    IndSets.insert(tmpSet);
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
 std::set<std::set<u64>> Graph::getMaxIndSets() {
-
     //
-    std::map<u64, std::set<u64>> IndSets;
+    std::set<std::set<u64>> IndSets;
+    std::set<u64> tmpSet;
     std::set<std::set<u64>> maxIndSets;
 
-    // Maximal set size
+    // Get all independent sets
+    getIndSets(IndSets, tmpSet, 0);
+
+    // Taille du set maximal pour pouvoir isoler que les max ind sets
     u64 maxSize = 0;
+    for(const auto& set : IndSets)
+        if(set.size()>maxSize) maxSize = set.size();
 
-    // Get maximal independent sets from the starting node i
-    for(u64 i=0 ; i<N ; i++)
-    {
-        IndSets.insert({i, {i}});
-        for(u64 j=0 ; j<N ; j++)
-        {
-            if(i==j) continue;
-            if( isNotConnectedToSet(j, IndSets[i]) )
-                IndSets[i].insert(j);
-        }
-        // update the max ind set size
-        if(IndSets[i].size() > maxSize ) maxSize = IndSets[i].size();
-    }
-
-    // keep only the real maximal sets
-    for(const auto& [v, IndSet] : IndSets)
-        if (IndSet.size() == maxSize) maxIndSets.insert(IndSet);
-
+    // On garde uniquement les sets de taille maximale
+    for(const auto& set : IndSets)
+        if (set.size() == maxSize) maxIndSets.insert(set);
+        
     return maxIndSets;
 }
 

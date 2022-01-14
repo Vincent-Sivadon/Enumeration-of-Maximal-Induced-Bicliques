@@ -37,11 +37,11 @@ int main(int argc, char** argv) {
             GM::Graph gMat = GM::genRandGraph(n);  // version matrice d'adjacence
 
             double beforeLst = omp_get_wtime();
-            std::set<std::set<u64>> bicliques = gLst.getBicliques();
+            std::set<std::set<u64>> bicliquesLst = gLst.getBicliques();
             double afterLst  = omp_get_wtime();
 
             double beforeMat = omp_get_wtime();
-            std::set<std::set<u64>> bicliques = gMat.getBicliques();
+            std::set<std::set<u64>> bicliquesMat = gMat.getBicliques();
             double afterMat  = omp_get_wtime();
 
             //

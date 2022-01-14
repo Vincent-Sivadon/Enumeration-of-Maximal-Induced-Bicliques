@@ -40,9 +40,10 @@ struct Graph {
     Graph genSubgraph(u64 i);
 
     // Indique si vertex est connecté au set
-    bool isNotConnectedToSet(u64 vertex, std::set<u64> set);
+    bool isConnectedToSet(u64 vertex, std::set<u64> set);
 
     // Enumère tout les sets indépendants maximaux du graphe
+    void getIndSets(std::set<std::set<u64>>& IndSets, std::set<u64>& tmpSet, u64 i);
     std::set<std::set<u64>> getMaxIndSets();
 
     // Enumère tout les bicliques maximales du graphe
