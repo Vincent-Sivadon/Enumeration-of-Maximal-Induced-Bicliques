@@ -49,6 +49,8 @@ struct Graph {
 
 };
 
+
+
 // =========================== GENERATION DE GRAPHE ===========================
 Graph genRandGraph(u64 N);  // Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
 

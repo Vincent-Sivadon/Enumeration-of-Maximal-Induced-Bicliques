@@ -41,14 +41,17 @@ void Tree::insert(std::set<u64> set)
 // Enumère toutes les branches
 void Tree::getBranches(std::set<std::set<u64>>& bicliques, std::set<u64>& tmpSet)
 {
-    for(const auto& [i, subtree] : subtrees)
+    if(subtrees.size() != 0)
     {
-        tmpSet.insert(i);
-        subtrees[i].getBranches(bicliques, tmpSet);
-        tmpSet.erase(i);
+        for(const auto& [i, subtree] : subtrees)
+        {
+            tmpSet.insert(i);
+            subtrees[i].getBranches(bicliques, tmpSet);
+            tmpSet.erase(i);
+        }
+    } else {
+        bicliques.insert(tmpSet);
     }
-
-    bicliques.insert(tmpSet);
 }
 
 // Enumère toutes les branches de taille maximale
@@ -79,11 +82,19 @@ std::set<std::set<u64>> Tree::getMaxBranches()
 
 void Tree::print()
 {
-    if (id != -1) 
-        std::cout << id << " ";
-    for (auto [id, subtree] : subtrees)
-        subtree.print();
-    std::cout << "\n";
+    std::set<std::set<u64>> bicliques;
+    std::set<u64> tmpSet;
+
+    // Enumère tout les bicliques
+    getBranches(bicliques, tmpSet);
+
+    std::cout << bicliques.size() << "\n";
+    for(auto& set : bicliques) {
+        for(auto& i : set) {
+            std::cout << i << " ";
+        }
+        std::cout << "\n";
+    }
 }
 
 

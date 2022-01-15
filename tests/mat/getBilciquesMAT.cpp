@@ -8,13 +8,16 @@ int main() {
     hex.connect(4, 2);
     hex.connect(0, 2);
     std::set<std::set<u64>> hex_bicliques = hex.getBicliques();
-    /* Should have the max induced bicliques
-        0 ----- 2
-          -   - 
-            -
-          -   -
-        4 ----- 3
-    */
+
+
+    std::set<std::set<u64>> expected = 
+        {
+            {0, 1, 3, 5}, {0, 2, 4, 5}, {0, 3, 4, 5}
+        };
+
+    for (auto& set : hex_bicliques)
+        assert(expected.find(set) != expected.end());
+
 
    return 0;
 }

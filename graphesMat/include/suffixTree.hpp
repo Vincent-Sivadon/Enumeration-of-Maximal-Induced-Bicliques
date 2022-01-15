@@ -23,11 +23,12 @@ struct Tree {
     void insert(std::set<u64> set);   // place un set dans la hiérarchie de l'arbre de suffix
     void addSubtree(u64 i);           // ajoute un arbre descendant
 
-    // Pour récupérer les branches de l'arbre ---------------------------------------------------------------
-    void getBranches(std::set<std::set<u64>>& bicliques, std::set<u64>& tmpSet); // énumère toutes les branches
+
+    // ============================= BRANCHES =============================
+    void getBranches(std::set<std::set<u64>>& bicliques, std::set<u64>& tmpSet); // Enumère toutes les branches et les stocke dans bicliques
     std::set<std::set<u64>> getMaxBranches();   // énumère toutes les branches de taille maximale
 
-    // Pour visualiser l'arbre -----------------------------------------------------------
+    // ============================= VISUALISATION =============================
     void print(); // affiche dans le terminal les branches de l'arbre
 };
 

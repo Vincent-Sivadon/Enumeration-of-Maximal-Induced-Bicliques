@@ -7,6 +7,7 @@
 
 #include "visualisationMat.hpp"
 #include "graphesMat.hpp"
+#include "suffixTree.hpp"
 
 namespace GM {
 
@@ -222,23 +223,12 @@ Graph Graph::genSubgraph(u64 i) {
     return subgraph;
 }
 
-// Utility function
-void insertProperSuffixes(std::set<u64> const& maxIndSet, std::set<std::set<u64>>& bicliques) {
-    std::set<u64> properSuffixes;
-    for(auto& el : maxIndSet) {
-        properSuffixes.insert(el);
-        bicliques.insert(properSuffixes);
-    }
-}
-
 // Enumère tout les bicliques maximales du graphe
 std::set<std::set<u64>> Graph::getBicliques() {
-    // Number of vertices
-    u64 N = adj.size();
-
-    // Store bicliques
-    std::set<std::set<u64>> bicliques;
     
+    //
+    Tree suffixTree;
+
     //
     for(u64 i=0 ; i<N ; i++)
     {
@@ -249,13 +239,12 @@ std::set<std::set<u64>> Graph::getBicliques() {
         std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
 
         for(const auto& maxIndSet : maxIndSets)
-        {
             if (isProper(maxIndSet)) 
-                // Search if maxIndSet is already in bicliques
-                if (bicliques.find(maxIndSet) == bicliques.end()) 
-                    insertProperSuffixes(maxIndSet, bicliques);
-        }
+                suffixTree.insert(maxIndSet);
     }
+
+    // On isole les branches maximale de l'arbre de suffix
+    std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
 
     return bicliques;
 }
