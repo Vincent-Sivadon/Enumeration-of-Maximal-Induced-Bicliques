@@ -1,3 +1,10 @@
+/*
+    - Contient la structure Graph.
+    - Cette version représente le graphe avec une matrice d'adjacence "adj"
+    - La librairie utilise le namespace GM pour Graphe Matrice
+
+*/
+
 #pragma once
 
 #include <vector>
@@ -10,64 +17,56 @@ typedef unsigned long long u64;
 namespace GM {
     
 
-// Structure représentatant un Graphe
+/* =========================== REPRESENTATION D'UN GRAPHE =========================== */
 struct Graph {
+    /* ========================= MEMBRE PRINCIPAL ========================= */
     std::vector<int> adj;   // Liste d'adjacence du graphe
     u64 N;                  // Nombre de Sommets
 
-    // Constructeur
+    // CONSTRUCTEUR
     Graph(u64 N) : N(N) {adj.resize(N*N) ;}
 
-    // Affiche le graphe dans le terminal (à des fins de debug)
-    void print();
 
-    // dessine le graphe à l'écran
-    void draw();
+    /* ===================== CONNECTIONS ENTRE SOMMETS ===================== */
+    void connect(u64 i, u64 j);      // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)    
+    bool areConnected(u64 i, u64 j); // Retourne un booléen indiquant si les sommets i et j sont connectés
 
-    // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
-    void connect(u64 i, u64 j);
 
-    // Retourne un booléen indiquant si les sommets i et j sont connectés
-    bool areConnected(u64 i, u64 j);
+    /* =========================== VISUALISATION =========================== */
+    void print(); // Affiche le graphe dans le terminal (à des fins de debug)
+    void draw(); // dessine le graphe à l'écran
 
-    // Retourn un booléen indiquant si un set est propre par rapport au graphe
-    bool isProper(std::set<u64> set);
+    
+    /* =============================== SETS =============================== */
+    bool isProper(std::set<u64> set);                       // Retourn un booléen indiquant si un set est propre par rapport au graphe
+    bool isConnectedToSet(u64 vertex, std::set<u64> set);   // Indique si vertex est connecté au set
+    void getIndSets(std::set<std::set<u64>>& IndSets, std::set<u64>& tmpSet, u64 i); 
+                                                            // Enumère tout les sets indépendants du graphe
+    std::set<std::set<u64>> getMaxIndSets();                // Eumère tout les sets indépendants maximaux
 
-    // Donne la longueur du plus court chemin depuis src pour chaque sommet
-    std::vector<u64> shortestPaths(u64 src);
 
-    // Génère les sous-graphes d'après le papier
-    Graph genSubgraph(u64 i);
+    /* ============================= UTILITAIRE ============================= */
+    std::vector<u64> shortestPaths(u64 src); // Donne la longueur du plus court chemin depuis src pour chaque sommet
 
-    // Indique si vertex est connecté au set
-    bool isConnectedToSet(u64 vertex, std::set<u64> set);
 
-    // Enumère tout les sets indépendants maximaux du graphe
-    void getIndSets(std::set<std::set<u64>>& IndSets, std::set<u64>& tmpSet, u64 i);
-    std::set<std::set<u64>> getMaxIndSets();
-
-    // Enumère tout les bicliques maximales du graphe
-    std::set<std::set<u64>> getBicliques();
-
+    /* ======================== PROCEDURE DE L'ARTICLE ======================== */
+    Graph genSubgraph(u64 i);               // Génère les sous-graphes d'après le papier
+    std::set<std::set<u64>> getBicliques(); // Enumère tout les bicliques maximales du graphe
 };
 
-// Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
-Graph genRandGraph(u64 N);
+// =========================== GENERATION DE GRAPHE ===========================
+Graph genRandGraph(u64 N); // Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
 
-// Génère un graphe qui représente une molecule d'eau (à des fins de tests majoritairement)
-Graph H2O();
 
-// Génère un graphe qui représente une molecule de méthane (à des fins de tests majoritairement)
-Graph Methane();
+// =========================== GRAPHES SIMPLES ===========================
+Graph H2O();        // Génère un graphe représentant une molécule de H2O
+Graph Methane();    // Génère un graphe représentant une molécule de méthane
+Graph Hexagone();   // Génère un graphe représentant un hexagone
 
-// Génère un graphe qui représente une molecule en forme d'hexagone (à des fins de tests majoritairement)
-Graph Hexagone();
 
-// Get the vertex for wich the dist to src is minimal (used)
-u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited);
-
-// Affiche dans le terminal un set de set
-void printSets(std::set<std::set<u64>> sets);
+// =========================== FONCTION UTILITAIRE ===========================
+u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited); // Get the vertex for wich the dist to src is minimal (used)
+void printSets(std::set<std::set<u64>> sets); // Affiche dans le terminal un set de set
 
 
 } // end namespace GM

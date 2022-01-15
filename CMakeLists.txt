@@ -54,7 +54,7 @@ target_compile_options(drawMat PUBLIC -std=c++17)
 
 
 # "make plot" va afficher le graphe des perfs
-add_custom_target(plot COMMAND sh ../plot.sh)
+add_custom_target(plot COMMAND sh ../data/plot.sh)
 
 string(ASCII 27 ESCAPE)
 message("${ESCAPE}[1;36m ============================ STRUCTURE DU PROJET ============================ ")

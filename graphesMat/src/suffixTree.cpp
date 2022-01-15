@@ -8,7 +8,37 @@
 namespace GM {
 
 
-// Enumère tout les 
+/* =========================== CONSTRUCTION =========================== */
+
+// Ajoute un arbre descendant
+void Tree::addSubtree(u64 i)
+{
+    Tree subtree(i);
+    subtrees.insert({i, subtree});
+}
+
+// place un set dans la hiérarchie de l'arbre de suffix
+void Tree::insert(std::set<u64> set)
+{
+    // Extraction du premier élément du set
+    auto iIter = set.begin();
+    u64 i = *(iIter);
+
+    addSubtree(i);
+    
+    // si le set a plus d'un élément
+    if (set.size() > 1)
+    {
+        set.erase(iIter);
+        subtrees[i].insert(set);
+    }
+}
+
+
+
+/* =========================== BRANCHES =========================== */
+
+// Enumère toutes les branches
 void Tree::getBranches(std::set<std::set<u64>>& bicliques, std::set<u64>& tmpSet)
 {
     for(const auto& [i, subtree] : subtrees)
@@ -21,7 +51,7 @@ void Tree::getBranches(std::set<std::set<u64>>& bicliques, std::set<u64>& tmpSet
     bicliques.insert(tmpSet);
 }
 
-// Enumère tout les "mots maximals" du suffix tree
+// Enumère toutes les branches de taille maximale
 std::set<std::set<u64>> Tree::getMaxBranches()
 {
     std::set<std::set<u64>> bicliques;
@@ -44,29 +74,8 @@ std::set<std::set<u64>> Tree::getMaxBranches()
 }
 
 
-void Tree::addSubtree(u64 i)
-{
-    Tree subtree(i);
-    subtrees.insert({i, subtree});
-}
 
-
-void Tree::insert(std::set<u64> set)
-{
-    // Extraction du premier élément du set
-    auto iIter = set.begin();
-    u64 i = *(iIter);
-
-    addSubtree(i);
-    
-    // si le set a plus d'un élément
-    if (set.size() > 1)
-    {
-        set.erase(iIter);
-        subtrees[i].insert(set);
-    }
-}
-
+/* =========================== VISUALISATION =========================== */
 
 void Tree::print()
 {
@@ -76,6 +85,7 @@ void Tree::print()
         subtree.print();
     std::cout << "\n";
 }
+
 
 
 } // end namespace GM

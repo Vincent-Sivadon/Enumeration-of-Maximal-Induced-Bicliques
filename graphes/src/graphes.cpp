@@ -11,11 +11,26 @@
 namespace GL {
 
 
+/* ===================== CONNECTIONS ENTRE SOMMETS ===================== */
+
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void Graph::connect(u64 i, u64 j) {
     adj[i].insert(j);   // insère i dans la liste des voisins de j
     adj[j].insert(i);   // insère j dans la liste des voisins de i
 }
+
+// Retourne un booléen indiquant si les sommets i et j sont connectés
+bool Graph::areConnected(u64 i, u64 j) {
+    // pour chaque sommet 'vertex' de la liste des voisins de i
+    for(const auto& vertex : adj[i])
+        if (vertex == j) return true;
+    return false;
+}
+
+
+
+
+/* =========================== VISUALISATION =========================== */
 
 // Affiche le graphe dans le terminal (à des fins de debug)
 void Graph::print() {
@@ -35,37 +50,73 @@ void Graph::print() {
     }
 }
 
-// Retourne un booléen indiquant si les sommets i et j sont connectés
-bool Graph::areConnected(u64 i, u64 j) {
-    // pour chaque sommet 'vertex' de la liste des voisins de i
-    for(const auto& vertex : adj[i])
-        if (vertex == j) return true;
-    return false;
-}
-
 // dessine le graphe à l'écran
 void Graph::draw() {
     // Appel à l'implémentation de "visualisation.cpp"
     drawGraph(*this);
 }
 
-// Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
-Graph genRandGraph(u64 N) {
-    // Déclaration d'un nouveau graphe
-    Graph graph;
 
-    // On ajoute une arrête entre i et j avec une probabilité de 50%
-    for(u64 i=0 ; i<N ; i++)
-        for(u64 j=0 ; j<N ; j++) {
-            // Nombre aléatoire entre 0 et 1
-            double r = (double) rand() / (double) RAND_MAX;
 
-            // Connecte i et j si r<0.5
-            if (r < 0.5) graph.connect(i, j);
-        }
-    
-    return graph;
+
+/* =============================== SETS =============================== */
+
+// Retourn un booléen indiquant si un set est propre par rapport au graphe
+bool Graph::isProper(std::set<u64> set)
+{
+    for (auto i = set.begin(); i!= set.end();i++)
+        for(auto j = set.begin(); j!=set.end();j++)
+            if( i!=j)                
+                if ( areConnected(*i,*j)) 
+                    return true;
+    return false;
 }
+
+// Indique si vertex est connecté au set
+bool Graph::isConnectedToSet(u64 v, std::set<u64> set)
+{
+    for (auto u : set){
+        if (areConnected(v, u)) return true;
+    }
+    return false;
+}
+
+// Enumère tout les sets indépendants maximaux du graphe
+std::set<std::set<u64>> Graph::getMaxIndSets() {
+    // Number of vertices
+    u64 N = adj.size();
+
+    //
+    std::map<u64, std::set<u64>> IndSets;
+    std::set<std::set<u64>> maxIndSets;
+
+    // Maximal set size
+    u64 maxSize = 0;
+
+    // Get maximal independent sets from the starting node i
+    for(const auto& [i, iNeighboors] : adj)
+    {
+        IndSets.insert({i, {i}});
+        for(const auto& [j, jNeighboors] : adj)
+        {
+            if(i==j) continue;
+            if( !isConnectedToSet(j, IndSets[i]) )
+                IndSets[i].insert(j);
+        }
+        // update the max ind set size
+        if(IndSets[i].size() > maxSize ) maxSize = IndSets[i].size();
+    }
+
+    // keep only the real maximal sets
+    for(const auto& [v, IndSet] : IndSets)
+        if (IndSet.size() == maxSize) maxIndSets.insert(IndSet);
+
+    return maxIndSets;
+}
+
+
+
+/* ============================= UTILITAIRE ============================= */
 
 // Recherche du sommet avec la distance minimale
 u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited) {
@@ -115,6 +166,12 @@ std::vector<u64> Graph::shortestPaths(u64 src) {
     return dist;
 }
 
+
+
+
+
+/* ======================== PROCEDURE DE L'ARTICLE ======================== */
+
 // Génère les sous-graphes d'après le papier
 Graph Graph::genSubgraph(u64 i) {
     // Get number of vertices
@@ -152,60 +209,6 @@ Graph Graph::genSubgraph(u64 i) {
         }
 
     return subgraph;
-}
-
-
-// Indique si vertex est connecté au set
-bool Graph::isNotConnectedToSet(u64 v, std::set<u64> set)
-{
-    for (auto u : set){
-        if (areConnected(v, u)) return false;
-    }
-    return true;
-}
-
-// Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets() {
-    // Number of vertices
-    u64 N = adj.size();
-
-    //
-    std::map<u64, std::set<u64>> IndSets;
-    std::set<std::set<u64>> maxIndSets;
-
-    // Maximal set size
-    u64 maxSize = 0;
-
-    // Get maximal independent sets from the starting node i
-    for(const auto& [i, iNeighboors] : adj)
-    {
-        IndSets.insert({i, {i}});
-        for(const auto& [j, jNeighboors] : adj)
-        {
-            if(i==j) continue;
-            if( isNotConnectedToSet(j, IndSets[i]) )
-                IndSets[i].insert(j);
-        }
-        // update the max ind set size
-        if(IndSets[i].size() > maxSize ) maxSize = IndSets[i].size();
-    }
-
-    // keep only the real maximal sets
-    for(const auto& [v, IndSet] : IndSets)
-        if (IndSet.size() == maxSize) maxIndSets.insert(IndSet);
-
-    return maxIndSets;
-}
-
-// Retourn un booléen indiquant si un set est propre par rapport au graphe
-bool Graph::isProper(std::set<u64> set)
-{
-    for (auto i = set.begin(); i!= set.end();i++)
-        for(auto j = set.begin(); j!=set.end();j++)
-            if( i!=j)                
-                if ( areConnected(*i,*j)) 
-                    return true;
-    return false;
 }
 
 // Utility function
@@ -249,6 +252,31 @@ std::set<std::set<u64>> Graph::getBicliques() {
 
 
 
+/* =========================== GENERATION DE GRAPHE =========================== */
+
+// Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
+Graph genRandGraph(u64 N) {
+    // Déclaration d'un nouveau graphe
+    Graph graph;
+
+    // On ajoute une arrête entre i et j avec une probabilité de 50%
+    for(u64 i=0 ; i<N ; i++)
+        for(u64 j=0 ; j<N ; j++) {
+            // Nombre aléatoire entre 0 et 1
+            double r = (double) rand() / (double) RAND_MAX;
+
+            // Connecte i et j si r<0.5
+            if (r < 0.5) graph.connect(i, j);
+        }
+    
+    return graph;
+}
+
+
+
+
+/* =========================== GRAPHES SIMPLES =========================== */
+
 // Génère un graphe qui représente une molecule d'eau (à des fins de tests majoritairement)
 Graph H2O() {
     Graph graph;
@@ -282,5 +310,6 @@ Graph Hexagone() {
     
     return graph;
 }
+
 
 } // end namespace GL
