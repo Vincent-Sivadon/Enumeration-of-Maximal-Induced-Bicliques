@@ -1,14 +1,16 @@
 #include <assert.h>
 
-#include "graphesMat.hpp"
+#include "graphes.hpp"
 
-int main() {
-    GM::Graph hex = GM::Hexagone();
+template <typename T>
+void test()
+{
+    Graph<T> hex = Hexagone<T>();
     hex.connect(0, 3);
     hex.connect(4, 2);
     hex.connect(0, 2);
-    std::set<std::set<u64>> hex_bicliques = hex.getBicliques();
 
+    std::set<std::set<u64>> hex_bicliques = hex.getBicliques();
 
     std::set<std::set<u64>> expected = 
         {
@@ -17,6 +19,15 @@ int main() {
 
     for (auto& set : hex_bicliques)
         assert(expected.find(set) != expected.end());
+}
+
+
+int main() {
+    // Lance les tests version matrice
+    test<Mat>();
+
+    // Lance les tests version liste
+    test<Lst>();
 
 
    return 0;

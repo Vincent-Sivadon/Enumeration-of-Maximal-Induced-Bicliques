@@ -1,73 +1,16 @@
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <set>
-#include <utility>
-# define INF 0x3f3f3f3f
-
-#include "visualisationMat.hpp"
-#include "graphesMat.hpp"
-#include "suffixTree.hpp"
-
-namespace GM {
+/*
+    - Contient l'implémentation de la structure Graph.
+*/
 
 
-/* ===================== CONNECTIONS ENTRE SOMMETS ===================== */
-    
-// Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
-void Graph::connect(u64 i, u64 j) {
-    adj[i*N + j] = 1;
-    adj[j*N + i] = 1;
-}
-
-// Retourne un booléen indiquant si les sommets i et j sont connectés
-bool Graph::areConnected(u64 i, u64 j) {
-    // Si adj[i][j] = 1 alors connectés sinon adj[i][j] = 0
-    return adj[i*N + j];
-}
-
-
-
-
-/* =========================== VISUALISATION =========================== */
-
-// Affiche le graphe dans le terminal (à des fins de debug)
-void Graph::print() {
-
-    // Pour chaque paire de sommet (i,j)
-    for(u64 i=0 ; i<N ; i++)
-    {
-        for(u64 j=0 ; j<N ; j++)
-        {
-            std::cout << adj[i*N + j] << " ";
-        }
-        std::cout << "\n";
-    }
-}
-
-// dessine le graphe à l'écran
-void Graph::draw() {
-    // Appel à l'implémentation de "visualisation.cpp"
-    drawGraph(*this);
-}
-
-void printSets(std::set<std::set<u64>> sets)
-{
-    for(auto& set : sets) {
-        for(auto& i : set) {
-            std::cout << i << " ";
-        }
-        std::cout << "\n";
-    }
-}
-
-
+#pragma once
 
 
 /* =============================== SETS =============================== */
 
 // Retourn un booléen indiquant si un set est propre par rapport au graphe
-bool Graph::isProper(std::set<u64> set)
+template <typename T>
+bool Graph<T>::isProper(std::set<u64> set)
 {
     for (auto i = set.begin(); i!= set.end();i++)
         for(auto j = set.begin(); j!=set.end();j++)
@@ -78,7 +21,8 @@ bool Graph::isProper(std::set<u64> set)
 }
 
 // Indique si vertex est connecté au set dans le graphe
-bool Graph::isConnectedToSet(u64 v, std::set<u64> set)
+template <typename T>
+bool Graph<T>::isConnectedToSet(u64 v, std::set<u64> set)
 {
     for (const auto& u : set){
         if (areConnected(v, u)) return true;
@@ -87,7 +31,8 @@ bool Graph::isConnectedToSet(u64 v, std::set<u64> set)
 }
 
 // Enumère tout les set indépendants
-void Graph::getIndSets(std::set<std::set<u64>>& IndSets, std::set<u64>& tmpSet, u64 i)
+template <typename T>
+void Graph<T>::getIndSets(std::set<std::set<u64>>& IndSets, std::set<u64>& tmpSet, u64 i)
 {
     for(u64 j=i ; j<N ; j++)
     {
@@ -107,7 +52,8 @@ void Graph::getIndSets(std::set<std::set<u64>>& IndSets, std::set<u64>& tmpSet, 
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets() {
+template <typename T>
+std::set<std::set<u64>> Graph<T>::getMaxIndSets() {
     //
     std::set<std::set<u64>> IndSets;
     std::set<u64> tmpSet;
@@ -131,22 +77,13 @@ std::set<std::set<u64>> Graph::getMaxIndSets() {
 
 
 
+
+
 /* ============================= UTILITAIRE ============================= */
 
-// Recherche du sommet avec la distance minimale
-u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited) {
-    // On initialisa la distance minimal à l'infini et l'index du noeud pour lequel la distance est minimal
-    u64 min = INF, min_index=0;
-
-    for(u64 v=0 ; v<dist.size() ; v++)
-        if (!visited[v] && dist[v]<=min)
-            min = dist[v], min_index = v;
-
-    return min_index;
-}
-
 // Donne la longueur du plus court chemin depuis src pour chaque sommet
-std::vector<u64> Graph::shortestPaths(u64 src) {    
+template <typename T>
+std::vector<u64> Graph<T>::shortestPaths(u64 src) {    
     /* On crée un tableau dynamique pour stocker les distances et on et 
     initialise toutes les distances à l'infini.
     Et on crée un ensemble pour dire si les sommets ont été visités */
@@ -171,7 +108,7 @@ std::vector<u64> Graph::shortestPaths(u64 src) {
         for(u64 v=0 ; v<N ; v++)
         {
             // si adj[u][v] = 0 alors ils ne sont pas voisins
-            if(adj[u*N + v]==0) continue;
+            if(!areConnected(u,v)) continue;
 
             // On met à jour la plus courte distance si besoin
             if (dist[v] > dist[u] + 1 && !visited[v])
@@ -188,13 +125,14 @@ std::vector<u64> Graph::shortestPaths(u64 src) {
 /* ======================== PROCEDURE DE L'ARTICLE ======================== */
 
 // Génère les sous-graphes d'après le papier
-Graph Graph::genSubgraph(u64 i) {
+template <typename T>
+Graph<T> Graph<T>::genSubgraph(u64 i) {
 
     // Obtenir les distances au sommet i
     std::vector<u64> dist = shortestPaths(i);
 
     //
-    Graph subgraph(N);
+    Graph<T> subgraph(N);
 
     //
     for(u64 x=0 ; x<N ; x++)
@@ -224,8 +162,8 @@ Graph Graph::genSubgraph(u64 i) {
 }
 
 // Enumère tout les bicliques maximales du graphe
-std::set<std::set<u64>> Graph::getBicliques() {
-    
+template <typename T>
+std::set<std::set<u64>> Graph<T>::getBicliques() {
     //
     Tree suffixTree;
 
@@ -252,12 +190,15 @@ std::set<std::set<u64>> Graph::getBicliques() {
 
 
 
-// =========================== GENERATION DE GRAPHE ===========================
+
+/* =========================== GENERATION DE GRAPHE =========================== */
 
 // Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
-Graph genRandGraph(u64 N) {
+template <typename T>
+Graph<T> genRandGraph(u64 N)
+{ 
     // Déclaration d'un nouveau graphe
-    Graph graph(N);
+    Graph<T> graph(N);
 
     // On ajoute une arrête entre i et j avec une probabilité de 50%
     for(u64 i=0 ; i<N ; i++)
@@ -275,31 +216,34 @@ Graph genRandGraph(u64 N) {
 
 
 
-// =========================== GRAPHES SIMPLES ===========================
+/* ============================= GRAPHES SIMPLES ============================= */
 
-// Génère un graphe qui représente une molecule d'eau (à des fins de tests majoritairement)
-Graph H2O() {
-    Graph graph(3);
+// Génère un graphe représentant une molécule de H2O
+template <typename T>
+Graph<T> H2O() {
+    Graph<T> graph(3);
     graph.connect(0, 1);
     graph.connect(0, 2);
 
     return graph;
 }
 
-// Génère un graphe qui représente une molecule de méthane (à des fins de tests majoritairement)
-Graph Methane() {
-    Graph graph(5);
+// Génère un graphe représentant une molécule de méthane
+template <typename T>
+Graph<T> Methane() {
+    Graph<T> graph(5);
     graph.connect(0, 1);
     graph.connect(0, 2);
     graph.connect(0, 3);
     graph.connect(0, 4);
 
     return graph;
-}
+}    
 
-// Génère un graphe qui représente une molecule en forme d'hexagone (à des fins de tests majoritairement)
-Graph Hexagone() {
-    Graph graph(6);
+// Génère un graphe représentant un hexagone
+template <typename T>
+Graph<T> Hexagone() {
+    Graph<T> graph(6);
 
     graph.connect(0, 1);
     graph.connect(1, 2);
@@ -309,6 +253,30 @@ Graph Hexagone() {
     graph.connect(5, 0);
     
     return graph;
+}   
+
+
+
+/* =========================== FONCTION UTILITAIRE =========================== */
+
+// Recherche du sommet avec la distance minimale
+u64 minDist(std::vector<u64>& dist, std::vector<bool>& visited) {
+    // On initialisa la distance minimal à l'infini et l'index du noeud pour lequel la distance est minimal
+    u64 min = INF, min_index=0;
+
+    for(u64 v=0 ; v<dist.size() ; v++)
+        if (!visited[v] && dist[v]<=min)
+            min = dist[v], min_index = v;
+
+    return min_index;
 }
 
-} // end namespace GM
+void printSets(std::set<std::set<u64>> sets)
+{
+    for(auto& set : sets) {
+        for(auto& i : set) {
+            std::cout << i << " ";
+        }
+        std::cout << "\n";
+    }
+}

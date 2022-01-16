@@ -15,7 +15,7 @@ Pour construire tout les exectuables : `make`
 Tout les executables vont être dans le répertoire build.  
 * draw    : dessine un hexagone à l'écran  
 * genPerf : génère les données de mesures de performances dans data/perf.dat   
-
+          : taille du graphe maximale prise à 50 par défaut, mais est spécifiable par : ./genPerf [Taille Maximale]
 ## Liste des macros
 Taper les commandes suivantes pour leur effet:  
 * make plot : génère l'image perf.png et l'affiche  
@@ -25,24 +25,16 @@ Taper les commandes suivantes pour leur effet:
 
 # Structure du projet
 La hiérarchie est la suivante :
-* graphes : librairie de manipulation de graphe par liste d'adjacence
+* graphes : librairie de manipulation de graphe
     * include :
         * graphes.hpp       : header de la structure Graph
-        * visualisation.hpp : header pour l'utilisation de la fonction drawGraph()
+        * graphesImpl.hpp   : implémentation de graphes (dans un .hpp parce que c'est une structure template)
+        * adj.hpp           : contient l'interface d'une liste/matrice d'adjacence
+        * suffixTree.hpp    : header de la structure d'arbre de suffix
+        * visualisation.hpp : contient l'implémentation de Graph::draw()
     * src :
-        * graphes.cpp       : implémentation de la structure Graph
-        * visualisation.cpp : implémentation de la simulation pour la visualisation 2D d'un graphe
-* graphesMat : librairie de manipulation de graphe par matrice d'adjacence
-    * include :
-        * graphesMat.hpp       : header de la structure Graph
-        * visualisationMat.hpp : header pour l'utilisation de la fonction drawGraph()
-        * suffixTree.hpp       : header de la structure d'arbre de suffix
-    * src :
-        * graphesMat.cpp       : implémentation de la structure Graph
-        * visualisationMat.cpp : implémentation de la simulation pour la visualisation 2D d'un graphe
-        * suffixTree.cpp       : implémentation de la structure d'arbre de suffix
+        * suffixTree.cpp    : implémentation de l'arbre de suffix
 * tests : 
-    * lst : contient les tests de la version liste
-    * mat : contient les tests de la version matrice 
+    * src : contient les tests de chaque fonction
 * data  : contient les scripts et données relatifs au plot
 * *files*.cpp : code executif faisant appel aux librairies

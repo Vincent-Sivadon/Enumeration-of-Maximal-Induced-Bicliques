@@ -1,9 +1,10 @@
+#pragma once
+
 #include <map>
 #include <set>
 
 typedef unsigned long long u64;
 
-namespace GM {
 
 /* =========================== REPRESENTATION D'UN ARBRE DE SUFFIX =========================== */
 
@@ -31,6 +32,3 @@ struct Tree {
     // ============================= VISUALISATION =============================
     void print(); // affiche dans le terminal les branches de l'arbre
 };
-
-
-} // end namespace GM

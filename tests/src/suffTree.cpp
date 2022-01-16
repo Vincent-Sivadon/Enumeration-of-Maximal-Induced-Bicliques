@@ -1,7 +1,8 @@
 #include <assert.h>
 
+
+#include "graphes.hpp"
 #include "suffixTree.hpp"
-#include "graphesMat.hpp"
 
 int main()
 {
@@ -9,7 +10,7 @@ int main()
     std::set<u64> set2 = {1,3,5};
     std::set<u64> set3 = {2,3};
 
-    GM::Tree suffixTree;
+    Tree suffixTree;
 
     suffixTree.insert(set1);
     suffixTree.insert(set2);

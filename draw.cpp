@@ -9,10 +9,9 @@
 
 // Dessine un hexagone
 int main() {
-    GL::Graph g = GL::Hexagone();
+    Graph<Lst> g = Hexagone<Lst>();
     g.draw();
 
-    std::set<std::set<u64>> bicliques = g.getBicliques();
 
     return 0;
 }

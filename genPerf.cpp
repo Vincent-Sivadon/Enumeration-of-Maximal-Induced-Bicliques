@@ -5,7 +5,26 @@
 #include <omp.h>
 
 #include "graphes.hpp"
-#include "graphesMat.hpp"
+
+template <typename T>
+double perf(int N)
+{
+    double time = 0;
+
+    // On moyenne sur 10 samples
+    for(int i=0 ; i<10 ; i++)
+    {
+        Graph<T> g = genRandGraph<T>(N);
+
+        double before = omp_get_wtime();
+        std::set<std::set<u64>> bicliques = g.getBicliques();
+        double after = omp_get_wtime();
+
+        time += (after - before);
+    }
+
+    return time/10;
+}
 
 int main(int argc, char** argv) {
     // Tailles des graphes utilisés pour les mesures de performances :
@@ -13,8 +32,7 @@ int main(int argc, char** argv) {
     u64 minSize = 10;       // plus petite taille
     u64 maxSize;
     if (argc<=1) {
-        std::cout << "Par défaut la taille du graphe maximale est prise à 100, mais elle est spécifiable par : " << argv[0] << " [Taille Maximale]" << std::endl;
-        maxSize = 100;
+        maxSize = 50;
     } else { maxSize = atoll(argv[1]) ;}
 
     // Liste des tailles
@@ -25,32 +43,11 @@ int main(int argc, char** argv) {
     // Pour chaque taille n
     for(const auto& n : sizes)
     {
-        // Va stocker la moyenne du temps d'execution pour les 10 samples
-        double tmpLst = 0;
-        double tmpMat = 0;
+        double matTime = perf<Mat>(n);
 
-        // On moyenne sur 10 samples
-        for(int i=0 ; i<10 ; i++)
-        {
-            // Initialization d'un nouveau graphe aléatoire
-            GL::Graph gLst = GL::genRandGraph(n);  // version liste d'adjacence
-            GM::Graph gMat = GM::genRandGraph(n);  // version matrice d'adjacence
+        double lstTime = perf<Lst>(n);
 
-            double beforeLst = omp_get_wtime();
-            std::set<std::set<u64>> bicliquesLst = gLst.getBicliques();
-            double afterLst  = omp_get_wtime();
-
-            double beforeMat = omp_get_wtime();
-            std::set<std::set<u64>> bicliquesMat = gMat.getBicliques();
-            double afterMat  = omp_get_wtime();
-
-            //
-            tmpLst += (afterLst - beforeLst);
-            tmpMat += (afterMat - beforeMat);            
-        }
-
-        // Temps moyen d'execution pour une taille n  :  tmp/10
-        std::cout << n << " " << tmpLst/10.0 << " " << tmpMat/10.0 << std::endl;
+        std::cout << n << " " << lstTime << " " << matTime << std::endl;
     }
 
     return 0;

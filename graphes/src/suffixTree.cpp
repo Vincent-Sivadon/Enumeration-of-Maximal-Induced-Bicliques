@@ -5,9 +5,6 @@
 #include "suffixTree.hpp"
 
 
-namespace GM {
-
-
 /* =========================== CONSTRUCTION =========================== */
 
 // Ajoute un arbre descendant
@@ -38,7 +35,7 @@ void Tree::insert(std::set<u64> set)
 
 /* =========================== BRANCHES =========================== */
 
-// Enumère toutes les branches
+// Enumère toutes les branches et les stocke dans bicliques
 void Tree::getBranches(std::set<std::set<u64>>& bicliques, std::set<u64>& tmpSet)
 {
     if(subtrees.size() != 0)
@@ -96,7 +93,3 @@ void Tree::print()
         std::cout << "\n";
     }
 }
-
-
-
-} // end namespace GM

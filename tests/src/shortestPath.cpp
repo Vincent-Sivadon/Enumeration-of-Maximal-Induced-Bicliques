@@ -3,12 +3,13 @@
 // Nombre Entier Maximal
 #define INF 0x3f3f3f3f
 
-#include "graphesMat.hpp"
+#include "graphes.hpp"
 
-int main() {
-    GM::Graph methane = GM::Methane();
-    GM::Graph h2o = GM::H2O();
-    GM::Graph hex = GM::Hexagone();
+template <typename T>
+void test() {
+    Graph<T> methane = Methane<T>();
+    Graph<T> h2o = H2O<T>();
+    Graph<T> hex = Hexagone<T>();
 
     // TEST 1
     std::vector<u64> dist = methane.shortestPaths(1);
@@ -25,5 +26,15 @@ int main() {
     std::vector<u64> expected3 = {0, 1, 2, INF, 2, 1};
     assert(dist3 == expected3);
 
-    return 0;
+}
+
+int main() {
+    // Lance les tests version matrice
+    test<Mat>();
+
+    // Lance les tests version liste
+    test<Lst>();
+
+
+   return 0;
 }
