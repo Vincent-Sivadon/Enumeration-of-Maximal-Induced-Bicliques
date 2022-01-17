@@ -74,17 +74,33 @@ find_package(SDL2 REQUIRED)
 
 
 
-# Génère les mesures de performances moyénnées de la fonction getBicliques pour des tailles variables
-add_executable(genPerf ${CMAKE_SOURCE_DIR}/genPerf.cpp)
-target_link_libraries(genPerf graphes OpenMP::OpenMP_CXX SDL2)
-target_compile_options(genPerf PUBLIC -std=c++17)
+
+# ============================================= GENERATION DES EXECUTABLES =============================================
+file( GLOB SRCS "*.cpp" )
+
+# pour chaque TEST
+foreach( source ${SRCS} )
+    # file ( GLOB ... ) donne les path absolu, on le transform en relative path
+    # exemple : 
+    # "/home/vincents/Documents/Projet/Enumeration-of-Maximal-Induced-Bicliques/tests/src/areConnectedTests"
+    # transformé en :
+    # "areConnectedTests"
+    string( REPLACE ".cpp" "" source_name ${source} )
+    string( REPLACE ${CMAKE_SOURCE_DIR}/ "" source_name ${source_name} )
+
+    # on créé l'executable
+    add_executable( ${source_name} ${source} )
+
+    # on link les librairies
+    target_link_libraries( ${source_name} graphes OpenMP::OpenMP_CXX SDL2 )
+    target_compile_options(${source_name} PUBLIC -std=c++17)
+
+endforeach( source ${TEST_SRCS} )
 
 
-# Executable qui dessine un hexagone à l'écran
-add_executable(draw ${CMAKE_SOURCE_DIR}/draw.cpp)
-target_link_libraries(draw graphes OpenMP::OpenMP_CXX SDL2)
-target_compile_options(draw PUBLIC -std=c++17)
 
+
+# ============================================= GENERATION DES MACRO =============================================
 
 # "make plot" va afficher le graphe des perfs
 add_custom_target(plot COMMAND sh ../data/plot.sh)
