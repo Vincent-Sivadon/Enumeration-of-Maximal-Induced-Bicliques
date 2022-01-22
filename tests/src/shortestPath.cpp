@@ -6,7 +6,8 @@
 #include "graphes.hpp"
 
 template <typename T>
-void test() {
+void test()
+{
     Graph<T> methane = Methane<T>();
     Graph<T> h2o = H2O<T>();
     Graph<T> hex = Hexagone<T>();
@@ -25,16 +26,15 @@ void test() {
     std::vector<u64> dist3 = hex.shortestPaths(0);
     std::vector<u64> expected3 = {0, 1, 2, INF, 2, 1};
     assert(dist3 == expected3);
-
 }
 
-int main() {
+int main()
+{
     // Lance les tests version matrice
     test<Mat>();
 
     // Lance les tests version liste
     test<Lst>();
 
-
-   return 0;
+    return 0;
 }

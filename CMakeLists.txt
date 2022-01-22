@@ -74,7 +74,6 @@ find_package(SDL2 REQUIRED)
 
 
 
-
 # ============================================= GENERATION DES EXECUTABLES =============================================
 file( GLOB SRCS "*.cpp" )
 

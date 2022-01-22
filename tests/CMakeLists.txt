@@ -1,6 +1,6 @@
 
 
-# ============================================= GENERATION DES TESTS POUR VERSION AVEC MATRICE D'ADJACENCE =============================================
+# ========================== GENERATION DES TESTS POUR VERSION AVEC MATRICE D'ADJACENCE ==========================
 
 file( GLOB TEST_SRCS "src/*.cpp" )
 

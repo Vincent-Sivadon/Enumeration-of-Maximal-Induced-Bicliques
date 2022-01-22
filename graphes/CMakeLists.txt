@@ -8,13 +8,9 @@ project(graphes)
 find_package(SDL2 REQUIRED)
 
 # Créé des variables avec les fichiers à compiler
-file(GLOB SRCS
-	"src/*.cpp"
-)
+file(GLOB SRCS "src/*.cpp")
 
-file(GLOB HEADERS
-	"include/*.hpp"
-)
+file(GLOB HEADERS "include/*.hpp")
 
 add_library(graphes STATIC ${SRCS} ${HEADERS})
 target_link_libraries(graphes SDL)

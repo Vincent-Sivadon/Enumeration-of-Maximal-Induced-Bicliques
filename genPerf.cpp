@@ -12,7 +12,7 @@ double perf(int N)
     double time = 0;
 
     // On moyenne sur 10 samples
-    for(int i=0 ; i<10 ; i++)
+    for (int i = 0; i < 10; i++)
     {
         Graph<T> g = genRandGraph<T>(N);
 
@@ -23,25 +23,29 @@ double perf(int N)
         time += (after - before);
     }
 
-    return time/10;
+    return time / 10;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
     // Tailles des graphes utilisés pour les mesures de performances :
-    int N = 10;             // nombre de mesure
-    u64 minSize = 10;       // plus petite taille
+    int N = 10;       // nombre de mesure
+    u64 minSize = 10; // plus petite taille
     u64 maxSize;
-    if (argc<=1) {
+
+    // Si pas d'argument donnée à l'exécution, on prend une taille max par défaut
+    if (argc <= 1)
         maxSize = 50;
-    } else { maxSize = atoll(argv[1]) ;}
+    else
+        maxSize = atoll(argv[1]);
 
     // Liste des tailles
     u64 sizes[N];
-    for(int i=0 ; i<N ; i++)
-        sizes[i] = minSize + i*(maxSize-minSize)/N;
-    
+    for (int i = 0; i < N; i++)
+        sizes[i] = minSize + i * (maxSize - minSize) / N;
+
     // Pour chaque taille n
-    for(const auto& n : sizes)
+    for (const auto &n : sizes)
     {
         double matTime = perf<Mat>(n);
 
