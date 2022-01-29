@@ -48,8 +48,8 @@ struct Graph
     std::vector<u64> shortestPaths(u64 src); // Donne la longueur du plus court chemin depuis src pour chaque sommet
 
     /* =========== PROCEDURE DE L'ARTICLE =========== */
-    Graph<T> genSubgraph(u64 i, std::map<u64, u64> &sigma); // Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
-    std::set<std::set<u64>> getBicliques();                 // Enumère tout les bicliques maximales du graphe
+    Graph<T> genSubgraph(u64 i);            // Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
+    std::set<std::set<u64>> getBicliques(); // Enumère tout les bicliques maximales du graphe
 };
 
 /* =========================== GENERATION DE GRAPHE =========================== */
