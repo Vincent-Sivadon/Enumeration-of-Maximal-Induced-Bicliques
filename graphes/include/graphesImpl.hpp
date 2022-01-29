@@ -123,17 +123,23 @@ std::vector<u64> Graph<T>::shortestPaths(u64 src)
 
 /* ======================== PROCEDURE DE L'ARTICLE ======================== */
 
-// Génère les sous-graphes d'après le papier
+// Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
 template <typename T>
-Graph<T> Graph<T>::genSubgraph(u64 i)
+Graph<T> Graph<T>::genSubgraph(u64 i, std::map<u64, u64> &sigma)
 {
     // Obtenir les distances au sommet i
     std::vector<u64> dist = shortestPaths(i);
 
-    //
-    Graph<T> subgraph(N);
+    // Store the pairs to insert in the subgraph
+    std::set<std::pair<u64, u64>> pairs;
 
-    //
+    // On redéfinit les indices des noeuds pour le sous graphe
+    // (si 3 est le premier sommet du graphe parent à être inséré dans le sous graphe, il aura pour indice 0)
+    // (si 5 est le troisième sommet à être inséré, il aura pour indice 2 dans le sous graphe)
+    // Sigma permet de garder en mémoire ces associations
+    u64 count = 0;
+
+    // Run through all pairs of nodes in the parent graph
     for (u64 x = 0; x < N; x++)
         for (u64 y = x + 1; y < N; y++)
         {
@@ -154,10 +160,30 @@ Graph<T> Graph<T>::genSubgraph(u64 i)
             // Ajouter une arrete si l'une des conditions est vérifiée
             if (cond1 || cond2 || cond3 || cond4)
             {
-                subgraph.connect(x, y);
+                // Si le noeud x n'est pas encore dans le sous graphe
+                if (sigma.find(x) == sigma.end())
+                {
+                    // Alors on l'insère en lui donnant l'indice "count"
+                    sigma.insert({x, count});
+                    count++;
+                }
+                // Do the same for y
+                if (sigma.find(y) == sigma.end())
+                {
+                    // Alors on l'insère en lui donnant l'indice "count"
+                    sigma.insert({y, count});
+                    count++;
+                }
+
+                // Add node x and y with new indices to the pairs of the subgraph
+                pairs.insert({sigma[x], sigma[y]});
             }
         }
 
+    // Create subgraph and insert all the pairs
+    Graph<T> subgraph(count);
+    for (const auto &pair : pairs)
+        subgraph.connect(pair.first, pair.second);
     return subgraph;
 }
 
@@ -172,7 +198,8 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
     for (u64 i = 0; i < N; i++)
     {
         // Construct the subgraph G_i
-        Graph subgraph_i = genSubgraph(i);
+        std::map<u64, u64> sigma; // récupère les nouveaux indices
+        Graph subgraph_i = genSubgraph(i, sigma);
 
         // Get all maximal independent sets of G_i
         std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();

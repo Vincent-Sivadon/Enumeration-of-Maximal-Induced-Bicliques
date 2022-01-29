@@ -28,6 +28,7 @@ struct Graph
 
     /* =========== CONSTRUCTEUR =========== */
     Graph(u64 N) : N(N) { adj = std::make_unique<T>(N); }
+    Graph() { adj = std::make_unique<T>; }
 
     /* ======== CONNECTIONS ENTRE SOMMETS ======== */
     void connect(u64 i, u64 j) { adj->connect(i, j); }                  // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
@@ -47,8 +48,8 @@ struct Graph
     std::vector<u64> shortestPaths(u64 src); // Donne la longueur du plus court chemin depuis src pour chaque sommet
 
     /* =========== PROCEDURE DE L'ARTICLE =========== */
-    Graph<T> genSubgraph(u64 i);            // Génère les sous-graphes d'après le papier
-    std::set<std::set<u64>> getBicliques(); // Enumère tout les bicliques maximales du graphe
+    Graph<T> genSubgraph(u64 i, std::map<u64, u64> &sigma); // Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
+    std::set<std::set<u64>> getBicliques();                 // Enumère tout les bicliques maximales du graphe
 };
 
 /* =========================== GENERATION DE GRAPHE =========================== */
