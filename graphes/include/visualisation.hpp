@@ -34,9 +34,8 @@ void drawParticle(SDL_Renderer *renderer, Vector center)
 {
     // Coordonnées du centre du disque
     double xc = center.x, yc = center.y;
-    double x = 0, y = 5;
+    double x = 0, y = 10;
 
-    SDL_SetRenderDrawColor(renderer, 250, 250, 250, 255);
     SDL_RenderDrawPoint(renderer, xc + x, yc - y);
 
     u64 p = 3 - (2 * 5);
@@ -169,8 +168,8 @@ void Graph<T>::draw()
 
     // Parameters
     u64 width = 800, height = 800; // dimensions de la fenêtre
-    u64 timeSteps = 300;           // nombre de pas de temps de la simulation
-    double l0 = 50;                // Taille du "ressort" qui représente les forces attractives entre sommets liés
+    u64 timeSteps = 600;           // nombre de pas de temps de la simulation
+    double l0 = 100;               // Taille du "ressort" qui représente les forces attractives entre sommets liés
 
     // Variables de positions, vitesses et accélérations pour chaque sommet
     std::vector<Vector> pos(N), vel(N), acc(N);
@@ -205,7 +204,110 @@ void Graph<T>::draw()
         // Dessine chaque sommets et chaque liens s'ils existent
         for (u64 i = 0; i < N; i++)
         {
+            SDL_SetRenderDrawColor(renderer, 250, 250, 250, 255);
             drawParticle(renderer, pos[i]);
+            for (u64 j = 0; j < N; j++)
+                if (areConnected(i, j))
+                    SDL_RenderDrawLine(renderer, pos[i].x, pos[i].y, pos[j].x, pos[j].y);
+        }
+
+        // Actualisation graphique de la fenêtre
+        SDL_RenderPresent(renderer);
+    }
+
+    // Met tout le code en pause tant que l'utilisation ne quitte pas la fenêtre
+    while (SDL_WaitEvent(&event))
+        if (event.type == SDL_QUIT)
+            break;
+
+    // Nettoie la mémoire
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+void setSDLcolor(SDL_Renderer *renderer, int id)
+{
+    if (id == 0)
+        SDL_SetRenderDrawColor(renderer, 250, 250, 250, 255);
+    else if (id == 1)
+        SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255);
+    else if (id == 2)
+        SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255);
+}
+
+// Bicoloration de la biclique du graphe
+template <typename T>
+void Graph<T>::drawBiclique(std::set<u64> biclique)
+{
+    // Initialise random seed
+    srand(getpid());
+
+    // Parameters
+    u64 width = 800, height = 800; // dimensions de la fenêtre
+    u64 timeSteps = 600;           // nombre de pas de temps de la simulation
+    double l0 = 100;               // Taille du "ressort" qui représente les forces attractives entre sommets liés
+
+    // Variables de positions, vitesses et accélérations pour chaque sommet
+    std::vector<Vector> pos(N), vel(N), acc(N);
+
+    // Initialisation des positions et des vitesses pour chaque sommet
+    for (u64 i = 0; i < N; i++)
+    {
+        pos[i].x = randxy(200, 400);
+        pos[i].y = randxy(200, 400);
+
+        vel[i].x = 0;
+        vel[i].y = 0;
+    }
+
+    // Assiociation of a color for each body
+    // 0 : white
+    // 1 : red
+    // 2 : green
+    std::vector<int> colors(N, 0);
+
+    // Start with the first node of the biclique
+    auto iter_first = biclique.begin();
+    u64 firstEl = *(biclique.begin());
+    biclique.erase(iter_first);
+    colors[firstEl] = 1;
+
+    // Set the colors by comparing nodes to the first one
+    for (const auto &el : biclique)
+    {
+        if (areConnected(firstEl, el))
+            colors[el] = 2;
+        else
+            colors[el] = 1;
+    }
+
+    // SDL initialisation (bibliothèque graphique 2D)
+    SDL_Event event;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_CreateWindowAndRenderer(800, 800, SDL_WINDOW_OPENGL, &window, &renderer);
+
+    // Boucle de la simulation
+    for (u64 t = 0; t < timeSteps; t++)
+    {
+        // Met à jour les positions des sommets sur le dessin
+        simulate<T>(*this, pos, vel, acc, l0, width, height);
+
+        // Efface le contenu graphique de la fenêter
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        // Dessine chaque sommets et chaque liens s'ils existent
+        for (u64 i = 0; i < N; i++)
+        {
+            // Draw particle
+            setSDLcolor(renderer, colors[i]);
+            drawParticle(renderer, pos[i]);
+
+            // Draw line
+            SDL_SetRenderDrawColor(renderer, 250, 250, 250, 255);
             for (u64 j = 0; j < N; j++)
                 if (areConnected(i, j))
                     SDL_RenderDrawLine(renderer, pos[i].x, pos[i].y, pos[j].x, pos[j].y);

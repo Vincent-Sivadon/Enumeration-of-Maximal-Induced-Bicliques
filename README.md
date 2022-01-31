@@ -13,7 +13,7 @@ Pour construire tout les exectuables : `make`
 
 ## Liste des executables
 Tout les executables vont être dans le répertoire build.  
-* draw    : dessine un hexagone à l'écran  
+* draw    : dessine un graph avec un blicique coloré
 * genPerf : génère les données de mesures de performances dans data/perf.dat   
           : taille du graphe maximale prise à 50 par défaut, mais est spécifiable par : ./genPerf [Taille Maximale]
 ## Liste des macros

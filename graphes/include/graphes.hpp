@@ -43,6 +43,7 @@ struct Graph
     /* =========== VISUALISATION =========== */
     void print() { adj->print(); }; // Affiche le graphe dans le terminal (à des fins de debug)
     void draw();                    // Dessine le graphe à  l'écran
+    void drawBiclique(std::set<u64> biclique);
 
     /* =========== UTILITAIRE =========== */
     std::vector<u64> shortestPaths(u64 src); // Donne la longueur du plus court chemin depuis src pour chaque sommet
