@@ -6,8 +6,15 @@
 #include <vector>
 #include <memory>
 #include <stdbool.h>
+#include <algorithm>
 
 typedef unsigned long long u64;
+typedef struct vertexMin
+{
+    int degree;
+    int vertex;
+} vertexMin;
+
 
 /* ============================== INTERFACE vers une représentation d'adjacence ============================== */
 struct Adj
@@ -16,8 +23,10 @@ struct Adj
     virtual ~Adj() = default;
 
     /* ============= PRINCIPAL ============= */
-    virtual void connect(u64 i, u64 j) = 0;      // Crée un lien entre deux sommets i et j
-    virtual bool areConnected(u64 i, u64 j) = 0; // Indique si deux sommets sont reliés ou non
+    virtual void connect(u64 i, u64 j) = 0;                   // Crée un lien entre deux sommets i et j
+    virtual bool areConnected(u64 i, u64 j) = 0;              // Indique si deux sommets sont reliés ou non
+    virtual std::vector<int> verticesdegrees() const = 0;     // Permet de connaitre Le degré de chaque sommet dans le graphe
+    virtual void deConnected(u64 i, u64 j) = 0;               // supprimer le lien entre deux sommets i et j
 
     /* ============ VISUALISATION ============ */
     virtual void print() const = 0; // Affiche le contenu de l'adjacence
@@ -31,12 +40,14 @@ struct Mat : public Adj
     u64 N;
 
     /* =========== CONSTRUCTEURS =========== */
-    Mat(u64 N) : N(N) { adj.resize(N * N); }
+    Mat(u64 N) : N(N) { adj.resize(N * N); }  
     virtual ~Mat() = default;
 
     /* ============= PRINCIPAL ============= */
-    void connect(u64 i, u64 j) override;      // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
-    bool areConnected(u64 i, u64 j) override; // Indique si deux sommets sont reliés ou non
+    void connect(u64 i, u64 j) override;                    // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
+    bool areConnected(u64 i, u64 j) override;               // Indique si deux sommets sont reliés ou non
+    std::vector<int> verticesdegrees() const override;      // Permet de connaitre le degré de toux les sommets du graphe
+    void deConnected(u64 i, u64 j) override;                // Supprimer le lien entre deux sommets i et j
 
     /* ============ VISUALISATION ============ */
     void print() const override; // Affiche le contenu de la matrice d'adjacence
@@ -54,8 +65,10 @@ struct Lst : public Adj
     virtual ~Lst() = default;
 
     /* ============= PRINCIPAL ============= */
-    void connect(u64 i, u64 j) override;      // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
-    bool areConnected(u64 i, u64 j) override; // Indique si deux sommets sont reliés ou non
+    void connect(u64 i, u64 j) override;                  // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
+    bool areConnected(u64 i, u64 j) override;             // Indique si deux sommets sont reliés ou non
+    std::vector<int> verticesdegrees() const override;    // Permet de connaitre le degré de toux les sommets du graphe
+    void deConnected(u64 i, u64 j) override;              // Supprimer le lien entre deux sommets i et j          
 
     /* ============ VISUALISATION ============ */
     void print() const override; // Affiche le contenu de la liste d'adjacence
@@ -74,6 +87,28 @@ bool Mat::areConnected(u64 i, u64 j)
 {
     // Si adj[i][j] = 1 alors connectés sinon adj[i][j] = 0
     return adj[i * N + j];
+}
+
+// Permet de connaitre le degré de tous les sommets du graphe
+std::vector<int> Mat::verticesdegrees() const
+{
+    std::vector<int> vertDeg (N);
+    int ctn = 0;
+    for(int i = 0; i < N; i++)
+        for(int j = 0; j < N; j++)
+            if(adj[i*N + j] == 1)
+                ctn++;
+        vertDeg.push_back(ctn);
+    
+    return vertDeg;
+
+}
+
+// Supprimé le lien entre deux sommets i et j
+void Mat::deConnected(u64 i, u64 j)
+{
+    adj[i*N +j] = 0;
+    adj[j*N +i] = 0;
 }
 
 // Affiche le contenu de la matrice d'adjacence
@@ -107,6 +142,39 @@ bool Lst::areConnected(u64 i, u64 j)
             return true;
     return false;
 }
+
+// Permet de connaitre le degré de tous les sommets du graphe
+std::vector<int> Lst::verticesdegrees() const
+{
+    std::vector<int> vertDeg (N);
+
+    for (auto &i : adj)
+        vertDeg.push_back(i.second.size());
+    return vertDeg;
+}
+
+// Supprimé le lien entre deux sommets i et j
+void Lst::deConnected(u64 i, u64 j)
+{
+    //parcourir la liste des voisins du premier sommet à la recherche du second puis le supprimer dès qu'on l'aura trouver
+    for(int k = 0; k < adj[i].size(); k++)
+    {
+        if (adj[i][k] == j ) {
+            adj[i].erase(adj[i].begin + k);
+            break;
+        }
+    }
+
+    //parcourir la liste des voisins du deuxième sommet à la recherche du premier puis le supprimer dès qu'on l'aura trouver
+    for(int k = 0; k < adj[j].size(); k++)
+    {
+        if (adj[j][k] == i) {
+            adj[j].erase(adj[j].begin() + k);
+            break;
+        }
+    }
+}
+
 
 // Affiche le contenu de la liste d'adjacence
 void Lst::print() const
