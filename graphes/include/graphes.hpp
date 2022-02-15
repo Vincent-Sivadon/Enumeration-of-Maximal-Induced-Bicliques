@@ -50,6 +50,7 @@ struct Graph
 
     /* =========== PROCEDURE DE L'ARTICLE =========== */
     Graph<T> genSubgraph(u64 i);            // Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
+    std::vector<Graph<T>> genSubgraphGik(u64 i);  // Génère les sous-graphes Gik à partir d'un graphe Gi donné
     std::set<std::set<u64>> getBicliques(); // Enumère tout les bicliques maximales du graphe
 };
 

@@ -160,6 +160,91 @@ Graph<T> Graph<T>::genSubgraph(u64 i)
     return subgraph;
 }
 
+// Fonction qui génére tous les sous graphes Gik pour un graphe Gi donné
+
+template <typename T>
+std::vector<Graph<T>> Graph<T>::genSubgraphGik(u64 i)
+{
+
+    std::vector<u64> dist = shortestPaths(i);
+
+    // Initialisation du tableau contenant l'ensemble des sous graphes Gik
+    std::vector<Graph<T>> all_subgraph_Gik;
+
+    Graph<T> subgraph;
+
+    // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
+
+    for (u64 x = i; x < N; x++)
+        for (u64 y = x + 1; y < N; y++)
+        {
+
+            bool are_connected = areConnected(x, y);
+
+            // Conditions  de construction des arretes
+
+            bool x_dist1 = dist[x] == 1;
+            bool y_dist1 = dist[y] == 1;
+            bool x_dist2 = dist[x] == 2;
+            bool y_dist2 = dist[y] == 2;
+
+            bool cond1 = x_dist1 && y_dist1 && are_connected;
+
+            // Si x est à distance un de i, on peut créer un sous graph Gik à partir de x
+            if (x_dist1)
+            {
+                // On détermine l'ensemble des sommets à distance un de x
+                std::vector<u64> dist1 = shortestPaths(x);
+
+                // On boucle sur l'ensemble des sommets à distance un de x
+                for (auto const &it : dist1)
+                {
+                    // on vérifie les sommets à distance un de x
+                    bool u_dist1 = dist1[it] == 1;
+
+                    // Les conditions de contructions des arrêtes
+                    bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
+
+                    bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
+
+                    if (cond1 || cond2 || cond3)
+
+                        subgraph.connect(x, y);
+                }
+
+                // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des sous graph Gik
+
+                all_subgraph_Gik.push_back(subgraph);
+            }
+
+            // On effectue les mêmes instructions qu'avec le premier if mais cette fois ci on vérifie si y appartient à l'ensemble à distance 1 de i
+
+            else if (y_dist1)
+            {
+                std::vector<u64> dist2 = shortestPaths(y);
+
+                // Conditon de verification pour les arretes
+
+                for (auto const &it : dist2)
+                {
+                    bool u_dist1 = dist2[it] == 1;
+
+                    bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
+
+                    bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
+
+                    if (cond1 || cond2 || cond3)
+                        // Add node x and y with new indices to the pairs of the subgraph
+                        subgraph.connect(x, y);
+                }
+
+                all_subgraph_Gik.push_back(subgraph);
+            }
+        }
+
+    return all_subgraph_Gik;
+}
+
 // Enumère tout les bicliques maximales du graphe
 template <typename T>
 std::set<std::set<u64>> Graph<T>::getBicliques()
