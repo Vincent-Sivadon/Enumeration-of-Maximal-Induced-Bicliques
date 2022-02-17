@@ -40,6 +40,16 @@ struct Graph
     void getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i); // Enumère tout les sets indépendants du graphe
     std::set<std::set<u64>> getMaxIndSets();                                         // Eumère tout les sets indépendants maximaux
 
+    /* ============ BRON-KERBOSCH ========== */
+    //Inter and union functions for Bron Kerbosch
+    std::set<u64> inter(std::set<u64> set, u64 v);           // Retourne l'intersection entre le sommet et l'ensemble de sommets entrés. 
+    std::set<u64> u(std::set<u64> uni, u64 v);               // Retourn l'union des mêmes arguments. 
+
+    // Bron Kerbosch algorithm
+    void prepareBron();
+    void bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X); // Algorithme permettant de générer les ensembles indépendants maximaux. 
+    std::set<std::set<u64>> cliques;  // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
+
     /* =========== VISUALISATION =========== */
     void print() { adj->print(); }; // Affiche le graphe dans le terminal (à des fins de debug)
     void draw();                    // Dessine le graphe à  l'écran
