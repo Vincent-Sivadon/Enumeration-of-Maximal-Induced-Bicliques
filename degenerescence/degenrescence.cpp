@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-
+#include <assert.h>
 #include <algorithm>
 
 typedef struct edgeMin // structure dont les champs stockent le sommet de degré minimal et ledit degré
@@ -8,6 +8,17 @@ typedef struct edgeMin // structure dont les champs stockent le sommet de degré
     int degree;
     int vertex;
 } edgeMin;
+
+/**
+ * @brief structure dont les champs permettent de stocker les sommets dans l'ordre de leurs suppression ainsi que leurs degrés respectifs
+ * degTab  -> contient les degrés des sommets,
+ * vertTab -> contient les sommets.
+ */
+typedef struct degenElem
+{  
+    std::vector<int> degTab;
+    std::vector<int> vertTab;
+} degenElem;
 
 /************ Fonction permettant de connaitre Le degre de chaque sommet*****/
 std::vector<int> Find_degrees(std::vector<std::vector<int>> &graph, int Nb_vertices)
@@ -35,36 +46,47 @@ void printGraph(std::vector<std::vector<int>> &graph, int N)
 {
     for (int i = 0; i < graph.size(); i++)
     {
-        std::cout << "\n voisins de : " << i << "\n";
+        std::cout << "voisins de " << i << ": ";
         for (auto x : graph[i])
-            std::cout << "->" << x;
-        printf("\n");
+            std::cout << x << ", ";
+        std::cout << std::endl;
     }
 }
 
-/************* Fonction permettant d'ajouter des arretes un graphe modeliser par une liste d'adjacence */
-
+/**
+ * Fonction permettant d'ajouter des arretes un graphe modeliser par une liste d'adjacence
+ */
 void addEdge(std::vector<std::vector<int>> &graph, int a, int b)
 {
     graph[a].push_back(b);
     graph[b].push_back(a);
 }
 
-/************* fonction permettant de trouver les sommets de degrés minimum ainsi que le degré minimal d'un graphe passé en argument *****************************/
+bool isGraphEmpty(std::vector<std::vector<int>> &graph, int N) {
+    auto degrees = Find_degrees(graph, N);
+    return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e) {
+        return e == 0;
+    });
+}
 
+/**
+ * fonction permettant de trouver les sommets de degrés minimum ainsi que le degré minimal d'un graphe passé en argument
+ * 
+ * 
+ * 
+ */
 edgeMin FindVertexDegMin(std::vector<std::vector<int>> &graph, int N)
 {
+    assert(!isGraphEmpty(graph, N));
     edgeMin s;
     std::vector<int> EdgeDeg = Find_degrees(graph, N); // Trouver les degrés de chaque sommet du graphe passé en argument et les stocker dans un tableau
 
-    int cnt = 0;
-    int vertexWithDegMin;
-    if (!graph[cnt].empty())
-        vertexWithDegMin = cnt; // On commence par initialisé le sommet de degré minimal comme le premier sommet de la liste d'adjacence
-    else
-    {
-        ++cnt;
-        vertexWithDegMin = cnt;
+    int vertexWithDegMin = 0;
+    for(int i = 0; i < N; i++) {
+        if(EdgeDeg[i] <= 0) 
+            continue;
+        vertexWithDegMin = i;
+        break;
     }
 
     int minEdgeDeg = EdgeDeg[vertexWithDegMin]; // On commence également par initialisé le degré minimial par le degré du premier sommet
@@ -147,18 +169,23 @@ void delEdge(std::vector<std::vector<int>> &graph, int a, int b)
     } */
 }
 
+
+
 /****************************Algo de degenerescence **********************/
 // template <typename T>
 // void degenOrder(const Graph<T> &graph, int N)
-void degenOrder(std::vector<std::vector<int>> &graph, int N)
+degenElem degenOrder(std::vector<std::vector<int>> &graph, int N)
 {
-    std::vector<int> rmOrder;
+    degenElem dge;
+    std::vector<int> rmdeg;
     std::vector<int> rmVertices;
-    while (!graph.empty())
+    int tmp = 0;
+    while (!isGraphEmpty(graph, N) && tmp++ < 10)
     {
+        printGraph(graph, N);
         edgeMin s = FindVertexDegMin(graph, N);
         std::cout << "degre : " << s.degree;
-        rmOrder.push_back(s.degree);
+        rmdeg.push_back(s.degree);
         std::cout << "  ; node : " << s.vertex;
         rmVertices.push_back(s.vertex);
         std::cout << "\n";
@@ -168,6 +195,9 @@ void degenOrder(std::vector<std::vector<int>> &graph, int N)
             delEdge(graph, s.vertex, u);
         }
     }
+    dge.degTab  = rmdeg;
+    dge.vertTab = rmVertices;
+    return dge ;
 }
 
 int main()
@@ -219,10 +249,14 @@ int main()
     PrintVerticesDeg(VertDeg);
     printMinVertex(u);*/
 
-    degenOrder(graph, N);
+    degenElem d = degenOrder(graph, N);
     // delEdge(graph, 0, 4);
     // std::cout << graph[0].empty() << "\n";
     printGraph(graph, N);
     //   printGraph(graph,N);
+    for (auto i :d.vertTab )
+    {
+        std::cout << i << " ";
+    }
     return 0;
 }
