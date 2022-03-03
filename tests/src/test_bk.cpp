@@ -4,7 +4,6 @@
 
 #include "bron-kerbosch.hpp"
 
-
 template <typename T>
 void test()
 {
