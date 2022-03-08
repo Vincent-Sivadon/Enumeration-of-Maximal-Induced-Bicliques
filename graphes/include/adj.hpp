@@ -14,6 +14,17 @@ typedef struct vertexMin
     int vertex;
 } vertexMin;
 
+/**
+ * @brief structure dont les champs permettent de stocker les sommets dans l'ordre de leurs suppression ainsi que leurs degrés respectifs
+ * degTab  -> contient les degrés des sommets,
+ * vertTab -> contient les sommets.
+ */
+typedef struct degenElem
+{
+    std::vector<int> degTab;
+    std::vector<int> vertTab;
+} degenElem;
+
 /* ============================== INTERFACE vers une représentation d'adjacence ============================== */
 struct Adj
 {
@@ -21,11 +32,13 @@ struct Adj
     virtual ~Adj() = default;
 
     /* ============= PRINCIPAL ============= */
-    virtual void connect(u64 i, u64 j) = 0;      // Crée un lien entre deux sommets i et j
-    virtual bool areConnected(u64 i, u64 j) = 0; // Indique si deux sommets sont reliés ou non
-    virtual std::vector<int> verticesdegrees() const = 0;     // Permet de connaitre Le degré de chaque sommet dans le graphe
-    virtual void deConnected(u64 i, u64 j) = 0;               // supprimer le lien entre deux sommets i et j
-
+    virtual void connect(u64 i, u64 j) = 0;               // Crée un lien entre deux sommets i et j
+    virtual bool areConnected(u64 i, u64 j) = 0;          // Indique si deux sommets sont reliés ou non
+    virtual std::vector<int> verticesdegrees() const = 0; // Permet de connaitre Le degré de chaque sommet dans le graphe
+    virtual void deConnected(u64 i, u64 j) = 0;           // supprimer le lien entre deux sommets i et j
+    virtual vertexMin findMinVertex() = 0;                // Trouver le sommet de degré minimal
+    virtual degenElem degenOrder() = 0;                   // Fonction permettant de connaitre l'ordre de dégénrescence du graphe.
+    virtual bool isGraphEmpty() const = 0;                // Fonction permettant de vérifier si le graphe est vide ou pas.
     /* ============ VISUALISATION ============ */
     virtual void print() const = 0; // Affiche le contenu de l'adjacence
 };
@@ -42,11 +55,13 @@ struct Mat : public Adj
     virtual ~Mat() = default;
 
     /* ============= PRINCIPAL ============= */
-    void connect(u64 i, u64 j) override;      // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
-    bool areConnected(u64 i, u64 j) override; // Indique si deux sommets sont reliés ou non
-    std::vector<int> verticesdegrees() const override;      // Permet de connaitre le degré de toux les sommets du graphe
-    void deConnected(u64 i, u64 j) override;                // Supprimer le lien entre deux sommets i et j
-
+    void connect(u64 i, u64 j) override;               // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
+    bool areConnected(u64 i, u64 j) override;          // Indique si deux sommets sont reliés ou non
+    std::vector<int> verticesdegrees() const override; // Permet de connaitre le degré de toux les sommets du graphe
+    void deConnected(u64 i, u64 j) override;           // Supprimer le lien entre deux sommets i et j
+    vertexMin findMinVertex() override;                // Trouver le sommet de degré minimal
+    degenElem degenOrder() override;                   // Fonction permettant de connaitre l'ordre de dégénrescence du graphe.
+    bool isGraphEmpty() const override;                         // Fonction permettant de savoir si le graphe est vide ou pas.
     /* ============ VISUALISATION ============ */
     void print() const override; // Affiche le contenu de la matrice d'adjacence
 };
@@ -63,11 +78,13 @@ struct Lst : public Adj
     virtual ~Lst() = default;
 
     /* ============= PRINCIPAL ============= */
-    void connect(u64 i, u64 j) override;      // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
-    bool areConnected(u64 i, u64 j) override; // Indique si deux sommets sont reliés ou non
-    std::vector<int> verticesdegrees() const override;    // Permet de connaitre le degré de toux les sommets du graphe
-    void deConnected(u64 i, u64 j) override;              // Supprimer le lien entre deux sommets i et j    
-
+    void connect(u64 i, u64 j) override;               // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
+    bool areConnected(u64 i, u64 j) override;          // Indique si deux sommets sont reliés ou non
+    std::vector<int> verticesdegrees() const override; // Permet de connaitre le degré de toux les sommets du graphe
+    void deConnected(u64 i, u64 j) override;           // Supprimer le lien entre deux sommets i et j
+    vertexMin findMinVertex() override;                // Trouver le sommet de degré minimal
+    degenElem degenOrder() override;                   // Fonction permettant de connaitre l'ordre de dégénrescence du graphe.
+    bool isGraphEmpty() const override;                         // Fonction permettant de savoir si le graphe est vide ou pas.
     /* ============ VISUALISATION ============ */
     void print() const override; // Affiche le contenu de la liste d'adjacence
 };
@@ -90,25 +107,75 @@ bool Mat::areConnected(u64 i, u64 j)
 // Permet de connaitre le degré de tous les sommets du graphe
 std::vector<int> Mat::verticesdegrees() const
 {
-    std::vector<int> vertDeg (N);
+    std::vector<int> vertDeg(N);
     int ctn = 0;
-    for(int i = 0; i < N; i++)
-        for(int j = 0; j < N; j++)
-            if(adj[i*N + j] == 1)
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++)
+            if (adj[i * N + j] == 1)
                 ctn++;
-        vertDeg.push_back(ctn);
-    
-    return vertDeg;
+    vertDeg.push_back(ctn);
 
+    return vertDeg;
 }
 
 // Supprimé le lien entre deux sommets i et j
 void Mat::deConnected(u64 i, u64 j)
 {
-    adj[i*N +j] = 0;
-    adj[j*N +i] = 0;
+    adj[i * N + j] = 0;
+    adj[j * N + i] = 0;
 }
 
+// Trouver le sommet de degré minimal
+vertexMin Mat::findMinVertex()
+{
+    vertexMin s;
+    std::vector<int> degrees = verticesdegrees();
+    int vertexWithMinDeg = 0;
+    for (int i = 0; i < N; i++)
+    {
+        if (degrees[i] <= 0)
+            continue;
+        vertexWithMinDeg = i;
+        break;
+    }
+    int minDeg = degrees[vertexWithMinDeg];
+
+    for (int i = 0; i < N; i++)
+    {
+        if (degrees[i] < minDeg)
+        {
+            minDeg = degrees[i];
+            vertexWithMinDeg = i;
+        }
+    }
+    s.degree = minDeg;
+    s.vertex = vertexWithMinDeg;
+
+    return s;
+}
+
+// Calcul de l'ordre de degenerescence du graphe.
+degenElem Mat::degnOrder() 
+{
+    degenElem dge;
+    std::vector<int> rmdeg;
+    std::vector<int> rmVertices;
+    int tmp = 0;
+    while (!isGraphEmpty() && tmp++ < 10)
+    {
+        vertexMin s = findMinVertex();
+        rmdeg.push_back(s.degree);
+        rmVertices.push_back(s.vertex);
+
+        for (auto u : graph[s.vertex])
+        {
+            deConnected(s.vertex,u);
+        }
+    }
+    dge.degTab  = rmdeg;
+    dge.vertTab = rmVertices;
+    return dge;
+}
 
 // Affiche le contenu de la matrice d'adjacence
 void Mat::print() const
@@ -142,10 +209,10 @@ bool Lst::areConnected(u64 i, u64 j)
     return false;
 }
 
-/ Permet de connaitre le degré de tous les sommets du graphe
+// Permet de connaitre le degré de tous les sommets du graphe
 std::vector<int> Lst::verticesdegrees() const
 {
-    std::vector<int> vertDeg (N);
+    std::vector<int> vertDeg(N);
 
     for (auto &i : adj)
         vertDeg.push_back(i.second.size());
@@ -155,23 +222,86 @@ std::vector<int> Lst::verticesdegrees() const
 // Supprimé le lien entre deux sommets i et j
 void Lst::deConnected(u64 i, u64 j)
 {
-    //parcourir la liste des voisins du premier sommet à la recherche du second puis le supprimer dès qu'on l'aura trouver
-    for(int k = 0; k < adj[i].size(); k++)
+    // parcourir la liste des voisins du premier sommet à la recherche du second puis le supprimer dès qu'on l'aura trouver
+    for (int k = 0; k < adj[i].size(); k++)
     {
-        if (adj[i][k] == j ) {
+        if (adj[i][k] == j)
+        {
             adj[i].erase(adj[i].begin + k);
             break;
         }
     }
 
-    //parcourir la liste des voisins du deuxième sommet à la recherche du premier puis le supprimer dès qu'on l'aura trouver
-    for(int k = 0; k < adj[j].size(); k++)
+    // parcourir la liste des voisins du deuxième sommet à la recherche du premier puis le supprimer dès qu'on l'aura trouver
+    for (int k = 0; k < adj[j].size(); k++)
     {
-        if (adj[j][k] == i) {
+        if (adj[j][k] == i)
+        {
             adj[j].erase(adj[j].begin() + k);
             break;
         }
     }
+}
+
+// Trouver le sommet de degré minimal
+vertexMin Lst::findMinVertex()
+{
+    vertexMin s;
+    std::vector<int> degrees = verticesdegrees();
+    int vertexWithMinDeg = 0;
+    for (int i = 0; i < N; i++)
+    {
+        if (degrees[i] <= 0)
+            continue;
+        vertexWithMinDeg = i;
+        break;
+    }
+    int minDeg = degrees[vertexWithMinDeg];
+
+    for (int i = 0; i < N; i++)
+    {
+        if (degrees[i] < minDeg)
+        {
+            minDeg = degrees[i];
+            vertexWithMinDeg = i;
+        }
+    }
+    s.degree = minDeg;
+    s.vertex = vertexWithMinDeg;
+
+    return s;
+}
+
+// Verifier si le graphe est vide ou pas
+bool Lst::isGraphEmpty() const
+{
+    auto degrees = verticesdegrees() const;
+    return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e) {
+        return e == 0;
+    });
+}
+
+// calcul de l'ordre de degenerescence du graphe
+degenElem Lst::degnOrder() 
+{
+    degenElem dge;
+    std::vector<int> rmdeg;
+    std::vector<int> rmVertices;
+    int tmp = 0;
+    while (!isGraphEmpty() && tmp++ < 10)
+    {
+        vertexMin s = findMinVertex();
+        rmdeg.push_back(s.degree);
+        rmVertices.push_back(s.vertex);
+
+        for (auto u : graph[s.vertex])
+        {
+            deConnected(s.vertex,u);
+        }
+    }
+    dge.degTab  = rmdeg;
+    dge.vertTab = rmVertices;
+    return dge;
 }
 
 // Affiche le contenu de la liste d'adjacence

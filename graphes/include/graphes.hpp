@@ -33,13 +33,17 @@ struct Graph
     /* ======== CONNECTIONS ENTRE SOMMETS ======== */
     void connect(u64 i, u64 j) { adj->connect(i, j); }                  // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
     bool areConnected(u64 i, u64 j) { return adj->areConnected(i, j); } // Retourne un booléen indiquant si les sommets i et j sont connectés
+    void deConnected(u64 i, u64 j) {adj->deConnected(u64 i, u64 j);}    //  Supprime l'arête qui lie les deux sommets i et
+
 
     /* ================ SETS ================ */
     bool isProper(std::set<u64> set);                                                // Retourn un booléen indiquant si un set est propre par rapport au graphe
     bool isConnectedToSet(u64 vertex, std::set<u64> set);                            // Indique si vertex est connecté au set
     void getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i); // Enumère tout les sets indépendants du graphe
     std::set<std::set<u64>> getMaxIndSets();                                         // Eumère tout les sets indépendants maximaux
-
+    vertexMin findMinVertex() { adj ->findMinVertex();}                              // Permet de trouver le sommet de degré minimal du graphe.
+    std::vector<int> verticesdegrees () const { adj ->verticesdegrees();}            // Permet de connaitre le degré de tous les sommets du graphe
+    
     /* =========== VISUALISATION =========== */
     void print() { adj->print(); }; // Affiche le graphe dans le terminal (à des fins de debug)
     void draw();                    // Dessine le graphe à  l'écran
