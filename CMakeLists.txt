@@ -80,8 +80,7 @@ add_subdirectory(tests)
 find_package(OpenMP REQUIRED)
 find_package(SDL2 REQUIRED)
 
-# ============================================= GENERATION DES EXECUTABLES
-# =============================================
+# ============== GENERATION DES EXECUTABLES ==============
 file(GLOB SRCS "*.cpp")
 
 # pour chaque TEST
@@ -98,12 +97,11 @@ foreach(source ${SRCS})
 
   # on link les librairies
   target_link_libraries(${source_name} graphes OpenMP::OpenMP_CXX SDL2)
-  target_compile_options(${source_name} PUBLIC -std=c++17)
+  target_compile_options(${source_name} PUBLIC -std=c++17 -Ofast)
 
 endforeach(source ${TEST_SRCS})
 
-# ============================================= GENERATION DES MACRO
-# =============================================
+# ============== GENERATION DES MACRO ==============
 
 # "make plot" va afficher le graphe des perfs
 add_custom_target(plot COMMAND sh ../data/plot.sh)

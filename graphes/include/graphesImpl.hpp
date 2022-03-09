@@ -167,7 +167,7 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
     //
     Tree suffixTree;
 
-    //
+#pragma omp parallel for
     for (u64 i = 0; i < N; i++)
     {
         // Construct the subgraph G_i
@@ -188,10 +188,13 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
             globalMaxIndSets.insert(tmp);
         }
 
-        // Add maxIndSet
-        for (const auto &maxIndSet : globalMaxIndSets)
-            if (isProper(maxIndSet))
-                suffixTree.insert(maxIndSet);
+#pragma omp critical
+        {
+            // Add maxIndSet
+            for (const auto &maxIndSet : globalMaxIndSets)
+                if (isProper(maxIndSet))
+                    suffixTree.insert(maxIndSet);
+        }
     }
 
     // On isole les branches maximale de l'arbre de suffix
