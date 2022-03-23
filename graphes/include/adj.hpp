@@ -61,7 +61,7 @@ struct Mat : public Adj
     void deConnected(u64 i, u64 j) override;           // Supprimer le lien entre deux sommets i et j
     vertexMin findMinVertex() override;                // Trouver le sommet de degré minimal
     degenElem degenOrder() override;                   // Fonction permettant de connaitre l'ordre de dégénrescence du graphe.
-    bool isGraphEmpty() const override;                         // Fonction permettant de savoir si le graphe est vide ou pas.
+    bool isGraphEmpty() const override;                // Fonction permettant de savoir si le graphe est vide ou pas.
     /* ============ VISUALISATION ============ */
     void print() const override; // Affiche le contenu de la matrice d'adjacence
 };
@@ -84,7 +84,7 @@ struct Lst : public Adj
     void deConnected(u64 i, u64 j) override;           // Supprimer le lien entre deux sommets i et j
     vertexMin findMinVertex() override;                // Trouver le sommet de degré minimal
     degenElem degenOrder() override;                   // Fonction permettant de connaitre l'ordre de dégénrescence du graphe.
-    bool isGraphEmpty() const override;                         // Fonction permettant de savoir si le graphe est vide ou pas.
+    bool isGraphEmpty() const override;                // Fonction permettant de savoir si le graphe est vide ou pas.
     /* ============ VISUALISATION ============ */
     void print() const override; // Affiche le contenu de la liste d'adjacence
 };
@@ -125,9 +125,18 @@ void Mat::deConnected(u64 i, u64 j)
     adj[j * N + i] = 0;
 }
 
+// Fonction pour vérifier si le graphe est vide ou pas
+bool Mat::isGraphEmpty()
+{
+    auto degrees = verticesdegrees();
+    return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e)
+                       { return e == 0; });
+}
+
 // Trouver le sommet de degré minimal
 vertexMin Mat::findMinVertex()
 {
+    assert(!isGraphEmpty());
     vertexMin s;
     std::vector<int> degrees = verticesdegrees();
     int vertexWithMinDeg = 0;
@@ -142,7 +151,7 @@ vertexMin Mat::findMinVertex()
 
     for (int i = 0; i < N; i++)
     {
-        if (degrees[i] < minDeg)
+        if (degrees[i] < minDeg) &&!(graph[i].empty())) // correction à faire sur la manière de vérifier que graph[i] est vide ou pas
         {
             minDeg = degrees[i];
             vertexWithMinDeg = i;
@@ -155,24 +164,24 @@ vertexMin Mat::findMinVertex()
 }
 
 // Calcul de l'ordre de degenerescence du graphe.
-degenElem Mat::degnOrder() 
+degenElem Mat::degnOrder()
 {
     degenElem dge;
     std::vector<int> rmdeg;
     std::vector<int> rmVertices;
     int tmp = 0;
-    while (!isGraphEmpty() && tmp++ < 10)
+    while (!isGraphEmpty())
     {
         vertexMin s = findMinVertex();
         rmdeg.push_back(s.degree);
         rmVertices.push_back(s.vertex);
 
-        for (auto u : graph[s.vertex])
+        for (auto u : graph[s.vertex]) // correction à faire
         {
-            deConnected(s.vertex,u);
+            deConnected(s.vertex, u);
         }
     }
-    dge.degTab  = rmdeg;
+    dge.degTab = rmdeg;
     dge.vertTab = rmVertices;
     return dge;
 }
@@ -243,9 +252,18 @@ void Lst::deConnected(u64 i, u64 j)
     }
 }
 
+// Verifier si le graphe est vide ou pas
+bool Lst::isGraphEmpty() const
+{
+    auto degrees = verticesdegrees() const;
+    return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e)
+                       { return e == 0; });
+}
+
 // Trouver le sommet de degré minimal
 vertexMin Lst::findMinVertex()
 {
+    assert (!isGraphEmpty());
     vertexMin s;
     std::vector<int> degrees = verticesdegrees();
     int vertexWithMinDeg = 0;
@@ -260,7 +278,7 @@ vertexMin Lst::findMinVertex()
 
     for (int i = 0; i < N; i++)
     {
-        if (degrees[i] < minDeg)
+        if (degrees[i] < minDeg && (adj[i].empty()))
         {
             minDeg = degrees[i];
             vertexWithMinDeg = i;
@@ -272,23 +290,15 @@ vertexMin Lst::findMinVertex()
     return s;
 }
 
-// Verifier si le graphe est vide ou pas
-bool Lst::isGraphEmpty() const
-{
-    auto degrees = verticesdegrees() const;
-    return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e) {
-        return e == 0;
-    });
-}
 
 // calcul de l'ordre de degenerescence du graphe
-degenElem Lst::degnOrder() 
+degenElem Lst::degnOrder()
 {
     degenElem dge;
     std::vector<int> rmdeg;
     std::vector<int> rmVertices;
     int tmp = 0;
-    while (!isGraphEmpty() && tmp++ < 10)
+    while (!isGraphEmpty())
     {
         vertexMin s = findMinVertex();
         rmdeg.push_back(s.degree);
@@ -296,10 +306,10 @@ degenElem Lst::degnOrder()
 
         for (auto u : graph[s.vertex])
         {
-            deConnected(s.vertex,u);
+            deConnected(s.vertex, u);
         }
     }
-    dge.degTab  = rmdeg;
+    dge.degTab = rmdeg;
     dge.vertTab = rmVertices;
     return dge;
 }

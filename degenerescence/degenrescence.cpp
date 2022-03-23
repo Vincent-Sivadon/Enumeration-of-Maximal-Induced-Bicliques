@@ -54,7 +54,7 @@ void printGraph(std::vector<std::vector<int>> &graph, int N)
 }
 
 /**
- * Fonction permettant d'ajouter des arretes un graphe modeliser par une liste d'adjacence
+ * Fonction permettant d'ajouter des arretes dans un graphe modeliser par une liste d'adjacence
  */
 void addEdge(std::vector<std::vector<int>> &graph, int a, int b)
 {
@@ -180,7 +180,7 @@ degenElem degenOrder(std::vector<std::vector<int>> &graph, int N)
     std::vector<int> rmdeg;
     std::vector<int> rmVertices;
     int tmp = 0;
-    while (!isGraphEmpty(graph, N) && tmp++ < 10)
+    while (!isGraphEmpty(graph, N))
     {
         printGraph(graph, N);
         edgeMin s = FindVertexDegMin(graph, N);
