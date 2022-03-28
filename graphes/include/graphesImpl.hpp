@@ -164,38 +164,121 @@ Graph<T> Graph<T>::genSubgraph(u64 i)
 template <typename T>
 std::set<std::set<u64>> Graph<T>::getBicliques()
 {
-    //
-    Tree suffixTree;
+    int rank, nproc;
 
-    //
-    for (u64 i = 0; i < N; i++)
+    MPI_Init(NULL, NULL);
+
+    MPI_Comm_size(MPI_COMM_WORLD, &nproc);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if (N % nproc != 1)
     {
-        // Construct the subgraph G_i
-        Graph subgraph_i = genSubgraph(i);
-
-        // Get all maximal independent sets of G_i
-        std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
-
-        // Rename the nodes
-        std::set<std::set<u64>> globalMaxIndSets; // sets with parent graph indices
-        std::set<u64> tmp;
-        for (const auto &maxIndSet : maxIndSets)
-        {
-            // Add the sets with parent graph indices
-            tmp.clear();
-            for (const auto &el : maxIndSet)
-                tmp.insert(el + i);
-            globalMaxIndSets.insert(tmp);
-        }
-
-        // Add maxIndSet
-        for (const auto &maxIndSet : globalMaxIndSets)
-            if (isProper(maxIndSet))
-                suffixTree.insert(maxIndSet);
+        std::cout << "Number of nodes % number of processus must be 1\n";
+        exit(1);
     }
 
-    // On isole les branches maximale de l'arbre de suffix
+    /* Rank 0 will gather bicliques, others will work */
+    // if (rank == 0)
+    Tree suffixTree;
+
+    if (rank != 0)
+    {
+
+        // Dispatch
+        int sectionSize = N / (nproc - 1);
+        int ibeg = (rank - 1) * sectionSize;
+        int iend = rank * sectionSize;
+
+        //
+        for (u64 i = ibeg; i < iend; i++)
+        {
+            // Construct the subgraph G_i
+            Graph subgraph_i = genSubgraph(i);
+
+            // Get all maximal independent sets of G_i
+            std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
+
+            // Rename the nodes
+            std::set<std::set<u64>> globalMaxIndSets; // sets with parent graph indices
+            std::set<u64> tmp;
+            for (const auto &maxIndSet : maxIndSets)
+            {
+                // Add the sets with parent graph indices
+                tmp.clear();
+                for (const auto &el : maxIndSet)
+                    tmp.insert(el + i);
+                globalMaxIndSets.insert(tmp);
+            }
+
+            // Add maxIndSet
+            for (const auto &maxIndSet : globalMaxIndSets)
+                if (isProper(maxIndSet))
+                    suffixTree.insert(maxIndSet);
+        }
+
+        // On isole les branches maximale de l'arbre de suffix
+        std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+        // MPI
+
+        // Get size
+        int nbEl = 0, nbBicliques = bicliques.size();
+        for (const auto &biclique : bicliques)
+            for (const auto &el : biclique)
+                nbEl++;
+
+        // Allocate memory for array to be sent
+        int *data = (int *)malloc(nbEl * sizeof(int));
+        int *offsets = (int *)malloc(nbBicliques * sizeof(int));
+
+        // Fill arrays
+        int i = 0, j = 0;
+        for (const auto &biclique : bicliques)
+        {
+            offsets[j] = i;
+            j++;
+            for (const auto &el : biclique)
+            {
+                data[i] = el;
+                i++;
+            }
+        }
+
+        MPI_Send(data, nbEl, MPI_INT, 0, 1000, MPI_COMM_WORLD);
+        MPI_Send(offsets, nbBicliques, MPI_INT, 0, 2000, MPI_COMM_WORLD);
+    }
+    else
+    {
+        int nbEl, nbBicliques;
+        MPI_Status status_data, status_offsets;
+        int *data, *offsets;
+
+        for (int i = 0; i < nproc - 1; i++)
+        {
+            // Data message
+            MPI_Probe(MPI_ANY_SOURCE, 1000, MPI_COMM_WORLD, &status_data);
+            MPI_Get_count(&status_data, MPI_INT, &nbEl);
+            data = (int *)realloc(data, nbEl * sizeof(int));
+
+            // Offsets message
+            MPI_Probe(MPI_ANY_SOURCE, 200, MPI_COMM_WORLD, &status_offsets);
+            MPI_Get_count(&status_offsets, MPI_INT, &nbBicliques);
+            offsets = (int *)realloc(offsets, nbBicliques * sizeof(int));
+
+            // Receives message
+            MPI_Recv(data, nbEl, MPI_INT, MPI_ANY_SOURCE, 1000, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(offsets, nbBicliques, MPI_INT, 0, 2000, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+            // Display test
+            // ------------
+            for (int j = 0; j < nbEl; j++)
+                std::cout << data[j] << " ";
+            std::cout << std::endl;
+        }
+    }
+
     std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+    MPI_Finalize();
 
     return bicliques;
 }

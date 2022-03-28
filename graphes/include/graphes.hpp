@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <mpi.h>
 
 #define INF 0x3f3f3f3f
 

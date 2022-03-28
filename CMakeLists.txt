@@ -79,10 +79,13 @@ add_subdirectory(tests)
 # Import des librairies
 find_package(OpenMP REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(MPI REQUIRED)
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 # ============================================= GENERATION DES EXECUTABLES
 # =============================================
 file(GLOB SRCS "*.cpp")
+set(LIBS graphes OpenMP::OpenMP_CXX SDL2 ${MPI_CXX_LIBRARIES})
 
 # pour chaque TEST
 foreach(source ${SRCS})
@@ -97,7 +100,7 @@ foreach(source ${SRCS})
   add_executable(${source_name} ${source})
 
   # on link les librairies
-  target_link_libraries(${source_name} graphes OpenMP::OpenMP_CXX SDL2)
+  target_link_libraries(${source_name} ${LIBS})
   target_compile_options(${source_name} PUBLIC -std=c++17)
 
 endforeach(source ${TEST_SRCS})
