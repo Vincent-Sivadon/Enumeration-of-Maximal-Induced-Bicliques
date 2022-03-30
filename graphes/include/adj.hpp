@@ -164,7 +164,7 @@ vertexMin Mat::findMinVertex()
 }
 
 // Calcul de l'ordre de degenerescence du graphe.
-degenElem Mat::degnOrder()
+degenElem Mat::degnOrder(Graph &graph)
 {
     degenElem dge;
     std::vector<int> rmdeg;

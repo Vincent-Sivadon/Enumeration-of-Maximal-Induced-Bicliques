@@ -18,7 +18,7 @@ void test()
 
     assert( 1 == methane.findMinVertex().degree);
     assert( 1 == methane.findMinVertex().vertex);
-    assert(false == methane.areConnected(2, 4));
+
 }
 
 // Test de la fonction areConnected (du struct Graph)
