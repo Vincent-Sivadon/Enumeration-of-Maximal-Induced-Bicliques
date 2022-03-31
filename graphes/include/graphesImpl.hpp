@@ -292,6 +292,7 @@ std::set<std::set<u64>> Graph<T>::getBicliquesParallel()
     std::set<std::set<u64>> bicliques;
 
     // For every nodes
+#pragma omp parallel for
     for (u64 i = 0; i < N; i++)
     {
         // Construct the subgraph G_i
