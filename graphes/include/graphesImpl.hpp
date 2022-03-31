@@ -200,6 +200,126 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
     return bicliques;
 }
 
+// From the 2 sets of an original biclique, indicates if by adding i, biclique is still viable
+template <typename T>
+bool Graph<T>::isViableBiclique(std::set<u64> &X, std::set<u64> &Y, u64 i)
+{
+    // If one of the sets is empty, it is a degenerated cases
+    if (X.size() == 0 || Y.size() == 0)
+        return false;
+
+    // Indicates if a biclique is viable
+    bool viable = true;
+
+    // If node is connected to an element from X
+    // check if he's connected to all elements from X, and none elements from Y
+    if (areConnected(i, *X.begin()))
+    {
+        // Check if connected to all elements of X
+        for (const auto &node : X)
+            if (!areConnected(i, node)) // if not, than this is not a viable biclique
+                viable = false;
+
+        // if the biclique is still viable, check if it's not connected to any elements of Y
+        if (viable)
+            for (const auto &node : Y)
+                if (areConnected(i, node)) // if it is, than this i not a viable biclique
+                    viable = false;
+    }
+    // do it the opposite way if not connected to X
+    else if (areConnected(i, *Y.begin()))
+    {
+        // Check if connected to all elements of Y
+        for (const auto &node : Y)
+            if (!areConnected(i, node)) // if not, than this is not a viable biclique
+                viable = false;
+
+        // if the biclique is still viable, check if it's not connected to any elements of X
+        if (viable)
+            for (const auto &node : X)
+                if (areConnected(i, node)) // if it is, than this i not a viable biclique
+                    viable = false;
+    }
+    // else if not connected to any element of X or Y, not viable
+    else
+        viable = false;
+
+    // Return
+    if (viable)
+        return true;
+    else
+        return false;
+}
+
+template <typename T>
+bool Graph<T>::isBicliqueMaximale(const std::set<u64> &biclique)
+{
+    std::set<u64> X, Y;
+
+    // Constructs sets X et Y
+    // ----------------------
+    X.insert(*biclique.begin()); // insert first node
+    for (const auto &node : biclique)
+    {
+        // If node is connected to an element from X : insert node in Y
+        // else : insert node in X
+        if (areConnected(node, *X.begin()))
+            Y.insert(node);
+        else
+            X.insert(node);
+    }
+
+    /* For every node in 1:n
+     * add this node to biclique
+     * check if it's still a biclique */
+    for (u64 i = 0; i < N; i++)
+    {
+        if (X.find(i) != X.end() || Y.find(i) != Y.end())
+            continue;
+        if (isViableBiclique(X, Y, i))
+            return false;
+    }
+
+    // If all the biclique passed all tests, it is maximale
+    return true;
+}
+
+// Enumère tout les bicliques maximales du graphe (parallel)
+template <typename T>
+std::set<std::set<u64>> Graph<T>::getBicliquesParallel()
+{
+    // Will store maximal induces bicliques
+    std::set<std::set<u64>> bicliques;
+
+    // For every nodes
+    for (u64 i = 0; i < N; i++)
+    {
+        // Construct the subgraph G_i
+        Graph subgraph_i = genSubgraph(i);
+
+        // Get all maximal independent sets of G_i
+        std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
+
+        // Rename the nodes
+        std::set<std::set<u64>> globalMaxIndSets; // sets with parent graph indices
+        std::set<u64> tmp;
+        for (const auto &maxIndSet : maxIndSets)
+        {
+            // Add the sets with parent graph indices
+            tmp.clear();
+            for (const auto &el : maxIndSet)
+                tmp.insert(el + i);
+            globalMaxIndSets.insert(tmp);
+        }
+
+        for (const auto &biclique : globalMaxIndSets)
+            if (isBicliqueMaximale(biclique))
+                bicliques.insert(biclique);
+    }
+
+    return bicliques;
+}
+
 /* =========================== GENERATION DE GRAPHE =========================== */
 
 // Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet

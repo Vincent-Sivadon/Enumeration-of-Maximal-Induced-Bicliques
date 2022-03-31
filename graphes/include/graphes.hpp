@@ -47,10 +47,13 @@ struct Graph
 
     /* =========== UTILITAIRE =========== */
     std::vector<u64> shortestPaths(u64 src); // Donne la longueur du plus court chemin depuis src pour chaque sommet
+    bool isBicliqueMaximale(const std::set<u64> &biclique);
+    bool isViableBiclique(std::set<u64> &X, std::set<u64> &Y, u64 i); // From the 2 sets of an original biclique, indicates if by adding i, biclique is still viable
 
     /* =========== PROCEDURE DE L'ARTICLE =========== */
-    Graph<T> genSubgraph(u64 i);            // Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
-    std::set<std::set<u64>> getBicliques(); // Enumère tout les bicliques maximales du graphe
+    Graph<T> genSubgraph(u64 i);                    // Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
+    std::set<std::set<u64>> getBicliques();         // Enumère tout les bicliques maximales du graphe
+    std::set<std::set<u64>> getBicliquesParallel(); // Enumère tout les bicliques maximales du graphe (parallel)
 };
 
 /* =========================== GENERATION DE GRAPHE =========================== */

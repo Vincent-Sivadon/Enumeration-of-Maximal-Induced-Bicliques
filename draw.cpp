@@ -14,7 +14,9 @@ int main()
     g.connect(0, 3);
     g.connect(4, 2);
     g.connect(0, 2);
-    g.drawBiclique({0, 2, 4, 5});
+    std::set<std::set<u64>> bicliques = g.getBicliquesParallel();
+    auto it = bicliques.begin();
+    g.drawBiclique(*it);
 
     return 0;
 }
