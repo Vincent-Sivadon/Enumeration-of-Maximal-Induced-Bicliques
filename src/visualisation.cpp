@@ -12,6 +12,11 @@
 
 #include <SDL2/SDL.h>
 
+#include "StructGraph.hpp"
+#include "grapheLst.hpp"
+#include "grapheMat.hpp"
+
+
 typedef unsigned long long u64;
 
 // Structures permettant la représentation des positions, vitesses, et accélérations de chaque sommet
@@ -30,7 +35,7 @@ u64 randxy(u64 plage, u64 centre)
 }
 
 // Détermine quel pixel font parti d'un disque de rayon 5 et les dessine
-void drawParticle(SDL_Renderer *renderer, Vector center)
+void drawParticle(SDL_Renderer *renderer, Vector& center)
 {
     // Coordonnées du centre du disque
     double xc = center.x, yc = center.y;
@@ -58,11 +63,10 @@ void drawParticle(SDL_Renderer *renderer, Vector center)
 }
 
 // Met à jour l'accélération que subit un sommet en fonction des autres sommets
-template <typename T>
-void compute_accelerations(Graph<T> &graph, std::vector<Vector> &pos, std::vector<Vector> &acc, double l0)
+void compute_accelerations(Graph& graph, std::vector<Vector> &pos, std::vector<Vector> &acc, double l0)
 {
     // Nombre de sommets
-    u64 N = graph.N;
+    u64 N = graph.getSize();
 
     // Calcul la force entre i et j
     for (u64 i = 0; i < N; i++)
@@ -112,14 +116,13 @@ void compute_accelerations(Graph<T> &graph, std::vector<Vector> &pos, std::vecto
 }
 
 // Met à jour les positions des sommets sur le dessins en fonction de l'accélération calculée
-template <typename T>
-void compute_positions(Graph<T> &graph, std::vector<Vector> &pos, std::vector<Vector> vel, std::vector<Vector> &acc, u64 w, u64 h)
+void compute_positions(Graph& graph, std::vector<Vector> &pos, std::vector<Vector> vel, std::vector<Vector> &acc, u64 w, u64 h)
 {
     // Pour pas qu'un sommet soit dessiné exactement au bord de la fenêtre
     u64 limits = 20;
 
     // Pour chaque sommet
-    for (u64 i = 0; i < graph.N; i++)
+    for (u64 i = 0; i < graph.getSize(); i++)
     {
         // Vecteur position du sommet i
         double tmpX = pos[i].x;
@@ -139,11 +142,10 @@ void compute_positions(Graph<T> &graph, std::vector<Vector> &pos, std::vector<Ve
 }
 
 // Fonction principale de mise à jour des positions des sommets
-template <typename T>
-void simulate(Graph<T> &graph, std::vector<Vector> &pos, std::vector<Vector> vel, std::vector<Vector> &acc, double l0, u64 w, u64 h)
+void simulate(Graph& graph, std::vector<Vector> &pos, std::vector<Vector> vel, std::vector<Vector> &acc, double l0, u64 w, u64 h)
 {
     // Nombre de sommets
-    u64 N = graph.N;
+    u64 N = graph.getSize();
 
     // Met à jour les accélérations
     compute_accelerations(graph, pos, acc, l0);
@@ -160,8 +162,7 @@ void simulate(Graph<T> &graph, std::vector<Vector> &pos, std::vector<Vector> vel
 }
 
 // Dessine le graph à l'écran
-template <typename T>
-void Graph<T>::draw()
+void Graph::draw()
 {
     // Initialise random seed
     srand(getpid());
@@ -195,7 +196,7 @@ void Graph<T>::draw()
     for (u64 t = 0; t < timeSteps; t++)
     {
         // Met à jour les positions des sommets sur le dessin
-        simulate<T>(*this, pos, vel, acc, l0, width, height);
+        simulate(*this, pos, vel, acc, l0, width, height);
 
         // Efface le contenu graphique de la fenêter
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -237,8 +238,7 @@ void setSDLcolor(SDL_Renderer *renderer, int id)
 }
 
 // Bicoloration de la biclique du graphe
-template <typename T>
-void Graph<T>::drawBiclique(std::set<u64> biclique)
+void Graph::drawBiclique(std::set<u64> biclique)
 {
     // Initialise random seed
     srand(getpid());
@@ -293,7 +293,7 @@ void Graph<T>::drawBiclique(std::set<u64> biclique)
     for (u64 t = 0; t < timeSteps; t++)
     {
         // Met à jour les positions des sommets sur le dessin
-        simulate<T>(*this, pos, vel, acc, l0, width, height);
+        simulate(*this, pos, vel, acc, l0, width, height);
 
         // Efface le contenu graphique de la fenêter
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -326,4 +326,4 @@ void Graph<T>::drawBiclique(std::set<u64> biclique)
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
-}
+} 

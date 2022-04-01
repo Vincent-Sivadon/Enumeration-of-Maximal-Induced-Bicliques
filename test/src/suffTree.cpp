@@ -1,11 +1,12 @@
 #include <assert.h>
 
-#include "graphes.hpp"
+#include "StructGraph.hpp"
 #include "suffixTree.hpp"
+
 
 int main()
 {
-    std::set<u64> set1 = {0, 2, 4};
+     std::set<u64> set1 = {0, 2, 4};
     std::set<u64> set2 = {1, 3, 5};
     std::set<u64> set3 = {2, 3};
 
@@ -22,7 +23,7 @@ int main()
             {0, 2, 4}, {1, 3, 5}};
 
     for (auto &set : bicliques)
-        assert(expected.find(set) != expected.end());
+        assert(expected.find(set) != expected.end()); 
 
     return 0;
 }

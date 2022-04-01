@@ -1,7 +1,5 @@
 #include <assert.h>
 
-#include "graphes.hpp"
-
 void test()
 {
     // First test

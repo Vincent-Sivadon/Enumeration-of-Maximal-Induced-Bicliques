@@ -4,7 +4,9 @@
 #include <set>
 #include <omp.h>
 
-#include "graphes.hpp"
+#include "StructGraph.hpp"
+#include "grapheLst.hpp"
+#include "grapheMat.hpp"
 
 template <typename T>
 double perf(int N)
@@ -14,10 +16,11 @@ double perf(int N)
     // On moyenne sur 10 samples
     for (int i = 0; i < 10; i++)
     {
-        Graph<T> g = genRandGraph<T>(N);
+        std::unique_ptr<Graph> g = std::make_unique<T>(N);
+        g->randomize();
 
         double before = omp_get_wtime();
-        std::set<std::set<u64>> bicliques = g.getBicliques();
+        std::set<std::set<u64>> bicliques = g->getBicliques();
         double after = omp_get_wtime();
 
         time += (after - before);
@@ -47,9 +50,9 @@ int main(int argc, char **argv)
     // Pour chaque taille n
     for (const auto &n : sizes)
     {
-        double matTime = perf<Mat>(n);
+        double matTime = perf<GraphMat>(n);
 
-        double lstTime = perf<Lst>(n);
+        double lstTime = perf<GraphLst>(n);
 
         std::cout << n << " " << lstTime << " " << matTime << std::endl;
     }

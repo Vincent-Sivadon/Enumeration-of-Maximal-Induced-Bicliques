@@ -1,14 +1,13 @@
 /*
-    - Contient l'implémentation de la structure Graph.
+    - Contient l'implémentation de l'interface structure Graph
 */
 
-#pragma once
+#include "StructGraph.hpp"
 
 /* =============================== SETS =============================== */
 
 // Retourn un booléen indiquant si un set est propre par rapport au graphe
-template <typename T>
-bool Graph<T>::isProper(std::set<u64> set)
+bool Graph::isProper(std::set<u64> set)
 {
     for (auto i = set.begin(); i != set.end(); i++)
         for (auto j = set.begin(); j != set.end(); j++)
@@ -19,8 +18,7 @@ bool Graph<T>::isProper(std::set<u64> set)
 }
 
 // Indique si vertex est connecté au set dans le graphe
-template <typename T>
-bool Graph<T>::isConnectedToSet(u64 v, std::set<u64> set)
+bool Graph::isConnectedToSet(u64 v, std::set<u64> set)
 {
     for (const auto &u : set)
     {
@@ -31,8 +29,7 @@ bool Graph<T>::isConnectedToSet(u64 v, std::set<u64> set)
 }
 
 // Enumère tout les set indépendants
-template <typename T>
-void Graph<T>::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i)
+void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i)
 {
     for (u64 j = i; j < N; j++)
     {
@@ -53,8 +50,7 @@ void Graph<T>::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSe
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-template <typename T>
-std::set<std::set<u64>> Graph<T>::getMaxIndSets()
+std::set<std::set<u64>> Graph::getMaxIndSets()
 {
     //
     std::set<std::set<u64>> IndSets;
@@ -81,8 +77,7 @@ std::set<std::set<u64>> Graph<T>::getMaxIndSets()
 /* ============================= UTILITAIRE ============================= */
 
 // Donne la longueur du plus court chemin depuis src pour chaque sommet
-template <typename T>
-std::vector<u64> Graph<T>::shortestPaths(u64 src)
+std::vector<u64> Graph::shortestPaths(u64 src)
 {
     /* On crée un tableau dynamique pour stocker les distances et on et
     initialise toutes les distances à l'infini.
@@ -124,14 +119,13 @@ std::vector<u64> Graph<T>::shortestPaths(u64 src)
 /* ======================== PROCEDURE DE L'ARTICLE ======================== */
 
 // Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
-template <typename T>
-Graph<T> Graph<T>::genSubgraph(u64 i)
+std::unique_ptr<Graph> Graph::genSubgraph(u64 i)
 {
     // Obtenir les distances au sommet i
     std::vector<u64> dist = shortestPaths(i);
 
     //
-    Graph<T> subgraph(N - i);
+    auto subgraph = make(N - i);
 
     // Run through all pairs of nodes in the parent graph
     for (u64 x = i; x < N; x++)
@@ -140,10 +134,10 @@ Graph<T> Graph<T>::genSubgraph(u64 i)
             bool are_connected = areConnected(x, y);
 
             // Conditions  de construction des arretes
-            bool x_dist1 = (dist[x] == 1 ? true : false);
-            bool y_dist1 = (dist[y] == 1 ? true : false);
-            bool x_dist2 = (dist[x] == 2 ? true : false);
-            bool y_dist2 = (dist[y] == 2 ? true : false);
+            bool x_dist1 = dist[x] == 1;
+            bool y_dist1 = dist[y] == 1;
+            bool x_dist2 = dist[x] == 2;
+            bool y_dist2 = dist[y] == 2;
 
             // Conditions  de construction des arretes
             bool cond1 = x_dist1 && y_dist1 && are_connected;
@@ -154,7 +148,7 @@ Graph<T> Graph<T>::genSubgraph(u64 i)
             // Ajouter une arrete si l'une des conditions est vérifiée
             if (cond1 || cond2 || cond3 || cond4)
                 // Add node x and y with new indices to the pairs of the subgraph
-                subgraph.connect(x - i, y - i);
+                subgraph->connect(x - i, y - i);
         }
 
     return subgraph;
@@ -162,22 +156,20 @@ Graph<T> Graph<T>::genSubgraph(u64 i)
 
 // Fonction qui génére tous les sous graphes Gik pour un graphe Gi donné
 
-template <typename T>
-std::vector<Graph<T>> Graph<T>::genSubgraphGik(u64 i)
+std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i)
 {
 
     std::vector<u64> dist = shortestPaths(i);
 
     // Initialisation du tableau contenant l'ensemble des sous graphes Gik
-    std::vector<Graph<T>> all_subgraph_Gik;
-
-    Graph<T> subgraph;
+    std::vector<std::unique_ptr<Graph>> all_subgraph_Gik;
 
     // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
 
     for (u64 x = i; x < N; x++)
         for (u64 y = x + 1; y < N; y++)
         {
+            auto subgraph = make(0);
 
             bool are_connected = areConnected(x, y);
 
@@ -209,12 +201,12 @@ std::vector<Graph<T>> Graph<T>::genSubgraphGik(u64 i)
 
                     if (cond1 || cond2 || cond3)
 
-                        subgraph.connect(x, y);
+                        subgraph->connect(x, y);
                 }
 
                 // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des sous graph Gik
 
-                all_subgraph_Gik.push_back(subgraph);
+                all_subgraph_Gik.push_back(std::move(subgraph));
             }
 
             // On effectue les mêmes instructions qu'avec le premier if mais cette fois ci on vérifie si y appartient à l'ensemble à distance 1 de i
@@ -235,10 +227,10 @@ std::vector<Graph<T>> Graph<T>::genSubgraphGik(u64 i)
 
                     if (cond1 || cond2 || cond3)
                         // Add node x and y with new indices to the pairs of the subgraph
-                        subgraph.connect(x, y);
+                        subgraph->connect(x, y);
                 }
 
-                all_subgraph_Gik.push_back(subgraph);
+                all_subgraph_Gik.push_back(std::move(subgraph));
             }
         }
 
@@ -246,8 +238,8 @@ std::vector<Graph<T>> Graph<T>::genSubgraphGik(u64 i)
 }
 
 // Enumère tout les bicliques maximales du graphe
-template <typename T>
-std::set<std::set<u64>> Graph<T>::getBicliques()
+
+std::set<std::set<u64>> Graph::getBicliques()
 {
     //
     Tree suffixTree;
@@ -256,10 +248,10 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
     for (u64 i = 0; i < N; i++)
     {
         // Construct the subgraph G_i
-        Graph subgraph_i = genSubgraph(i);
+        auto subgraph_i = genSubgraph(i);
 
         // Get all maximal independent sets of G_i
-        std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
+        std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets();
 
         // Rename the nodes
         std::set<std::set<u64>> globalMaxIndSets; // sets with parent graph indices
@@ -288,11 +280,10 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
 /* =========================== GENERATION DE GRAPHE =========================== */
 
 // Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
-template <typename T>
-Graph<T> genRandGraph(u64 N)
+
+void Graph::randomize()
 {
     // Déclaration d'un nouveau graphe
-    Graph<T> graph(N);
 
     // On ajoute une arrête entre i et j avec une probabilité de 50%
     for (u64 i = 0; i < N; i++)
@@ -303,52 +294,8 @@ Graph<T> genRandGraph(u64 N)
 
             // Connecte i et j si r<0.5
             if (r < 0.5)
-                graph.connect(i, j);
+                connect(i, j);
         }
-
-    return graph;
-}
-
-/* ============================= GRAPHES SIMPLES ============================= */
-
-// Génère un graphe représentant une molécule de H2O
-template <typename T>
-Graph<T> H2O()
-{
-    Graph<T> graph(3);
-    graph.connect(0, 1);
-    graph.connect(0, 2);
-
-    return graph;
-}
-
-// Génère un graphe représentant une molécule de méthane
-template <typename T>
-Graph<T> Methane()
-{
-    Graph<T> graph(5);
-    graph.connect(0, 1);
-    graph.connect(0, 2);
-    graph.connect(0, 3);
-    graph.connect(0, 4);
-
-    return graph;
-}
-
-// Génère un graphe représentant un hexagone
-template <typename T>
-Graph<T> Hexagone()
-{
-    Graph<T> graph(6);
-
-    graph.connect(0, 1);
-    graph.connect(1, 2);
-    graph.connect(2, 3);
-    graph.connect(3, 4);
-    graph.connect(4, 5);
-    graph.connect(5, 0);
-
-    return graph;
 }
 
 /* =========================== FONCTION UTILITAIRE =========================== */

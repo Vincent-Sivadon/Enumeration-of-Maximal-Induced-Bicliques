@@ -2,7 +2,7 @@
 
 # ========================== GENERATION DES TESTS POUR VERSION AVEC MATRICE D'ADJACENCE ==========================
 
-file( GLOB TEST_SRCS "src/*.cpp" )
+file( GLOB TEST_SRCS "Lst_test/*.cpp" )
 
 # pour chaque TEST
 foreach( testsourcefile ${TEST_SRCS} )
