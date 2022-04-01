@@ -7,320 +7,286 @@
 /* =============================== SETS =============================== */
 
 // Retourn un booléen indiquant si un set est propre par rapport au graphe
-bool Graph::isProper(std::set<u64> set)
-{
-    for (auto i = set.begin(); i != set.end(); i++)
-        for (auto j = set.begin(); j != set.end(); j++)
-            if (i != j)
-                if (areConnected(*i, *j))
-                    return true;
-    return false;
+bool Graph::isProper(std::set<u64> set) {
+  for (auto i = set.begin(); i != set.end(); i++)
+    for (auto j = set.begin(); j != set.end(); j++)
+      if (i != j)
+        if (areConnected(*i, *j)) return true;
+  return false;
 }
 
 // Indique si vertex est connecté au set dans le graphe
-bool Graph::isConnectedToSet(u64 v, std::set<u64> set)
-{
-    for (const auto &u : set)
-    {
-        if (areConnected(v, u))
-            return true;
-    }
-    return false;
+bool Graph::isConnectedToSet(u64 v, std::set<u64> set) {
+  for (const auto &u : set) {
+    if (areConnected(v, u)) return true;
+  }
+  return false;
 }
 
 // Enumère tout les set indépendants
-void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i)
-{
-    for (u64 j = i; j < N; j++)
-    {
-        // On ajoute j au tmpSet si il n'est connecté à aucun k de tmpSet
-        if (isConnectedToSet(j, tmpSet))
-            continue;
+void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i) {
+  for (u64 j = i; j < N; j++) {
+    // On ajoute j au tmpSet si il n'est connecté à aucun k de tmpSet
+    if (isConnectedToSet(j, tmpSet)) continue;
 
-        // Si on a passé le test, on insert j
-        tmpSet.insert(j);
+    // Si on a passé le test, on insert j
+    tmpSet.insert(j);
 
-        // on refait la procédure à partir de j+1
-        getIndSets(IndSets, tmpSet, j + 1);
+    // on refait la procédure à partir de j+1
+    getIndSets(IndSets, tmpSet, j + 1);
 
-        // Puisqu'on a construit le set indépendants qui partait de j, on le supprime du tmpSet
-        tmpSet.erase(j);
-    }
-    IndSets.insert(tmpSet);
+    // Puisqu'on a construit le set indépendants qui partait de j, on le
+    // supprime du tmpSet
+    tmpSet.erase(j);
+  }
+  IndSets.insert(tmpSet);
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets()
-{
-    //
-    std::set<std::set<u64>> IndSets;
-    std::set<u64> tmpSet;
-    std::set<std::set<u64>> maxIndSets;
+std::set<std::set<u64>> Graph::getMaxIndSets() {
+  //
+  std::set<std::set<u64>> IndSets;
+  std::set<u64> tmpSet;
+  std::set<std::set<u64>> maxIndSets;
 
-    // Get all independent sets
-    getIndSets(IndSets, tmpSet, 0);
+  // Get all independent sets
+  getIndSets(IndSets, tmpSet, 0);
 
-    // Taille du set maximal pour pouvoir isoler que les max ind sets
-    u64 maxSize = 0;
-    for (const auto &set : IndSets)
-        if (set.size() > maxSize)
-            maxSize = set.size();
+  // Taille du set maximal pour pouvoir isoler que les max ind sets
+  u64 maxSize = 0;
+  for (const auto &set : IndSets)
+    if (set.size() > maxSize) maxSize = set.size();
 
-    // On garde uniquement les sets de taille maximale
-    for (const auto &set : IndSets)
-        if (set.size() == maxSize)
-            maxIndSets.insert(set);
+  // On garde uniquement les sets de taille maximale
+  for (const auto &set : IndSets)
+    if (set.size() == maxSize) maxIndSets.insert(set);
 
-    return maxIndSets;
+  return maxIndSets;
 }
 
 /* ============================= UTILITAIRE ============================= */
 
 // Donne la longueur du plus court chemin depuis src pour chaque sommet
-std::vector<u64> Graph::shortestPaths(u64 src)
-{
-    /* On crée un tableau dynamique pour stocker les distances et on et
-    initialise toutes les distances à l'infini.
-    Et on crée un ensemble pour dire si les sommets ont été visités */
-    std::vector<u64> dist(N, INF);
-    std::vector<bool> visited(N, false);
+std::vector<u64> Graph::shortestPaths(u64 src) {
+  /* On crée un tableau dynamique pour stocker les distances et on et
+  initialise toutes les distances à l'infini.
+  Et on crée un ensemble pour dire si les sommets ont été visités */
+  std::vector<u64> dist(N, INF);
+  std::vector<bool> visited(N, false);
 
-    // On intialise ça distance à 0
-    dist[src] = 0;
+  // On intialise ça distance à 0
+  dist[src] = 0;
 
-    // On fera au maximum N iterations
-    for (u64 j = 0; j < N; j++)
-    {
-        // On calcul l'index du noeud pour lequel la distance est minimal
-        // On le supprime donc de l'ensemble
-        u64 u = minDist(dist, visited);
-        visited[u] = true;
+  // On fera au maximum N iterations
+  for (u64 j = 0; j < N; j++) {
+    // On calcul l'index du noeud pour lequel la distance est minimal
+    // On le supprime donc de l'ensemble
+    u64 u      = minDist(dist, visited);
+    visited[u] = true;
 
-        // On vérifie que u ne dépasse pas la distance souhaitée
-        if (dist[u] >= 2)
-            break;
+    // On vérifie que u ne dépasse pas la distance souhaitée
+    if (dist[u] >= 2) break;
 
-        // On boucle sur tous les voisins contenues dans adj
-        for (u64 v = 0; v < N; v++)
-        {
-            // si adj[u][v] = 0 alors ils ne sont pas voisins
-            if (!areConnected(u, v))
-                continue;
+    // On boucle sur tous les voisins contenues dans adj
+    for (u64 v = 0; v < N; v++) {
+      // si adj[u][v] = 0 alors ils ne sont pas voisins
+      if (!areConnected(u, v)) continue;
 
-            // On met à jour la plus courte distance si besoin
-            if (dist[v] > dist[u] + 1 && !visited[v])
-                dist[v] = dist[u] + 1;
-        }
+      // On met à jour la plus courte distance si besoin
+      if (dist[v] > dist[u] + 1 && !visited[v]) dist[v] = dist[u] + 1;
     }
+  }
 
-    return dist;
+  return dist;
 }
 
 /* ======================== PROCEDURE DE L'ARTICLE ======================== */
 
-// Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des sommets)
-std::unique_ptr<Graph> Graph::genSubgraph(u64 i)
-{
-    // Obtenir les distances au sommet i
-    std::vector<u64> dist = shortestPaths(i);
+// Génère les sous-graphes d'après le papier (sigma contiendra l'ordre des
+// sommets)
+std::unique_ptr<Graph> Graph::genSubgraph(u64 i) {
+  // Obtenir les distances au sommet i
+  std::vector<u64> dist = shortestPaths(i);
 
-    //
-    auto subgraph = make(N - i);
+  //
+  auto subgraph = make(N - i);
 
-    // Run through all pairs of nodes in the parent graph
-    for (u64 x = i; x < N; x++)
-        for (u64 y = x + 1; y < N; y++)
-        {
-            bool are_connected = areConnected(x, y);
+  // Run through all pairs of nodes in the parent graph
+  for (u64 x = i; x < N; x++)
+    for (u64 y = x + 1; y < N; y++) {
+      bool are_connected = areConnected(x, y);
 
-            // Conditions  de construction des arretes
-            bool x_dist1 = dist[x] == 1;
-            bool y_dist1 = dist[y] == 1;
-            bool x_dist2 = dist[x] == 2;
-            bool y_dist2 = dist[y] == 2;
+      // Conditions  de construction des arretes
+      bool x_dist1 = dist[x] == 1;
+      bool y_dist1 = dist[y] == 1;
+      bool x_dist2 = dist[x] == 2;
+      bool y_dist2 = dist[y] == 2;
 
-            // Conditions  de construction des arretes
-            bool cond1 = x_dist1 && y_dist1 && are_connected;
-            bool cond2 = x_dist2 && y_dist2 && are_connected;
-            bool cond3 = x_dist1 && y_dist2 && !are_connected;
-            bool cond4 = x_dist2 && y_dist1 && !are_connected;
+      // Conditions  de construction des arretes
+      bool cond1 = x_dist1 && y_dist1 && are_connected;
+      bool cond2 = x_dist2 && y_dist2 && are_connected;
+      bool cond3 = x_dist1 && y_dist2 && !are_connected;
+      bool cond4 = x_dist2 && y_dist1 && !are_connected;
 
-            // Ajouter une arrete si l'une des conditions est vérifiée
-            if (cond1 || cond2 || cond3 || cond4)
-                // Add node x and y with new indices to the pairs of the subgraph
-                subgraph->connect(x - i, y - i);
-        }
+      // Ajouter une arrete si l'une des conditions est vérifiée
+      if (cond1 || cond2 || cond3 || cond4)
+        // Add node x and y with new indices to the pairs of the subgraph
+        subgraph->connect(x - i, y - i);
+    }
 
-    return subgraph;
+  return subgraph;
 }
 
 // Fonction qui génére tous les sous graphes Gik pour un graphe Gi donné
 
-std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i)
-{
+std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i) {
+  std::vector<u64> dist = shortestPaths(i);
 
-    std::vector<u64> dist = shortestPaths(i);
+  // Initialisation du tableau contenant l'ensemble des sous graphes Gik
+  std::vector<std::unique_ptr<Graph>> all_subgraph_Gik;
 
-    // Initialisation du tableau contenant l'ensemble des sous graphes Gik
-    std::vector<std::unique_ptr<Graph>> all_subgraph_Gik;
+  // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
 
-    // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
+  for (u64 x = i; x < N; x++)
+    for (u64 y = x + 1; y < N; y++) {
+      auto subgraph = make(0);
 
-    for (u64 x = i; x < N; x++)
-        for (u64 y = x + 1; y < N; y++)
-        {
-            auto subgraph = make(0);
+      bool are_connected = areConnected(x, y);
 
-            bool are_connected = areConnected(x, y);
+      // Conditions  de construction des arretes
 
-            // Conditions  de construction des arretes
+      bool x_dist1 = dist[x] == 1;
+      bool y_dist1 = dist[y] == 1;
+      bool x_dist2 = dist[x] == 2;
+      bool y_dist2 = dist[y] == 2;
 
-            bool x_dist1 = dist[x] == 1;
-            bool y_dist1 = dist[y] == 1;
-            bool x_dist2 = dist[x] == 2;
-            bool y_dist2 = dist[y] == 2;
+      bool cond1 = x_dist1 && y_dist1 && are_connected;
 
-            bool cond1 = x_dist1 && y_dist1 && are_connected;
+      // Si x est à distance un de i, on peut créer un sous graph Gik à partir
+      // de x
+      if (x_dist1) {
+        // On détermine l'ensemble des sommets à distance un de x
+        std::vector<u64> dist1 = shortestPaths(x);
 
-            // Si x est à distance un de i, on peut créer un sous graph Gik à partir de x
-            if (x_dist1)
-            {
-                // On détermine l'ensemble des sommets à distance un de x
-                std::vector<u64> dist1 = shortestPaths(x);
+        // On boucle sur l'ensemble des sommets à distance un de x
+        for (auto const &it : dist1) {
+          // on vérifie les sommets à distance un de x
+          bool u_dist1 = dist1[it] == 1;
 
-                // On boucle sur l'ensemble des sommets à distance un de x
-                for (auto const &it : dist1)
-                {
-                    // on vérifie les sommets à distance un de x
-                    bool u_dist1 = dist1[it] == 1;
+          // Les conditions de contructions des arrêtes
+          bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
 
-                    // Les conditions de contructions des arrêtes
-                    bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
+          bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
 
-                    bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
-
-                    if (cond1 || cond2 || cond3)
-
-                        subgraph->connect(x, y);
-                }
-
-                // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des sous graph Gik
-
-                all_subgraph_Gik.push_back(std::move(subgraph));
-            }
-
-            // On effectue les mêmes instructions qu'avec le premier if mais cette fois ci on vérifie si y appartient à l'ensemble à distance 1 de i
-
-            else if (y_dist1)
-            {
-                std::vector<u64> dist2 = shortestPaths(y);
-
-                // Conditon de verification pour les arretes
-
-                for (auto const &it : dist2)
-                {
-                    bool u_dist1 = dist2[it] == 1;
-
-                    bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
-
-                    bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
-
-                    if (cond1 || cond2 || cond3)
-                        // Add node x and y with new indices to the pairs of the subgraph
-                        subgraph->connect(x, y);
-                }
-
-                all_subgraph_Gik.push_back(std::move(subgraph));
-            }
+          if (cond1 || cond2 || cond3) subgraph->connect(x, y);
         }
 
-    return all_subgraph_Gik;
+        // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des
+        // sous graph Gik
+
+        all_subgraph_Gik.push_back(std::move(subgraph));
+      }
+
+      // On effectue les mêmes instructions qu'avec le premier if mais cette
+      // fois ci on vérifie si y appartient à l'ensemble à distance 1 de i
+
+      else if (y_dist1) {
+        std::vector<u64> dist2 = shortestPaths(y);
+
+        // Conditon de verification pour les arretes
+
+        for (auto const &it : dist2) {
+          bool u_dist1 = dist2[it] == 1;
+
+          bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
+
+          bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
+
+          if (cond1 || cond2 || cond3)
+            // Add node x and y with new indices to the pairs of the subgraph
+            subgraph->connect(x, y);
+        }
+
+        all_subgraph_Gik.push_back(std::move(subgraph));
+      }
+    }
+
+  return all_subgraph_Gik;
 }
 
 // Enumère tout les bicliques maximales du graphe
 
-std::set<std::set<u64>> Graph::getBicliques()
-{
-    //
-    Tree suffixTree;
+std::set<std::set<u64>> Graph::getBicliques() {
+  //
+  Tree suffixTree;
 
-    //
-    for (u64 i = 0; i < N; i++)
-    {
-        // Construct the subgraph G_i
-        auto subgraph_i = genSubgraph(i);
+  //
+  for (u64 i = 0; i < N; i++) {
+    // Construct the subgraph G_i
+    auto subgraph_i = genSubgraph(i);
 
-        // Get all maximal independent sets of G_i
-        std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets();
+    // Get all maximal independent sets of G_i
+    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets();
 
-        // Rename the nodes
-        std::set<std::set<u64>> globalMaxIndSets; // sets with parent graph indices
-        std::set<u64> tmp;
-        for (const auto &maxIndSet : maxIndSets)
-        {
-            // Add the sets with parent graph indices
-            tmp.clear();
-            for (const auto &el : maxIndSet)
-                tmp.insert(el + i);
-            globalMaxIndSets.insert(tmp);
-        }
-
-        // Add maxIndSet
-        for (const auto &maxIndSet : globalMaxIndSets)
-            if (isProper(maxIndSet))
-                suffixTree.insert(maxIndSet);
+    // Rename the nodes
+    std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
+    std::set<u64> tmp;
+    for (const auto &maxIndSet : maxIndSets) {
+      // Add the sets with parent graph indices
+      tmp.clear();
+      for (const auto &el : maxIndSet) tmp.insert(el + i);
+      globalMaxIndSets.insert(tmp);
     }
 
-    // On isole les branches maximale de l'arbre de suffix
-    std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+    // Add maxIndSet
+    for (const auto &maxIndSet : globalMaxIndSets)
+      if (isProper(maxIndSet)) suffixTree.insert(maxIndSet);
+  }
 
-    return bicliques;
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  return bicliques;
 }
 
-/* =========================== GENERATION DE GRAPHE =========================== */
+/* =========================== GENERATION DE GRAPHE ===========================
+ */
 
-// Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à un autre sommet
+// Génère un graphe pour lequel chaque sommet a 50% de chance d'être connecté à
+// un autre sommet
 
-void Graph::randomize()
-{
-    // Déclaration d'un nouveau graphe
+void Graph::randomize() {
+  // Déclaration d'un nouveau graphe
 
-    // On ajoute une arrête entre i et j avec une probabilité de 50%
-    for (u64 i = 0; i < N; i++)
-        for (u64 j = 0; j < N; j++)
-        {
-            // Nombre aléatoire entre 0 et 1
-            double r = (double)rand() / (double)RAND_MAX;
+  // On ajoute une arrête entre i et j avec une probabilité de 50%
+  for (u64 i = 0; i < N; i++)
+    for (u64 j = 0; j < N; j++) {
+      // Nombre aléatoire entre 0 et 1
+      double r = (double) rand() / (double) RAND_MAX;
 
-            // Connecte i et j si r<0.5
-            if (r < 0.5)
-                connect(i, j);
-        }
+      // Connecte i et j si r<0.5
+      if (r < 0.5) connect(i, j);
+    }
 }
 
-/* =========================== FONCTION UTILITAIRE =========================== */
+/* =========================== FONCTION UTILITAIRE ===========================
+ */
 
 // Recherche du sommet avec la distance minimale
-u64 minDist(std::vector<u64> &dist, std::vector<bool> &visited)
-{
-    // On initialisa la distance minimal à l'infini et l'index du noeud pour lequel la distance est minimal
-    u64 min = INF, min_index = 0;
+u64 minDist(std::vector<u64> &dist, std::vector<bool> &visited) {
+  // On initialisa la distance minimal à l'infini et l'index du noeud pour
+  // lequel la distance est minimal
+  u64 min = INF, min_index = 0;
 
-    for (u64 v = 0; v < dist.size(); v++)
-        if (!visited[v] && dist[v] <= min)
-            min = dist[v], min_index = v;
+  for (u64 v = 0; v < dist.size(); v++)
+    if (!visited[v] && dist[v] <= min) min = dist[v], min_index = v;
 
-    return min_index;
+  return min_index;
 }
 
-void printSets(std::set<std::set<u64>> sets)
-{
-    for (auto &set : sets)
-    {
-        for (auto &i : set)
-        {
-            std::cout << i << " ";
-        }
-        std::cout << "\n";
-    }
+void printSets(std::set<std::set<u64>> sets) {
+  for (auto &set : sets) {
+    for (auto &i : set) { std::cout << i << " "; }
+    std::cout << "\n";
+  }
 }
