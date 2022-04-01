@@ -7,6 +7,8 @@ find_package(SDL2 REQUIRED)
 
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
+add_subdirectory(extern)
+
 # Build la librairie "graphes"
 add_subdirectory(src)
 add_subdirectory(apps)

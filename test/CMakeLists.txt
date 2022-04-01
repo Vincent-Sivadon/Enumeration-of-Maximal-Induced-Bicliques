@@ -1,27 +1,2 @@
 
-
-# ========================== GENERATION DES TESTS POUR VERSION AVEC MATRICE D'ADJACENCE ==========================
-
-file( GLOB TEST_SRCS "Lst_test/*.cpp" )
-
-# pour chaque TEST
-foreach( testsourcefile ${TEST_SRCS} )
-    # file ( GLOB ... ) donne les path absolu, on le transform en relative path
-    # exemple : 
-    # "/home/vincents/Documents/Projet/Enumeration-of-Maximal-Induced-Bicliques/tests/src/areConnectedTests"
-    # transformé en :
-    # "areConnectedTests"
-    string( REPLACE ".cpp" "" testname ${testsourcefile} )
-    string( REPLACE ${CMAKE_CURRENT_SOURCE_DIR}/src/ "" testname ${testname} )
-
-    # on créé l'executable
-    add_executable( ${testname} ${testsourcefile} )
-
-    # on link les librairies
-    target_link_libraries( ${testname} graphes SDL2 )
-    target_compile_options(${testname} PUBLIC -std=c++17)
-
-    # on ajoute cet executable à la liste des tests
-    add_test(${testname} ${testname})
-
-endforeach( testsourcefile ${TEST_SRCS} )
+add_subdirectory(graph)
