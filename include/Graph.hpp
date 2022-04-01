@@ -16,7 +16,7 @@
 
 #define INF 0x3f3f3f3f
 
-#include "suffixTree.hpp"
+#include "SuffixTree.hpp"
 
 typedef unsigned long long u64;
 
@@ -27,6 +27,50 @@ typedef struct vertexMin {
 
 class Graph {
 public:
+  Graph(u64 N) : N(N){};
+
+  /* ============================= GRAPHES SIMPLES =============================
+   */
+
+  // Génère un graphe représentant une molécule de H2O
+  template<typename T>
+  static std::unique_ptr<T> makeH2O() {
+    auto res = std::make_unique<T>(3);
+
+    res->connect(0, 1);
+    res->connect(0, 2);
+
+    return res;
+  }
+
+  // Génère un graphe représentant une molécule de méthane
+  template<typename T>
+  static std::unique_ptr<T> makeMethane() {
+    auto res = std::make_unique<T>(5);
+
+    res->connect(0, 1);
+    res->connect(0, 2);
+    res->connect(0, 3);
+    res->connect(0, 4);
+
+    return res;
+  }
+
+  // Génère un graphe représentant un hexagone
+  template<typename T>
+  static std::unique_ptr<T> makeHexagone() {
+    auto res = std::make_unique<T>(6);
+
+    res->connect(0, 1);
+    res->connect(1, 2);
+    res->connect(2, 3);
+    res->connect(3, 4);
+    res->connect(4, 5);
+    res->connect(5, 0);
+
+    return res;
+  }
+
   /* ======== CONNECTIONS ENTRE SOMMETS ======== */
   virtual void connect(u64 i,
                        u64 j) = 0;   // Crée un lien entre deux sommets i et j
@@ -37,16 +81,18 @@ public:
   virtual std::vector<int>
   verticesdegrees() const = 0;   // Permet de connaitre Le degré de chaque sommet dans le graphe
 
-  virtual void deConnected(u64 i, u64 j) = 0;   // supprimer le lien entre deux sommets i et j
-  Graph(u64 N) : N(N){};
+  virtual void disconnect(u64 i, u64 j) = 0;   // supprimer le lien entre deux sommets i et j
+
 
   /* ================ SETS ================ */
   bool isProper(std::set<u64> set);   // Retourne un booléen indiquant si un set
                                       // est propre par rapport au graphe
   virtual bool isConnectedToSet(u64 vertex,
                                 std::set<u64> set);   // Indique si un vertex est connecté au set
+
   virtual void getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet,
                           u64 i);   // Enumère tous les sets indépendants du graphe
+
   virtual std::set<std::set<u64>> getMaxIndSets();   // Enumère tous les sets indépendants maximaux
 
   /* =========== VISUALISATION =========== */
@@ -64,8 +110,7 @@ public:
   virtual std::vector<std::unique_ptr<Graph>>
   genSubgraphGik(u64 i);   // Génère les sous-graphes Gik à partir d'un graphe Gi donné
 
-  virtual std::set<std::set<u64>>
-  getBicliques();   // Enumère tout les bicliques maximales du graphe
+  std::set<std::set<u64>> getBicliques();   // Enumère tout les bicliques maximales du graphe
 
   void randomize();   // Permet de génerer aléatoirement un graphe
 
@@ -82,45 +127,3 @@ u64 minDist(std::vector<u64> &dist,
             std::vector<bool> &visited);        // Donne le vertex pour lequel la
                                                 // distance à la source est minimal
 void printSets(std::set<std::set<u64>> sets);   // Affiche dans le terminal un set de set
-
-/* ============================= GRAPHES SIMPLES =============================
- */
-
-// Génère un graphe représentant une molécule de H2O
-template<typename T>
-std::unique_ptr<T> H2O() {
-  auto res = std::make_unique<T>(3);
-
-  res->connect(0, 1);
-  res->connect(0, 2);
-
-  return res;
-}
-
-// Génère un graphe représentant une molécule de méthane
-template<typename T>
-std::unique_ptr<T> Methane() {
-  auto res = std::make_unique<T>(5);
-
-  res->connect(0, 1);
-  res->connect(0, 2);
-  res->connect(0, 3);
-  res->connect(0, 4);
-
-  return res;
-}
-
-// Génère un graphe représentant un hexagone
-template<typename T>
-std::unique_ptr<T> Hexagone() {
-  auto res = std::make_unique<T>(6);
-
-  res->connect(0, 1);
-  res->connect(1, 2);
-  res->connect(2, 3);
-  res->connect(3, 4);
-  res->connect(4, 5);
-  res->connect(5, 0);
-
-  return res;
-}

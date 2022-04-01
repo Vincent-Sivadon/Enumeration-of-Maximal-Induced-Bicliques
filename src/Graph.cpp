@@ -2,7 +2,7 @@
     - Contient l'implémentation de l'interface structure Graph
 */
 
-#include "StructGraph.hpp"
+#include "Graph.hpp"
 
 /* =============================== SETS =============================== */
 
@@ -81,7 +81,7 @@ std::vector<u64> Graph::shortestPaths(u64 src) {
   for (u64 j = 0; j < N; j++) {
     // On calcul l'index du noeud pour lequel la distance est minimal
     // On le supprime donc de l'ensemble
-    u64 u      = minDist(dist, visited);
+    u64 u = minDist(dist, visited);
     visited[u] = true;
 
     // On vérifie que u ne dépasse pas la distance souhaitée

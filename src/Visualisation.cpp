@@ -12,9 +12,9 @@
 
 #include <SDL2/SDL.h>
 
-#include "StructGraph.hpp"
-#include "grapheLst.hpp"
-#include "grapheMat.hpp"
+#include "Graph.hpp"
+#include "GraphList.hpp"
+#include "GraphMat.hpp"
 
 typedef unsigned long long u64;
 
@@ -156,7 +156,7 @@ void Graph::draw() {
   // Parameters
   u64 width = 800, height = 800;   // dimensions de la fenêtre
   u64 timeSteps = 600;             // nombre de pas de temps de la simulation
-  double l0     = 100;             // Taille du "ressort" qui représente les forces attractives
+  double l0 = 100;                 // Taille du "ressort" qui représente les forces attractives
                                    // entre sommets liés
 
   // Variables de positions, vitesses et accélérations pour chaque sommet
@@ -226,7 +226,7 @@ void Graph::drawBiclique(std::set<u64> biclique) {
   // Parameters
   u64 width = 800, height = 800;   // dimensions de la fenêtre
   u64 timeSteps = 600;             // nombre de pas de temps de la simulation
-  double l0     = 100;             // Taille du "ressort" qui représente les forces attractives
+  double l0 = 100;                 // Taille du "ressort" qui représente les forces attractives
                                    // entre sommets liés
 
   // Variables de positions, vitesses et accélérations pour chaque sommet
@@ -249,7 +249,7 @@ void Graph::drawBiclique(std::set<u64> biclique) {
 
   // Start with the first node of the biclique
   auto iter_first = biclique.begin();
-  u64 firstEl     = *(biclique.begin());
+  u64 firstEl = *(biclique.begin());
   biclique.erase(iter_first);
   colors[firstEl] = 1;
 

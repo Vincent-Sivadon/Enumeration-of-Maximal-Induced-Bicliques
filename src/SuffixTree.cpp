@@ -2,7 +2,7 @@
 #include <map>
 #include <set>
 
-#include "suffixTree.hpp"
+#include "SuffixTree.hpp"
 
 /* =========================== CONSTRUCTION =========================== */
 
@@ -16,7 +16,7 @@ void Tree::addSubtree(u64 i) {
 void Tree::insert(std::set<u64> set) {
   // Extraction du premier élément du set
   auto iIter = set.begin();
-  u64 i      = *(iIter);
+  u64 i = *(iIter);
 
   addSubtree(i);
 

@@ -1,4 +1,4 @@
-#include "grapheMat.hpp"
+#include "GraphMat.hpp"
 
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void GraphMat::connect(u64 i, u64 j) {
@@ -43,7 +43,7 @@ std::vector<int> GraphMat::verticesdegrees() const {
 }
 
 // Supprimé le lien entre deux sommets i et j
-void GraphMat::deConnected(u64 i, u64 j) {
+void GraphMat::disconnect(u64 i, u64 j) {
   adj[i * N + j] = 0;
   adj[j * N + i] = 0;
 }
