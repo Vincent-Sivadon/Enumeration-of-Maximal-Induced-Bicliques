@@ -39,11 +39,13 @@ struct Graph
     bool isConnectedToSet(u64 vertex, std::set<u64> set);                            // Indique si vertex est connecté au set
     void getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i); // Enumère tout les sets indépendants du graphe
     std::set<std::set<u64>> getMaxIndSets();                                         // Eumère tout les sets indépendants maximaux
+    std::set<std::set<u64>> getMaxIndSets2();
+
 
     /* ============ BRON-KERBOSCH ========== */
     //Inter and union functions for Bron Kerbosch
     std::set<u64> inter(std::set<u64> set, u64 v);           // Retourne l'intersection entre le sommet et l'ensemble de sommets entrés. 
-    std::set<u64> u(std::set<u64> uni, u64 v);               // Retourn l'union des mêmes arguments. 
+    std::set<u64> u(std::set<u64> uni, u64 v);               // Retourne l'union des mêmes arguments. 
 
     // Bron Kerbosch algorithm
     void prepareBron();
@@ -83,3 +85,4 @@ void printSets(std::set<std::set<u64>> sets);                    // Affiche dans
 /* =========================== FICHIERS D'IMPLEMENTATION =========================== */
 #include "graphesImpl.hpp"
 #include "visualisation.hpp"
+#include "bron-kerbosch.hpp"

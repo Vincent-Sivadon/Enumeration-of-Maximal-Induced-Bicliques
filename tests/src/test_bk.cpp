@@ -2,14 +2,14 @@
 #include <set>
 #include <iostream>
 
-#include "bron-kerbosch.hpp"
+#include "graphes.hpp"
 
 template <typename T>
 void test()
 {
     // TEST 1
     Graph<T> hex = Hexagone<T>();
-    std::set<std::set<u64>> maxIndSets = hex.getMaxIndSets();
+    std::set<std::set<u64>> maxIndSets = hex.getMaxIndSets2();
     std::set<std::set<u64>> expected = 
         {
             {0, 2, 4}, {1, 3, 5}
@@ -19,7 +19,7 @@ void test()
 
     // TEST 2
     Graph<T> meth = Methane<T>();
-    std::set<std::set<u64>> maxIndSets2 = meth.getMaxIndSets();
+    std::set<std::set<u64>> maxIndSets2 = meth.getMaxIndSets2();
     std::set<u64> expected2 = {1, 2, 3, 4};
     for(auto& set : maxIndSets2)
         assert(set == expected2);
