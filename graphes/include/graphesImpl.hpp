@@ -292,3 +292,5 @@ void printSets(std::set<std::set<u64>> sets)
         std::cout << "\n";
     }
 }
+
+/* =========================== DEGENERESCENC =========================== */

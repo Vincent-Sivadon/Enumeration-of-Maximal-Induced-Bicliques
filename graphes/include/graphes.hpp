@@ -45,6 +45,8 @@ struct Graph
     void draw();                    // Dessine le graphe à  l'écran
     void drawBiclique(std::set<u64> biclique);
 
+    /* =========== DEGENERESCENCE =========== */
+
     /* =========== UTILITAIRE =========== */
     std::vector<u64> shortestPaths(u64 src); // Donne la longueur du plus court chemin depuis src pour chaque sommet
 
