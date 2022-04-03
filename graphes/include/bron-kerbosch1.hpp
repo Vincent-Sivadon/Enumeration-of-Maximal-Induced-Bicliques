@@ -1,5 +1,5 @@
 /*
-    - Contient l'implémentation de la structure Graph version Bron-Kerbosch. 
+    - Contient l'implémentation de l'algo 1 de Bron-Kerbosch. 
 */
 
 #pragma once
