@@ -17,9 +17,12 @@ typedef unsigned long long u64;
 //d'ensembles, on commence donc par implémenter une fonction union et inter. 
 
 template <typename T>
-std::set<u64> Graph<T>::u(std::set<u64> uni, u64 v)
+std::set<u64> Graph<T>::u(std::set<u64> uni, std::set<u64> v)
 {
-    uni.insert(v);
+    for(auto k : v)
+    {
+        uni.insert(k);
+    }
     return uni;
 }
 
@@ -45,7 +48,7 @@ void Graph<T>::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
     std::set<u64> r,p,x;
 
     if(P.empty() && X.empty())
-        cliques.insert(R);
+        cliques1.insert(R);
     else 
     {
         for(auto v : P)
@@ -81,11 +84,11 @@ std::set<std::set<u64>> Graph<T>::getMaxIndSets2() {
     // Maximal set size
     u64 maxSize = 0;
 
-    for(auto i : cliques)
+    for(auto i : cliques1)
         if(i.size() > maxSize)
             maxSize = i.size();
 
-    for(auto i : cliques)
+    for(auto i : cliques1)
         if(i.size() == maxSize)
             maxIndSets.insert(i);
 

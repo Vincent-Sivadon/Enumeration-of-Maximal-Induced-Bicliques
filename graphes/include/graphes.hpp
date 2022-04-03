@@ -40,17 +40,23 @@ struct Graph
     void getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, u64 i); // Enumère tout les sets indépendants du graphe
     std::set<std::set<u64>> getMaxIndSets();                                         // Eumère tout les sets indépendants maximaux
     std::set<std::set<u64>> getMaxIndSets2();
+    std::set<std::set<u64>> getMaxIndSets3();
 
 
     /* ============ BRON-KERBOSCH ========== */
     //Inter and union functions for Bron Kerbosch
     std::set<u64> inter(std::set<u64> set, u64 v);           // Retourne l'intersection entre le sommet et l'ensemble de sommets entrés. 
-    std::set<u64> u(std::set<u64> uni, u64 v);               // Retourne l'union des mêmes arguments. 
+    std::set<u64> u(std::set<u64> uni, std::set<u64> v);               // Retourne l'union des mêmes arguments. 
 
-    // Bron Kerbosch algorithm
+    // Bron Kerbosch algorithm 1
     void prepareBron();
     void bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X); // Algorithme permettant de générer les ensembles indépendants maximaux. 
-    std::set<std::set<u64>> cliques;  // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
+    std::set<std::set<u64>> cliques1; // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
+
+    // Bron Kerbosch algorithm 2
+    void prepareBron2();
+    void bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X); // Algorithme permettant de générer les ensembles indépendants maximaux. 
+    std::set<std::set<u64>> cliques2;  // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
 
     /* =========== VISUALISATION =========== */
     void print() { adj->print(); }; // Affiche le graphe dans le terminal (à des fins de debug)
@@ -85,4 +91,5 @@ void printSets(std::set<std::set<u64>> sets);                    // Affiche dans
 /* =========================== FICHIERS D'IMPLEMENTATION =========================== */
 #include "graphesImpl.hpp"
 #include "visualisation.hpp"
-#include "bron-kerbosch.hpp"
+#include "bron-kerbosch1.hpp"
+#include "bron-kerbosch2.hpp"

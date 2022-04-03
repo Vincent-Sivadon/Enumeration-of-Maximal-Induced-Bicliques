@@ -17,14 +17,20 @@ template <typename T>
 void Graph<T>::bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X)
 {
 
-    std::set<u64> r,p1,p2,x;
+    std::set<u64> r,p1,p2,x, u1;
 
     if(P.empty() && X.empty())
-        cliques.insert(R);
+        cliques2.insert(R);
 
-    auto u1 = u(P, X)[1];
-    p1 = inter(P, u1);
-    
+    for(auto k : P)
+    {
+        u1 = u(X, k);
+    }
+
+    for(auto i : u1)
+    {
+        p1 = inter(P, i);
+    }
     for(auto v : p1)
         {
             r = u(R,v);
@@ -58,11 +64,11 @@ std::set<std::set<u64>> Graph<T>::getMaxIndSets3() {
     // Maximal set size
     u64 maxSize = 0;
 
-    for(auto i : cliques)
+    for(auto i : cliques2)
         if(i.size() > maxSize)
             maxSize = i.size();
 
-    for(auto i : cliques)
+    for(auto i : cliques2)
         if(i.size() == maxSize)
             maxIndSets.insert(i);
 
