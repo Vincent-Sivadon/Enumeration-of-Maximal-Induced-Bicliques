@@ -32,9 +32,9 @@ La hiérarchie est la suivante :
         * visualisation.hpp : contient l'implémentation de Graph::draw()
    
 * src :
-        * implémentation de l'arbre de suffix, de la visualisation ainsi que de la structure des graphes
+         implémentation de l'arbre de suffix, de la visualisation ainsi que de la structure des graphes
 * include : 
-        * contient toutes les librairies
+        contient toutes les librairies
 * tests : 
     * graph : contient les tests de chaque fonction
 * plot  : contient les scripts et données relatifs au plot
