@@ -1,7 +1,5 @@
 # Enumeration de bicliques maximales d'un gaphe
 
-![adjacencyMatrix](adjacencyMatrix.png "Matrice d'Adjacence")
-
 # Build
 Pour constuire le projet :  
 ```
@@ -19,7 +17,7 @@ Tout les executables vont être dans le répertoire build.
 ## Liste des macros
 Taper les commandes suivantes pour leur effet:  
 * make plot   : génère l'image perf.png et l'affiche  
-* ctest       : execute tout les tests du projet  
+* gtest       : execute tout les tests du projet  
 * make clean  : supprime les executables  
 
 
@@ -27,25 +25,28 @@ Taper les commandes suivantes pour leur effet:
 La hiérarchie est la suivante :
 * graphes : librairie de manipulation de graphe
     * include :
-        * graphes.hpp       : header de la structure Graph
-        * graphesImpl.hpp   : implémentation de graphes (dans un .hpp parce que c'est une structure template)
-        * adj.hpp           : contient l'interface d'une liste/matrice d'adjacence
+        * graphes.hpp       : interface de la structure Graph
+        * graphesList.hpp   : implémentation de graphes sous forme de liste
+        * graphesMat.hpp    : implémentation de graphes sous forme de matrice d'adjacence
         * suffixTree.hpp    : header de la structure d'arbre de suffix
         * visualisation.hpp : contient l'implémentation de Graph::draw()
-    * src :
-        * suffixTree.cpp    : implémentation de l'arbre de suffix
+   
+* src :
+        * implémentation de l'arbre de suffix, de la visualisation ainsi que de la structure des graphes
+* include : 
+        * contient toutes les librairies
 * tests : 
-    * src : contient les tests de chaque fonction
-* data  : contient les scripts et données relatifs au plot
-* *files*.cpp : code executif faisant appel aux librairies
+    * graph : contient les tests de chaque fonction
+* plot  : contient les scripts et données relatifs au plot
+* apps  : contient draw.cpp et genperf.cpp
 
 
 # Utilisation de la librairie
 * Générer un graphe :
     * aléatoirement :
-        * Forme Liste d'Adjacence   : ̀`Graph<Lst> g = genRandGraph<Lst>(Taille)`
-        * Forme Matrice d'Adjacence : ̀`Graph<Mat> g = genRandGraph<Mat>(Taille)`
+        * Forme Liste d'Adjacence   : ̀`GraphList g = random(Taille)`
+        * Forme Matrice d'Adjacence : ̀`GraphMat g = random(Taille)`
     * prédéfini     :
-        * Molécule de Méthane  : `Graph<Lst> g = Méthane<Lst>();`
+        * Molécule de Méthane  : `Graph<GraphList> g = Méthane<GraphList>();`
 * Manipulation d'un graphe :
     * Obtenir ses bicliques maximales : `std::set<std::set<u64>> bicliques = g.getBicliques()`
