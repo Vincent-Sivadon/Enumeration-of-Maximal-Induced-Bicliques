@@ -83,7 +83,6 @@ public:
 
   virtual void disconnect(u64 i, u64 j) = 0;   // supprimer le lien entre deux sommets i et j
 
-
   /* ================ SETS ================ */
   bool isProper(std::set<u64> set);   // Retourne un booléen indiquant si un set
                                       // est propre par rapport au graphe
@@ -103,6 +102,11 @@ public:
   /* =========== UTILITAIRE =========== */
   std::vector<u64> shortestPaths(u64 src);   // Donne la longueur du plus court chemin depuis src
                                              // pour chaque sommet
+  bool isViableBiclique(std::set<u64> &X, std::set<u64> &Y,
+                        u64 i);   // From the 2 sets of an original biclique,
+                                  // indicates if by adding i, biclique is still viable
+  bool isBicliqueMaximale(const std::set<u64> &biclique);   // Indicates if a biclique is maximale
+                                                            // regarding the graph
 
   /* =========== PROCEDURE DE L'ARTICLE =========== */
   virtual std::unique_ptr<Graph> genSubgraph(u64 i);   // Génère les sous-graphes Gi de l'algo
@@ -111,6 +115,7 @@ public:
   genSubgraphGik(u64 i);   // Génère les sous-graphes Gik à partir d'un graphe Gi donné
 
   std::set<std::set<u64>> getBicliques();   // Enumère tout les bicliques maximales du graphe
+  std::set<std::set<u64>> getBicliquesParallel();   // version parallèle OpenMP
 
   void randomize();   // Permet de génerer aléatoirement un graphe
 
