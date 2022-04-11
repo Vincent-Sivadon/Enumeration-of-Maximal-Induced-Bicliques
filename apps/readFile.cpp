@@ -4,9 +4,12 @@
 
 #include "ReadFile.hpp"
 
-// Dessine un hexagone
+#include <iostream>
+
+// Dessine un hexagone à partir d'un fichier .csv
 int main() {
-  std::unique_ptr<Graph> g = initFromFile<GraphList>("../data/edges.csv");
+  std::unique_ptr<Graph> g = initFromFile<GraphList>("../data/hexagone.csv");
+  g->draw();
 
   return 0;
 }
