@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 #define INF 0x3f3f3f3f
 
@@ -110,7 +111,11 @@ public:
   virtual std::vector<std::unique_ptr<Graph>>
   genSubgraphGik(u64 i);   // Génère les sous-graphes Gik à partir d'un graphe Gi donné
 
-  std::set<std::set<u64>> getBicliques();   // Enumère tout les bicliques maximales du graphe
+  std::set<std::set<u64>> getBicliques();     // Enumère tout les bicliques maximales du graphe
+  virtual std::vector<u64> findDegrees() = 0; // Permet de connaitre le degré de tous les sommet à un instant donné
+  virtual void deleteVertex(u64 i) = 0;       //   supprime le sommet dont l'identifiant est passer en argument du graphe
+  virtual void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) = 0; // Permet de trouver le sommet courant de degré minimal dans le graphe
+  virtual void degenOrder(std::vector<u64> &orderedVertices) = 0; // permet d'avoir l'aodre de dégénérescence dans le graphe
 
   void randomize();   // Permet de génerer aléatoirement un graphe
 

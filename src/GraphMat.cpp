@@ -47,3 +47,79 @@ void GraphMat::disconnect(u64 i, u64 j) {
   adj[i * N + j] = 0;
   adj[j * N + i] = 0;
 }
+
+std::vector<u64> GraphMat::findDegrees() {
+  std::vector<u64> vertDeg(N);
+
+  for (int i = 0; i < N; i++) {
+    u64 nbVoisins = 0;
+    for (int j = 0; j < N; j++)
+      if (adj[i * N + j] == 1) nbVoisins++;
+    vertDeg[i] = nbVoisins;
+  }
+
+  return vertDeg;
+}
+
+//
+void GraphMat::deleteVertex(u64 i) {
+  // Search for all i neighboors
+  for (int k = 0; k < N; k++)
+    if (adj[i * N + k] == 1) adj[i * N + k] = 0;
+  if (adj[k * N + i] == 1) adj[k * N + i] = 0;
+}
+
+//
+void GraphMat::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
+  std::vector<u64> vertDeg = findDegrees();
+  vertexMinDeg = 0;
+  minDeg = 0;
+
+  for (int i = 0; i < N; i++) {
+    if (vertDeg[i] <= 0) continue;
+    vertexMinDeg = i;
+    break;
+  }
+  minDeg = vertDeg[vertexMinDeg];
+
+  for (u64 i = 0; i < N; i++)
+    if (vertDeg[i] < minDeg) {
+      minDeg = vertDeg[i];
+      vertexMinDeg = i;
+    }
+}
+
+void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
+  // Allocation
+  orderedVertices.resize(N);
+  std::vector<int> checkTab(N);
+  for (int i = 0; i < N; i++) checkTab[i] = 0;
+  int nbRestant = N;
+  u64 tmp = 0;
+  u64 vertexMinDeg, minDeg;
+
+  for (int i = 0; i < N; i++) {
+    if (nbRestant > 2) {
+      findMinDegree(vertexMinDeg, minDeg);
+      orderedVertices[i] = vertexMinDeg;
+      nbRestant -= 1;
+      checkTab[vertexMinDeg] = 1;
+      deleteVertex(i);
+    }
+
+    else if (nbRestant == 2) {
+      findMinDegree(vertexMinDeg, minDeg);
+      orderedVertices[i] = vertexMinDeg;
+      nbRestant -= 1;
+      checkTab[vertexMinDeg] = 1;
+      std::vector<int>::iterator it;
+      it = std::find(checkTab.begin(), checkTab.end(), 0);
+      auto val = it - checkTab.begin();
+      if(it != checkTab.end())
+      {
+         orderedVertices[i+1] = val;
+         break;
+      }
+    }
+  }
+}
