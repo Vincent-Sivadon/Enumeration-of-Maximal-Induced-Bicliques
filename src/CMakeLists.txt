@@ -4,6 +4,8 @@ add_library(Graph STATIC
     GraphList.cpp ${INCLUDE_DIR}/GraphList.hpp
     GraphMat.cpp ${INCLUDE_DIR}/GraphMat.hpp
     Graph.cpp ${INCLUDE_DIR}/Graph.hpp
+    Bron-Kerbosch.cpp ${INCLUDE_DIR}/Graph.hpp
+    Bron-Kerbosch2.cpp ${INCLUDE_DIR}/Graph.hpp
     SuffixTree.cpp ${INCLUDE_DIR}/SuffixTree.hpp
     Visualisation.cpp
 )

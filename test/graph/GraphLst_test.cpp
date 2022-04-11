@@ -73,6 +73,34 @@ TEST(GraphLstTest, getMaxIndSets) {
   for (auto &set : maxIndSets2) assert(set == expected2);
 }
 
+TEST(GraphLstTest, getMaxIndSets2) {
+  // TEST 1
+  auto hex = Graph::makeHexagone<GraphList>();
+  std::set<std::set<u64>> maxIndSets = hex->getMaxIndSets2();
+  std::set<std::set<u64>> expected = {{0, 2, 4}, {1, 3, 5}};
+  for (auto &set : maxIndSets) assert(expected.find(set) != expected.end());
+
+  // TEST 2
+  auto meth = Graph::makeMethane<GraphList>();
+  std::set<std::set<u64>> maxIndSets2 = meth->getMaxIndSets2();
+  std::set<u64> expected2 = {1, 2, 3, 4};
+  for (auto &set : maxIndSets2) assert(set == expected2);
+}
+
+TEST(GraphLstTest, getMaxIndSets3) {
+  // TEST 1
+  auto hex = Graph::makeHexagone<GraphList>();
+  std::set<std::set<u64>> maxIndSets = hex->getMaxIndSets3();
+  std::set<std::set<u64>> expected = {{0, 2, 4}, {1, 3, 5}};
+  for (auto &set : maxIndSets) assert(expected.find(set) != expected.end());
+
+  // TEST 2
+  auto meth = Graph::makeMethane<GraphList>();
+  std::set<std::set<u64>> maxIndSets2 = meth->getMaxIndSets3();
+  std::set<u64> expected2 = {1, 2, 3, 4};
+  for (auto &set : maxIndSets2) assert(set == expected2);
+}
+
 TEST(GraphLstTest, isProper) {
   auto hex = Graph::makeHexagone<GraphList>();
   auto methane = Graph::makeMethane<GraphList>();
