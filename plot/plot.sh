@@ -1,2 +1,2 @@
-sudo gnuplot -c ../data/gnu_script.gp
+sudo gnuplot -c ../plot/gnu_script.gp
 eog ../perf.png
