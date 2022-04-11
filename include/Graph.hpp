@@ -83,7 +83,6 @@ public:
 
   virtual void disconnect(u64 i, u64 j) = 0;   // supprimer le lien entre deux sommets i et j
 
-
   /* ================ SETS ================ */
   bool isProper(std::set<u64> set);   // Retourne un booléen indiquant si un set
                                       // est propre par rapport au graphe
@@ -94,23 +93,6 @@ public:
                           u64 i);   // Enumère tous les sets indépendants du graphe
 
   virtual std::set<std::set<u64>> getMaxIndSets();   // Enumère tous les sets indépendants maximaux
-  virtual std::set<std::set<u64>> getMaxIndSets2();
-  virtual std::set<std::set<u64>> getMaxIndSets3();
-
-  /* ============ BRON-KERBOSCH ========== */
-    //Inter and union functions for Bron Kerbosch
-    virtual std::set<u64> inter(std::set<u64> set, u64 v);           // Retourne l'intersection entre le sommet et l'ensemble de sommets entrés. 
-    virtual std::set<u64> u(std::set<u64> uni, u64 v);               // Retourne l'union des mêmes arguments. 
-
-    // Bron Kerbosch algorithm 1
-    virtual void prepareBron();
-    virtual void bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X); // Algorithme permettant de générer les ensembles indépendants maximaux. 
-
-    // Bron Kerbosch algorithm 2
-    virtual void prepareBron2();
-    virtual void bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X); // Algorithme permettant de générer les ensembles indépendants maximaux. 
-
-    std::set<std::set<u64>> cliques;  // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
 
   /* =========== VISUALISATION =========== */
   virtual void print() const = 0;   // Affiche le graphe dans le terminal (à des fins de debug)
@@ -120,6 +102,11 @@ public:
   /* =========== UTILITAIRE =========== */
   std::vector<u64> shortestPaths(u64 src);   // Donne la longueur du plus court chemin depuis src
                                              // pour chaque sommet
+  bool isViableBiclique(std::set<u64> &X, std::set<u64> &Y,
+                        u64 i);   // From the 2 sets of an original biclique,
+                                  // indicates if by adding i, biclique is still viable
+  bool isBicliqueMaximale(const std::set<u64> &biclique);   // Indicates if a biclique is maximale
+                                                            // regarding the graph
 
   /* =========== PROCEDURE DE L'ARTICLE =========== */
   virtual std::unique_ptr<Graph> genSubgraph(u64 i);   // Génère les sous-graphes Gi de l'algo
@@ -128,6 +115,7 @@ public:
   genSubgraphGik(u64 i);   // Génère les sous-graphes Gik à partir d'un graphe Gi donné
 
   std::set<std::set<u64>> getBicliques();   // Enumère tout les bicliques maximales du graphe
+  std::set<std::set<u64>> getBicliquesParallel();   // version parallèle OpenMP
 
   void randomize();   // Permet de génerer aléatoirement un graphe
 
