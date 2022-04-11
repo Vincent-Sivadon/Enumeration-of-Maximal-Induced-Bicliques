@@ -11,6 +11,8 @@ add_library(
   # Bron-Kerbosch2.cpp ${INCLUDE_DIR}/Graph.hpp
   SuffixTree.cpp
   ${INCLUDE_DIR}/SuffixTree.hpp
+  ReadFile.cpp
+  ${INCLUDE_DIR}/ReadFile.hpp
   Visualisation.cpp)
 
 target_link_libraries(Graph PUBLIC SDL2 OpenMP::OpenMP_CXX)

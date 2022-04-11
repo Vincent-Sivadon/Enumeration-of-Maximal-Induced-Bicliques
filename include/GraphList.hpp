@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Graph.hpp"
 
 /* ============================== POUR UNE LISTE D'ADJACENCE
