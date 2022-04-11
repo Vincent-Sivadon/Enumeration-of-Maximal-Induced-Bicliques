@@ -27,6 +27,25 @@ double perf(int N) {
   return time / 10;
 }
 
+template<typename T>
+double perfParallel(int N) {
+  double time = 0;
+
+  // On moyenne sur 10 samples
+  for (int i = 0; i < 10; i++) {
+    std::unique_ptr<Graph> g = std::make_unique<T>(N);
+    g->randomize();
+
+    double before = omp_get_wtime();
+    std::set<std::set<u64>> bicliques = g->getBicliquesParallel();
+    double after = omp_get_wtime();
+
+    time += (after - before);
+  }
+
+  return time / 10;
+}
+
 int main(int argc, char **argv) {
   // Tailles des graphes utilisés pour les mesures de performances :
   int N = 10;         // nombre de mesure
@@ -45,10 +64,13 @@ int main(int argc, char **argv) {
   // Pour chaque taille n
   for (const auto &n : sizes) {
     double matTime = perf<GraphMat>(n);
+    double matParallelTime = perfParallel<GraphMat>(n);
 
     double lstTime = perf<GraphList>(n);
+    double lstParallelTime = perfParallel<GraphList>(n);
 
-    std::cout << n << " " << lstTime << " " << matTime << std::endl;
+    std::cout << n << " " << lstTime << " " << lstParallelTime << " " << matTime << " "
+              << matParallelTime << std::endl;
   }
 
   return 0;

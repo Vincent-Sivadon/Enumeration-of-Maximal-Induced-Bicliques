@@ -59,6 +59,7 @@ TEST(GraphLstTest, getBicliques) {
   for (auto &set : hex_bicliques) assert(expected.find(set) != expected.end());
 }
 
+/*
 TEST(GraphLstTest, getMaxIndSets) {
   // TEST 1
   auto hex = Graph::makeHexagone<GraphList>();
@@ -100,6 +101,7 @@ TEST(GraphLstTest, getMaxIndSets3) {
   std::set<u64> expected2 = {1, 2, 3, 4};
   for (auto &set : maxIndSets2) assert(set == expected2);
 }
+*/
 
 TEST(GraphLstTest, isProper) {
   auto hex = Graph::makeHexagone<GraphList>();
