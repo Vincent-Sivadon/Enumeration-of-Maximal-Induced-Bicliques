@@ -4,6 +4,8 @@
 
 #include "Graph.hpp"
 
+#include <unistd.h>
+
 /* =============================== SETS =============================== */
 
 // Retourn un booléen indiquant si un set est propre par rapport au graphe
@@ -292,6 +294,8 @@ std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i) {
 std::set<std::set<u64>> Graph::getBicliques() {
   //
   Tree suffixTree;
+
+  sleep(5);
 
   //
   for (u64 i = 0; i < N; i++) {
