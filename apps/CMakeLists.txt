@@ -13,4 +13,4 @@ target_link_libraries(readFile PUBLIC Graph)
 
 add_executable(getBicliques getBicliques.cpp)
 target_link_libraries(getBicliques PUBLIC Graph)
-target_compile_options(getBicliques PUBLIC -Ofast)
+target_compile_options(getBicliques PUBLIC -ggdb3 -Ofast)

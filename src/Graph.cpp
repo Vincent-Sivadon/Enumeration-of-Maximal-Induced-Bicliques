@@ -4,7 +4,7 @@
 
 #include "Graph.hpp"
 
-#include <unistd.h>
+#include <omp.h>
 
 /* =============================== SETS =============================== */
 
@@ -45,11 +45,12 @@ void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, 
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets() {
+void Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet,
+                          std::set<std::set<u64>> &maxIndSets) {
   //
-  std::set<std::set<u64>> IndSets;
-  std::set<u64> tmpSet;
-  std::set<std::set<u64>> maxIndSets;
+  IndSets.clear();
+  tmpSet.clear();
+  maxIndSets.clear();
 
   // Get all independent sets
   getIndSets(IndSets, tmpSet, 0);
@@ -62,8 +63,6 @@ std::set<std::set<u64>> Graph::getMaxIndSets() {
   // On garde uniquement les sets de taille maximale
   for (const auto &set : IndSets)
     if (set.size() == maxSize) maxIndSets.insert(set);
-
-  return maxIndSets;
 }
 
 /* ============================= UTILITAIRE ============================= */
@@ -295,7 +294,7 @@ std::set<std::set<u64>> Graph::getBicliques() {
   //
   Tree suffixTree;
 
-  sleep(5);
+  double getMaxIndSetsTIME = 0;
 
   //
   for (u64 i = 0; i < N; i++) {
@@ -303,7 +302,13 @@ std::set<std::set<u64>> Graph::getBicliques() {
     auto subgraph_i = genSubgraph(i);
 
     // Get all maximal independent sets of G_i
-    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets();
+    std::set<std::set<u64>> IndSets;
+    std::set<u64> tmpSet;
+    std::set<std::set<u64>> maxIndSets;
+    double start = omp_get_wtime();
+    subgraph_i->getMaxIndSets(IndSets, tmpSet, maxIndSets);
+    double end = omp_get_wtime();
+    getMaxIndSetsTIME += end - start;
 
     // Rename the nodes
     std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
@@ -323,6 +328,8 @@ std::set<std::set<u64>> Graph::getBicliques() {
   // On isole les branches maximale de l'arbre de suffix
   std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
 
+  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+
   return bicliques;
 }
 
@@ -336,8 +343,11 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
     // Construct the subgraph G_i
     auto subgraph_i = genSubgraph(i);
 
+    std::set<std::set<u64>> IndSets;
+    std::set<u64> tmpSet;
+    std::set<std::set<u64>> maxIndSets;
     // Get all maximal independent sets of G_i
-    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets();
+    subgraph_i->getMaxIndSets(IndSets, tmpSet, maxIndSets);
 
     // Rename the nodes
     std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices

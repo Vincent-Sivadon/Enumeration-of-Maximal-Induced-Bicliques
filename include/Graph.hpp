@@ -92,7 +92,9 @@ public:
   virtual void getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet,
                           u64 i);   // Enumère tous les sets indépendants du graphe
 
-  virtual std::set<std::set<u64>> getMaxIndSets();   // Enumère tous les sets indépendants maximaux
+  virtual void getMaxIndSets(
+          std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet,
+          std::set<std::set<u64>> &maxIndSets);   // Enumère tous les sets indépendants maximaux
 
   /* =========== VISUALISATION =========== */
   virtual void print() const = 0;   // Affiche le graphe dans le terminal (à des fins de debug)
