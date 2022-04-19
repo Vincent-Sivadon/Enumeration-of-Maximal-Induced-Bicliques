@@ -45,12 +45,12 @@ void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, 
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-void Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet,
-                          std::set<std::set<u64>> &maxIndSets) {
+std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets,
+                                             std::set<u64> &tmpSet) {
   //
   IndSets.clear();
   tmpSet.clear();
-  maxIndSets.clear();
+  std::set<std::set<u64>> maxIndSets;
 
   // Get all independent sets
   getIndSets(IndSets, tmpSet, 0);
@@ -63,6 +63,8 @@ void Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSe
   // On garde uniquement les sets de taille maximale
   for (const auto &set : IndSets)
     if (set.size() == maxSize) maxIndSets.insert(set);
+
+  return maxIndSets;
 }
 
 /* ============================= UTILITAIRE ============================= */
@@ -304,9 +306,8 @@ std::set<std::set<u64>> Graph::getBicliques() {
     // Get all maximal independent sets of G_i
     std::set<std::set<u64>> IndSets;
     std::set<u64> tmpSet;
-    std::set<std::set<u64>> maxIndSets;
     double start = omp_get_wtime();
-    subgraph_i->getMaxIndSets(IndSets, tmpSet, maxIndSets);
+    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets(IndSets, tmpSet);
     double end = omp_get_wtime();
     getMaxIndSetsTIME += end - start;
 
@@ -345,9 +346,8 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
 
     std::set<std::set<u64>> IndSets;
     std::set<u64> tmpSet;
-    std::set<std::set<u64>> maxIndSets;
     // Get all maximal independent sets of G_i
-    subgraph_i->getMaxIndSets(IndSets, tmpSet, maxIndSets);
+    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets(IndSets, tmpSet);
 
     // Rename the nodes
     std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
