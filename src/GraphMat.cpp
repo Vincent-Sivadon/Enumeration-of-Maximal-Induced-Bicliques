@@ -65,9 +65,10 @@ std::vector<u64> GraphMat::findDegrees() {
 //
 void GraphMat::deleteVertex(u64 i) {
   // Search for all i neighboors
-  for (int k = 0; k < N; k++)
+  for (int k = 0; k < N; k++) {
     if (adj[i * N + k] == 1) adj[i * N + k] = 0;
-  if (adj[k * N + i] == 1) adj[k * N + i] = 0;
+    if (adj[k * N + i] == 1) adj[k * N + i] = 0;
+  }
 }
 
 //
@@ -116,10 +117,9 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
       std::vector<int>::iterator it;
       it = std::find(checkTab.begin(), checkTab.end(), 0);
       auto val = it - checkTab.begin();
-      if(it != checkTab.end())
-      {
-         orderedVertices[i+1] = val;
-         break;
+      if (it != checkTab.end()) {
+        orderedVertices[i + 1] = val;
+        break;
       }
     }
   }
