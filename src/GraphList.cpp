@@ -126,10 +126,9 @@ void GraphList::degenOrder(std::vector<u64> &orderedVertices) {
       std::vector<int>::iterator it;
       it = std::find(checkTab.begin(), checkTab.end(), 0);
       auto val = it - checkTab.begin();
-      if(it != checkTab.end())
-      {
-         orderedVertices[i+1] = val;
-         break;
+      if (it != checkTab.end()) {
+        orderedVertices[i + 1] = val;
+        break;
       }
     }
   }
