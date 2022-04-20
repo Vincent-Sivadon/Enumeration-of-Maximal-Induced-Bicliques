@@ -24,6 +24,10 @@ public:
   void print() const override;
 
   static GraphList random(u64 N);
+  std::vector<u64> findDegrees() override;
+  void deleteVertex(u64 i) override;
+  void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) override;
+  void degenOrder(std::vector<u64> &orderedVertices) override;
 
 protected:
   std::unique_ptr<Graph> make(u64 n) override;
