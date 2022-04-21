@@ -29,6 +29,8 @@ public:
   void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) override;
   void degenOrder(std::vector<u64> &orderedVertices) override;
 
+  void changeToComplementary() override;
+
 protected:
   std::unique_ptr<Graph> make(u64 n) override;
 };

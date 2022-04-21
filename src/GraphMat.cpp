@@ -124,3 +124,7 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
     }
   }
 }
+
+void GraphMat::changeToComplementary() {
+  for (int i = 0; i < N * N; i++) adj[i] == 0 ? adj[i] = 1 : adj[i] = 0;
+}

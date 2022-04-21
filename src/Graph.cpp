@@ -360,7 +360,11 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
     }
 
     for (const auto &biclique : globalMaxIndSets)
-      if (isBicliqueMaximale(biclique)) bicliques.insert(biclique);
+      if (isBicliqueMaximale(biclique))
+#pragma omp critical
+      {
+        bicliques.insert(biclique);
+      }
   }
 
   return bicliques;

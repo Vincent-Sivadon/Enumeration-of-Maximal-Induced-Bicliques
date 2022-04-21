@@ -133,3 +133,15 @@ void GraphList::degenOrder(std::vector<u64> &orderedVertices) {
     }
   }
 }
+
+void GraphList::changeToComplementary() {
+  std::set<u64> newNeighboors;
+  for (int i = 0; i < N; i++) {
+    newNeighboors.clear();
+    for (int j = 0; j < N; j++) {
+      // If vertex j is not in neighboors of i, than insert in newNeighboors
+      if (adj[i].find(j) == adj[i].end()) newNeighboors.insert(j);
+    }
+    adj[i] = newNeighboors;
+  }
+}
