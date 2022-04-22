@@ -145,3 +145,88 @@ void GraphList::changeToComplementary() {
     adj[i] = newNeighboors;
   }
 }
+
+
+bool GraphList::isClique(std::set<u64>edgeSets)
+{
+  u64 n = edgeSets.size();
+  bool status = true;
+  if (n < 3) return false;
+
+  for (auto i : edgeSets) {
+    std::map<u64,std::set<u64>>::iterator it;
+    for(it = adj.begin(); it != adj.end(); it++)
+    {
+      if (it->first == i and (it->second.size()!= (n-1))) {
+        status = false;
+        break;
+      }
+    }
+  return status;
+}
+
+
+u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB)
+{
+  int  pivot = -1;
+ int maxSize = -1;
+
+  for (const auto &u : SUBG) {
+    std::set<u64> gammaU = adj[u];
+    std::set<u64> inter = intersectionOfSets(gammaU, CAND);
+    u64 sizeOfInter = inter.size();
+
+    if (sizeOfInter >= maxSize) {
+      pivot = u;
+      maxSize = sizeOfInter;
+    }
+  }
+
+  return pivot;
+}
+
+//
+
+void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
+                      std::set<std::set<u64>> &stockCliques)
+{
+  if (SUBG.empty()) {
+    if (isClique(Q, graph)) { stockCliques.push_back(Q); };
+    std::cout << " clique, ";
+  } else {
+    int currentPivot = choosePivotElement(SUBG, CAND, graph);
+    std::vector<int> gammaPivot = graph[currentPivot];
+    std::vector<int> EXTu = diffOfSets(CAND, gammaPivot);
+    while (not EXTu.empty()) {
+      int q = EXTu[0];
+      // int q = randchoice(EXTu);
+      Q.push_back(q);
+      std::cout << q << ", ";
+      std::vector<int> gammaQ = graph[q];
+      std::vector<int> SUBGq = intersectionOfSets(SUBG, gammaQ);
+      std::vector<int> CANDq = intersectionOfSets(CAND, gammaQ);
+      expandTomitaList(SUBGq, CANDq, Q, graph, stockCliques);
+      std::vector<int> singleq = {q};
+      // CAND.pop_back(q);
+      // Q.pop_back(q);
+      // Q = diffOfSets(Q,singleq);
+      CAND = diffOfSets(CAND, singleq);
+      std::cout << "back, ";
+      Q = diffOfSets(Q, singleq);
+      EXTu = diffOfSets(CAND, gammaPivot);
+      // std::cout << "back, ";
+    }
+  }
+
+}
+
+
+void getAllMaxCliques(std::set<u64> vertices,
+             std::set<std::set<u64>> &cliques){
+  std::cout << " Start of clique finding !"
+            << "\n\n";
+  std::vector<int> Q;
+  expandTomitaList(vertices, vertices, Q, graph, cliques);
+  std::cout << " End of clique finding !"
+            << "\n";
+}

@@ -128,3 +128,24 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
 void GraphMat::changeToComplementary() {
   for (int i = 0; i < N * N; i++) adj[i] == 0 ? adj[i] = 1 : adj[i] = 0;
 }
+
+//
+bool GraphMat::isClique(std::set<u64>edgeSets)
+{
+  int n = edgeSets.size();
+  bool status = true;
+  if (n < 3) return false;
+
+  for (auto i : edgeSets) {
+    u64 nbVoisins = 0;
+    for (int j = 0; j < N; j++)
+      if (adj[i * N + j] == 1) nbVoisins++;
+    
+    if(nbVoisins != n-1)
+    {
+      status = false;
+      break;
+    }
+    }
+  return status;
+}
