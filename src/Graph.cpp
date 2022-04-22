@@ -411,3 +411,40 @@ void printSets(std::set<std::set<u64>> sets) {
     std::cout << "\n";
   }
 }
+
+// calcul la différence ensembliste A\B
+std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+  std::set<u64>::iterator it;
+  std::set<u64> output;
+  for (auto i : A) {
+    it = std::find(B.begin(), B.end(), i);
+    if (it == B.end()) output.insert(i);
+  }
+  return output;
+}
+
+// calcul de l'intersection de deux ensembles
+std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+  std::set<u64>::iterator it;
+  std::set<u64> output;
+  for (auto i : B) {
+    it = std::find(A.begin(), A.end(), i);
+    if (it != A.end()) output.insert(i);
+  }
+  return output;
+}
+
+// calcul de la réunion de deux ensembles
+std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+  std::set<u64>::iterator it;
+  std::set<u64> output = A;
+
+  for (auto i : B) {
+    it = std::find(A.begin(), A.end(), i);
+    if (it == A.end()) A.insert(i);
+  }
+  return output;
+} 
