@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <utility>
 #include <vector>
+#include <random>
 
 #define INF 0x3f3f3f3f
 
@@ -109,6 +110,10 @@ public:
                                   // indicates if by adding i, biclique is still viable
   bool isBicliqueMaximale(const std::set<u64> &biclique);   // Indicates if a biclique is maximale
                                                             // regarding the graph
+  std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B); // calcul la différence ensembliste A\B
+  std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B); // calcul de l'intersection de deux ensembles
+  std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B); // calcul de la réunion de deux ensembles
+  int randchoice(std::set<u64> v) ;     // Opère un choix aléatoire d'élément du set v
 
   /* =========== PROCEDURE DE L'ARTICLE =========== */
   virtual std::unique_ptr<Graph> genSubgraph(u64 i);   // Génère les sous-graphes Gi de l'algo

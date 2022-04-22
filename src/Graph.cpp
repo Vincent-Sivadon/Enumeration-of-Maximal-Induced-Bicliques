@@ -448,3 +448,16 @@ std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B)
   }
   return output;
 } 
+
+// Opère un choix aléatoire d'élément du set v
+u64 randchoice(std::set<u64> v) 
+{
+   std::random_device r_device;
+  std::mt19937 engine{r_device()};
+  std::uniform_int_distribution<u64> dist(0, v.size() - 1);
+
+  std::set<u64>::iterator it;
+  it = std::find(v.begin(), v.end(), dist(engine));
+  u64 rand_elemnent = *it;
+  return rand_elemnent;
+}
