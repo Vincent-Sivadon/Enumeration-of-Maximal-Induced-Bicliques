@@ -21,7 +21,7 @@
 
 typedef unsigned long long u64;
 
-typedef struct vertexMin {
+typedef struct {
   int degree;
   int vertex;
 } vertexMin;
@@ -139,8 +139,8 @@ public:
 
   u64 getSize() { return N; }
 
-  virtual bool isClique(std::set<u64>edgeSets) ; // Vérifie si l'ensemble donné en parametre est bien un clique ou pas
-  virtual u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB); // Choisir un pivot parmi les sommet éligible afin de
+  virtual bool isClique(std::set<u64>& edgeSets) = 0; // Vérifie si l'ensemble donné en parametre est bien un clique ou pas
+  virtual u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) = 0; // Choisir un pivot parmi les sommet éligible afin de
                                                                           // minimiser le nombre de sommet à axplorer pendant 
                                                                           // la recherche des cliques maximales
 

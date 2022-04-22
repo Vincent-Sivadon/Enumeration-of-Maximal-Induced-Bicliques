@@ -130,7 +130,7 @@ void GraphMat::changeToComplementary() {
 }
 
 //
-bool GraphMat::isClique(std::set<u64>edgeSets)
+bool GraphMat::isClique(std::set<u64>& edgeSets)
 {
   int n = edgeSets.size();
   bool status = true;

@@ -123,8 +123,7 @@ void GraphList::degenOrder(std::vector<u64> &orderedVertices) {
       orderedVertices[i] = vertexMinDeg;
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
-      std::vector<int>::iterator it;
-      it = std::find(checkTab.begin(), checkTab.end(), 0);
+      auto it = std::find(checkTab.begin(), checkTab.end(), 0);
       auto val = it - checkTab.begin();
       if (it != checkTab.end()) {
         orderedVertices[i + 1] = val;
@@ -147,7 +146,7 @@ void GraphList::changeToComplementary() {
 }
 
 
-bool GraphList::isClique(std::set<u64>edgeSets)
+bool GraphList::isClique(std::set<u64>& edgeSets)
 {
   u64 n = edgeSets.size();
   bool status = true;
@@ -157,12 +156,14 @@ bool GraphList::isClique(std::set<u64>edgeSets)
     std::map<u64,std::set<u64>>::iterator it;
     for(it = adj.begin(); it != adj.end(); it++)
     {
-      if (it->first == i and (it->second.size()!= (n-1))) {
+      if ((it->first == i) && (it->second.size() != (n-1))) {
         status = false;
         break;
       }
     }
+
   return status;
+}
 }
 
 
@@ -171,7 +172,7 @@ u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB)
   int  pivot = -1;
  int maxSize = -1;
 
-  for (const auto &u : SUBG) {
+  for (const auto &u : SUB) {
     std::set<u64> gammaU = adj[u];
     std::set<u64> inter = intersectionOfSets(gammaU, CAND);
     u64 sizeOfInter = inter.size();
