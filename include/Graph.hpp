@@ -29,8 +29,7 @@ class Graph {
 public:
   Graph(u64 N) : N(N){};
 
-  /* ============================= GRAPHES SIMPLES =============================
-   */
+  /* ============================= GRAPHES SIMPLES ============================= */
 
   // Génère un graphe représentant une molécule de H2O
   template<typename T>
