@@ -11,12 +11,11 @@
 
 // Dessine un hexagone
 int main() {
-  std::unique_ptr<GraphList> g = Graph::makeHexagone<GraphList>();
-  g->connect(0, 3);
-  g->connect(4, 2);
-  g->connect(0, 2);
-  std::set<std::set<u64>> bicliques = g->getBicliques();
-  g->drawBiclique(*bicliques.begin());
+  std::unique_ptr<GraphMat> g = Graph::makeHexagone<GraphMat>();
+  // std::set<std::set<u64>> bicliques = g->getBicliques();
+  // g->drawBiclique(*bicliques.begin());
+  g->changeToComplementary();
+  g->draw();
 
   return 0;
 }

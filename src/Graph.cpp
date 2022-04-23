@@ -4,6 +4,8 @@
 
 #include "Graph.hpp"
 
+#include <omp.h>
+
 /* =============================== SETS =============================== */
 
 // Retourn un booléen indiquant si un set est propre par rapport au graphe
@@ -43,10 +45,11 @@ void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, 
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets() {
+std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets,
+                                             std::set<u64> &tmpSet) {
   //
-  std::set<std::set<u64>> IndSets;
-  std::set<u64> tmpSet;
+  IndSets.clear();
+  tmpSet.clear();
   std::set<std::set<u64>> maxIndSets;
 
   // Get all independent sets
@@ -98,6 +101,79 @@ std::vector<u64> Graph::shortestPaths(u64 src) {
   }
 
   return dist;
+}
+
+// From the 2 sets of an original biclique, indicates if by adding i, biclique is still viable
+bool Graph::isViableBiclique(std::set<u64> &X, std::set<u64> &Y, u64 i) {
+  // If one of the sets is empty, it is a degenerated cases
+  if (X.size() == 0 || Y.size() == 0) return false;
+
+  // Indicates if a biclique is viable
+  bool viable = true;
+
+  // If node is connected to an element from X
+  // check if he's connected to all elements from X, and none elements from Y
+  if (areConnected(i, *X.begin())) {
+    // Check if connected to all elements of X
+    for (const auto &node : X)
+      if (!areConnected(i, node))   // if not, than this is not a viable biclique
+        viable = false;
+
+    // if the biclique is still viable, check if it's not connected to any elements of Y
+    if (viable)
+      for (const auto &node : Y)
+        if (areConnected(i, node))   // if it is, than this i not a viable biclique
+          viable = false;
+  }
+  // do it the opposite way if not connected to X
+  else if (areConnected(i, *Y.begin())) {
+    // Check if connected to all elements of Y
+    for (const auto &node : Y)
+      if (!areConnected(i, node))   // if not, than this is not a viable biclique
+        viable = false;
+
+    // if the biclique is still viable, check if it's not connected to any elements of X
+    if (viable)
+      for (const auto &node : X)
+        if (areConnected(i, node))   // if it is, than this i not a viable biclique
+          viable = false;
+  }
+  // else if not connected to any element of X or Y, not viable
+  else
+    viable = false;
+
+  // Return
+  if (viable) return true;
+  else
+    return false;
+}
+
+bool Graph::isBicliqueMaximale(const std::set<u64> &biclique) {
+  if (biclique.size() == 1) return false;
+
+  std::set<u64> X, Y;
+
+  // Constructs sets X et Y
+  // ----------------------
+  X.insert(*biclique.begin());   // insert first node
+  for (const auto &node : biclique) {
+    // If node is connected to an element from X : insert node in Y
+    // else : insert node in X
+    if (areConnected(node, *X.begin())) Y.insert(node);
+    else
+      X.insert(node);
+  }
+
+  /* For every node in 1:n
+   * add this node to biclique
+   * check if it's still a biclique */
+  for (u64 i = 0; i < N; i++) {
+    if (X.find(i) != X.end() || Y.find(i) != Y.end()) continue;
+    if (isViableBiclique(X, Y, i)) return false;
+  }
+
+  // If all the biclique passed all tests, it is maximale
+  return true;
 }
 
 /* ======================== PROCEDURE DE L'ARTICLE ======================== */
@@ -220,13 +296,20 @@ std::set<std::set<u64>> Graph::getBicliques() {
   //
   Tree suffixTree;
 
+  double getMaxIndSetsTIME = 0;
+
   //
   for (u64 i = 0; i < N; i++) {
     // Construct the subgraph G_i
     auto subgraph_i = genSubgraph(i);
 
     // Get all maximal independent sets of G_i
-    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets();
+    std::set<std::set<u64>> IndSets;
+    std::set<u64> tmpSet;
+    double start = omp_get_wtime();
+    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets(IndSets, tmpSet);
+    double end = omp_get_wtime();
+    getMaxIndSetsTIME += end - start;
 
     // Rename the nodes
     std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
@@ -245,6 +328,44 @@ std::set<std::set<u64>> Graph::getBicliques() {
 
   // On isole les branches maximale de l'arbre de suffix
   std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+
+  return bicliques;
+}
+
+std::set<std::set<u64>> Graph::getBicliquesParallel() {
+  // Will store maximal induces bicliques
+  std::set<std::set<u64>> bicliques;
+
+  // For every nodes
+#pragma omp parallel for
+  for (u64 i = 0; i < N; i++) {
+    // Construct the subgraph G_i
+    auto subgraph_i = genSubgraph(i);
+
+    std::set<std::set<u64>> IndSets;
+    std::set<u64> tmpSet;
+    // Get all maximal independent sets of G_i
+    std::set<std::set<u64>> maxIndSets = subgraph_i->getMaxIndSets(IndSets, tmpSet);
+
+    // Rename the nodes
+    std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
+    std::set<u64> tmp;
+    for (const auto &maxIndSet : maxIndSets) {
+      // Add the sets with parent graph indices
+      tmp.clear();
+      for (const auto &el : maxIndSet) tmp.insert(el + i);
+      globalMaxIndSets.insert(tmp);
+    }
+
+    for (const auto &biclique : globalMaxIndSets)
+      if (isBicliqueMaximale(biclique))
+#pragma omp critical
+      {
+        bicliques.insert(biclique);
+      }
+  }
 
   return bicliques;
 }
@@ -289,4 +410,54 @@ void printSets(std::set<std::set<u64>> sets) {
     for (auto &i : set) { std::cout << i << " "; }
     std::cout << "\n";
   }
+}
+
+// calcul la différence ensembliste A\B
+std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+  std::set<u64>::iterator it;
+  std::set<u64> output;
+  for (auto i : A) {
+    it = std::find(B.begin(), B.end(), i);
+    if (it == B.end()) output.insert(i);
+  }
+  return output;
+}
+
+// calcul de l'intersection de deux ensembles
+std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+  std::set<u64>::iterator it;
+  std::set<u64> output;
+  for (auto i : B) {
+    it = std::find(A.begin(), A.end(), i);
+    if (it != A.end()) output.insert(i);
+  }
+  return output;
+}
+
+// calcul de la réunion de deux ensembles
+std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+  std::set<u64>::iterator it;
+  std::set<u64> output = A;
+
+  for (auto i : B) {
+    it = std::find(A.begin(), A.end(), i);
+    if (it == A.end()) A.insert(i);
+  }
+  return output;
+} 
+
+// Opère un choix aléatoire d'élément du set v
+u64 randchoice(std::set<u64> v) 
+{
+   std::random_device r_device;
+  std::mt19937 engine{r_device()};
+  std::uniform_int_distribution<u64> dist(0, v.size() - 1);
+
+  std::set<u64>::iterator it;
+  it = std::find(v.begin(), v.end(), dist(engine));
+  u64 rand_elemnent = *it;
+  return rand_elemnent;
 }

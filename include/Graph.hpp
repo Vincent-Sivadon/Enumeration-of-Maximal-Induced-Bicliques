@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <utility>
 #include <vector>
+#include <random>
 
 #define INF 0x3f3f3f3f
 
@@ -20,7 +21,7 @@
 
 typedef unsigned long long u64;
 
-typedef struct vertexMin {
+typedef struct {
   int degree;
   int vertex;
 } vertexMin;
@@ -82,7 +83,6 @@ public:
 
   virtual void disconnect(u64 i, u64 j) = 0;   // supprimer le lien entre deux sommets i et j
 
-
   /* ================ SETS ================ */
   bool isProper(std::set<u64> set);   // Retourne un booléen indiquant si un set
                                       // est propre par rapport au graphe
@@ -92,7 +92,9 @@ public:
   virtual void getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet,
                           u64 i);   // Enumère tous les sets indépendants du graphe
 
-  virtual std::set<std::set<u64>> getMaxIndSets();   // Enumère tous les sets indépendants maximaux
+  virtual std::set<std::set<u64>>
+  getMaxIndSets(std::set<std::set<u64>> &IndSets,
+                std::set<u64> &tmpSet);   // Enumère tous les sets indépendants maximaux
 
   /* =========== VISUALISATION =========== */
   virtual void print() const = 0;   // Affiche le graphe dans le terminal (à des fins de debug)
@@ -102,6 +104,15 @@ public:
   /* =========== UTILITAIRE =========== */
   std::vector<u64> shortestPaths(u64 src);   // Donne la longueur du plus court chemin depuis src
                                              // pour chaque sommet
+  bool isViableBiclique(std::set<u64> &X, std::set<u64> &Y,
+                        u64 i);   // From the 2 sets of an original biclique,
+                                  // indicates if by adding i, biclique is still viable
+  bool isBicliqueMaximale(const std::set<u64> &biclique);   // Indicates if a biclique is maximale
+                                                            // regarding the graph
+  std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B); // calcul la différence ensembliste A\B
+  std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B); // calcul de l'intersection de deux ensembles
+  std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B); // calcul de la réunion de deux ensembles
+  int randchoice(std::set<u64> v) ;     // Opère un choix aléatoire d'élément du set v
 
   /* =========== PROCEDURE DE L'ARTICLE =========== */
   virtual std::unique_ptr<Graph> genSubgraph(u64 i);   // Génère les sous-graphes Gi de l'algo
@@ -110,10 +121,34 @@ public:
   genSubgraphGik(u64 i);   // Génère les sous-graphes Gik à partir d'un graphe Gi donné
 
   std::set<std::set<u64>> getBicliques();   // Enumère tout les bicliques maximales du graphe
+  std::set<std::set<u64>> getBicliquesParallel();   // version parallèle OpenMP
+  virtual std::vector<u64>
+  findDegrees() = 0;   // Permet de connaitre le degré de tous les sommet à un instant donné
+  virtual void deleteVertex(
+          u64 i) = 0;   //   supprime le sommet dont l'identifiant est passer en argument du graphe
+  virtual void findMinDegree(
+          u64 &vertexMinDeg,
+          u64 &minDeg) = 0;   // Permet de trouver le sommet courant de degré minimal dans le graphe
+  virtual void degenOrder(std::vector<u64> &orderedVertices) = 0;   // permet d'avoir l'ordre de
+                                                                    // dégénérescence dans le graphe
 
   void randomize();   // Permet de génerer aléatoirement un graphe
 
+  virtual void changeToComplementary() = 0;
+
   u64 getSize() { return N; }
+
+  virtual bool isClique(std::set<u64>& edgeSets) = 0; // Vérifie si l'ensemble donné en parametre est bien un clique ou pas
+  virtual u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) = 0; // Choisir un pivot parmi les sommet éligible afin de
+                                                                          // minimiser le nombre de sommet à axplorer pendant 
+                                                                          // la recherche des cliques maximales
+
+  virtual void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
+                      std::set<std::set<u64>> &stockCliques);                           // Procédure récursive de recherche par arbre couvrant des
+                                                                                        // cliques 
+
+   virtual void getAllMaxCliques(std::set<u64> vertices,
+             std::set<std::set<u64>> &cliques);  // Calcul effectif des cliques maximales
 
 protected:
   u64 N;
