@@ -13,6 +13,6 @@ file(GLOB SRCS "src/*.cpp")
 file(GLOB HEADERS "include/*.hpp")
 
 add_library(graphes STATIC ${SRCS} ${HEADERS})
-target_link_libraries(graphes SDL)
+target_link_libraries(graphes SDL2)
 target_include_directories(graphes PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_compile_options(graphes PUBLIC -std=c++17)
