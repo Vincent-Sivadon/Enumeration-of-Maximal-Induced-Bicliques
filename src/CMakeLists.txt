@@ -7,8 +7,8 @@ add_library(
   ${INCLUDE_DIR}/GraphMat.hpp
   Graph.cpp
   ${INCLUDE_DIR}/Graph.hpp
-  # Bron-Kerbosch.cpp ${INCLUDE_DIR}/Graph.hpp
-  # Bron-Kerbosch2.cpp ${INCLUDE_DIR}/Graph.hpp
+  Bron-Kerbosch.cpp
+  Bron-Kerbosch2.cpp
   SuffixTree.cpp
   ${INCLUDE_DIR}/SuffixTree.hpp
   ReadFile.cpp
@@ -17,4 +17,4 @@ add_library(
 
 target_link_libraries(Graph PUBLIC SDL2 OpenMP::OpenMP_CXX)
 target_include_directories(Graph PUBLIC ${CMAKE_CURRENT_INCLUDE_DIR})
-target_compile_options(Graph PUBLIC -ggdb3 -Ofast)
+target_compile_options(Graph PUBLIC -g)

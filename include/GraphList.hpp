@@ -20,6 +20,9 @@ public:
   void disconnect(u64 i,
                   u64 j) override;   // supprimer le lien entre deux sommets i et j
 
+  
+
+
   /* =========== VISUALISATION =========== */
   void print() const override;
 

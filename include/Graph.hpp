@@ -97,6 +97,24 @@ public:
   getMaxIndSets(std::set<std::set<u64>> &IndSets,
                 std::set<u64> &tmpSet);   // Enumère tous les sets indépendants maximaux
 
+  std::set<std::set<u64>> getMaxIndSets2(std::set<std::set<u64>> cliques);
+
+  /* ============ BRON-KERBOSCH ========== */                
+    //Inter and union functions for Bron Kerbosch
+    std::set<u64> inter(std::set<u64> set, u64 v);           // Retourne l'intersection entre le sommet et l'ensemble de sommets entrés. 
+    std::set<u64> u(std::set<u64> uni, std::set<u64> v);               // Retourne l'union des mêmes arguments. 
+
+    // Bron Kerbosch algorithm 1
+     void prepareBron() ;
+     std::set<std::set<u64>> bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X) ; // Algorithme permettant de générer les ensembles indépendants maximaux. 
+    std::set<std::set<u64>> cliques1; // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
+
+    // Bron Kerbosch algorithm 2
+    void prepareBron2();
+    void bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X); // Algorithme permettant de générer les ensembles indépendants maximaux. 
+    std::set<std::set<u64>> cliques2;  // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
+
+
   /* =========== VISUALISATION =========== */
   virtual void print() const = 0;   // Affiche le graphe dans le terminal (à des fins de debug)
   void draw();                      // Dessine le graphe à  l'écran
@@ -145,11 +163,11 @@ public:
                                                                           // la recherche des cliques maximales
 
   virtual void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
-                      std::set<std::set<u64>> &stockCliques);                           // Procédure récursive de recherche par arbre couvrant des
+                      std::set<std::set<u64>> &stockCliques) = 0;                           // Procédure récursive de recherche par arbre couvrant des
                                                                                         // cliques 
 
    virtual void getAllMaxCliques(std::set<u64> vertices,
-             std::set<std::set<u64>> &cliques);  // Calcul effectif des cliques maximales
+             std::set<std::set<u64>> &cliques) = 0;  // Calcul effectif des cliques maximales
 
 protected:
   u64 N;
