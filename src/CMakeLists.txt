@@ -7,8 +7,8 @@ add_library(
   ${INCLUDE_DIR}/GraphMat.hpp
   Graph.cpp
   ${INCLUDE_DIR}/Graph.hpp
-  # Bron-Kerbosch.cpp ${INCLUDE_DIR}/Graph.hpp
-  # Bron-Kerbosch2.cpp ${INCLUDE_DIR}/Graph.hpp
+  Bron-Kerbosch.cpp
+  Bron-Kerbosch2.cpp
   SuffixTree.cpp
   ${INCLUDE_DIR}/SuffixTree.hpp
   ReadFile.cpp
