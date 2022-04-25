@@ -5,6 +5,7 @@
 #include "Graph.hpp"
 
 #include <omp.h>
+#include <algorithm>
 
 /* =============================== SETS =============================== */
 
@@ -413,7 +414,7 @@ void printSets(std::set<std::set<u64>> sets) {
 }
 
 // calcul la différence ensembliste A\B
-std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B)
+std::set<u64> Graph::diffOfSets(std::set<u64> &A, std::set<u64> &B)
 {
   std::set<u64>::iterator it;
   std::set<u64> output;
@@ -425,7 +426,7 @@ std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B)
 }
 
 // calcul de l'intersection de deux ensembles
-std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
+std::set<u64> Graph::intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
 {
   std::set<u64>::iterator it;
   std::set<u64> output;
@@ -437,7 +438,7 @@ std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
 }
 
 // calcul de la réunion de deux ensembles
-std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B)
+std::set<u64> Graph::unionOfSets(std::set<u64> &A, std::set<u64> &B)
 {
   std::set<u64>::iterator it;
   std::set<u64> output = A;

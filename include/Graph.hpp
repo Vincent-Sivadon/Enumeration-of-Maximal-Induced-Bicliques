@@ -145,11 +145,11 @@ public:
                                                                           // la recherche des cliques maximales
 
   virtual void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
-                      std::set<std::set<u64>> &stockCliques);                           // Procédure récursive de recherche par arbre couvrant des
+                      std::set<std::set<u64>> &stockCliques) = 0;                           // Procédure récursive de recherche par arbre couvrant des
                                                                                         // cliques 
 
    virtual void getAllMaxCliques(std::set<u64> vertices,
-             std::set<std::set<u64>> &cliques);  // Calcul effectif des cliques maximales
+             std::set<std::set<u64>> &cliques) = 0;  // Calcul effectif des cliques maximales
 
 protected:
   u64 N;
