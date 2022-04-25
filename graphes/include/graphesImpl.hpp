@@ -78,6 +78,8 @@ std::set<std::set<u64>> Graph<T>::getMaxIndSets()
     return maxIndSets;
 }
 
+
+
 /* ============================= UTILITAIRE ============================= */
 
 // Donne la longueur du plus court chemin depuis src pour chaque sommet
@@ -165,7 +167,7 @@ template <typename T>
 std::set<std::set<u64>> Graph<T>::getBicliques()
 {
     //
-    Tree suffixTree;
+    Tree suffixTree, suffixTree2, suffixTree3;
 
     //
     for (u64 i = 0; i < N; i++)
@@ -174,12 +176,14 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
         Graph subgraph_i = genSubgraph(i);
 
         // Get all maximal independent sets of G_i
-        std::set<std::set<u64>> maxIndSets = subgraph_i.getMaxIndSets();
+        std::set<std::set<u64>> maxIndSets1 = subgraph_i.getMaxIndSets();
+        std::set<std::set<u64>> maxIndSets2 = subgraph_i.getMaxIndSets2();
+        std::set<std::set<u64>> maxIndSets3 = subgraph_i.getMaxIndSets3();
 
         // Rename the nodes
         std::set<std::set<u64>> globalMaxIndSets; // sets with parent graph indices
         std::set<u64> tmp;
-        for (const auto &maxIndSet : maxIndSets)
+        for (const auto &maxIndSet : maxIndSets1)
         {
             // Add the sets with parent graph indices
             tmp.clear();
@@ -187,17 +191,52 @@ std::set<std::set<u64>> Graph<T>::getBicliques()
                 tmp.insert(el + i);
             globalMaxIndSets.insert(tmp);
         }
-
         // Add maxIndSet
         for (const auto &maxIndSet : globalMaxIndSets)
             if (isProper(maxIndSet))
                 suffixTree.insert(maxIndSet);
+
+        // Getbicliques with the two versions of Bron Kerbosch
+        std::set<std::set<u64>> globalMaxIndSets2, globalMaxIndSets3; // sets with parent graph indices
+        std::set<u64> tmp2, tmp3;
+
+        for (const auto &maxIndSet : maxIndSets2)
+        {
+            // Add the sets with parent graph indices
+            tmp2.clear();
+            for (const auto &el : maxIndSet)
+                tmp2.insert(el + i);
+            globalMaxIndSets2.insert(tmp2);
+        }
+
+        // Add maxIndSet
+        for (const auto &maxIndSet : globalMaxIndSets2)
+            if (isProper(maxIndSet))
+                suffixTree2.insert(maxIndSet);
+
+
+        for (const auto &maxIndSet : maxIndSets3)
+        {
+            // Add the sets with parent graph indices
+            tmp3.clear();
+            for (const auto &el : maxIndSet)
+                tmp3.insert(el + i);
+            globalMaxIndSets3.insert(tmp3);
+        }
+
+        // Add maxIndSet
+        for (const auto &maxIndSet : globalMaxIndSets3)
+            if (isProper(maxIndSet))
+                suffixTree3.insert(maxIndSet);
+        
     }
 
-    // On isole les branches maximale de l'arbre de suffix
-    std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+    // On isole les branches maximales de l'arbre de suffix
+    std::set<std::set<u64>> bicliques1 = suffixTree.getMaxBranches();
+    std::set<std::set<u64>> bicliques_bk = suffixTree2.getMaxBranches();
+    std::set<std::set<u64>> bicliques_bk2 = suffixTree3.getMaxBranches();
 
-    return bicliques;
+    return bicliques1, bicliques_bk, bicliques_bk2;
 }
 
 /* =========================== GENERATION DE GRAPHE =========================== */
