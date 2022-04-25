@@ -75,6 +75,17 @@ TEST(GraphMatTest, getMaxIndSets) {
   for (auto &set : maxIndSets2) assert(set == expected2);
 }
 
+/*TEST(GraphMatTest, bronKerbosch) {
+  // TEST 1
+   std::set<u64> R; R.empty();
+   std::set<u64> P = {1,2,3,4};
+   std::set<u64> X; X.empty();
+
+   prepareBron(); 
+   bronKerbosch(R, P, X);
+}*/
+
+
 TEST(GraphMatTest, isProper) {
   auto hex = Graph::makeHexagone<GraphMat>();
   auto methane = Graph::makeMethane<GraphMat>();
