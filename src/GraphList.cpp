@@ -146,31 +146,29 @@ void GraphList::changeToComplementary() {
 }
 
 
-bool GraphList::isClique(std::set<u64>& edgeSets)
-{
+bool GraphList::isClique(std::set<u64> &edgeSets) {
   u64 n = edgeSets.size();
   bool status = true;
   if (n < 3) return false;
 
   for (auto i : edgeSets) {
-    std::map<u64,std::set<u64>>::iterator it;
-    for(it = adj.begin(); it != adj.end(); it++)
-    {
-      if ((it->first == i) && (it->second.size() != (n-1))) {
+    std::map<u64, std::set<u64>>::iterator it;
+    for (it = adj.begin(); it != adj.end(); it++) {
+      if ((it->first == i) && (it->second.size() != (n - 1))) {
         status = false;
-        break;
+         //  return status;
       }
     }
 
-  return status;
-}
+
+  }
+return status;
 }
 
 
-u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB)
-{
-  int  pivot = -1;
- int maxSize = -1;
+u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
+  int pivot = -1;
+  int maxSize = -1;
 
   for (const auto &u : SUB) {
     std::set<u64> gammaU = adj[u];
@@ -188,46 +186,46 @@ u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB)
 
 //
 
-void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
-                      std::set<std::set<u64>> &stockCliques)
-{
+
+
+ void GraphList::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
+                  std::set<std::set<u64>> &stockCliques) {
   if (SUBG.empty()) {
-    if (isClique(Q, graph)) { stockCliques.push_back(Q); };
-    std::cout << " clique, ";
+     
+    if (isClique(Q)) { stockCliques.insert(Q); };
+     //std::cout << " clique, ";
   } else {
-    int currentPivot = choosePivotElement(SUBG, CAND, graph);
-    std::vector<int> gammaPivot = graph[currentPivot];
-    std::vector<int> EXTu = diffOfSets(CAND, gammaPivot);
+    u64 currentPivot = ChooseMyPivot(SUBG, CAND);
+    std::set<u64> gammaPivot = adj[currentPivot];
+    std::set<u64> EXTu = diffOfSets(CAND, gammaPivot);
     while (not EXTu.empty()) {
-      int q = EXTu[0];
+      u64 q = *(EXTu.begin());
       // int q = randchoice(EXTu);
-      Q.push_back(q);
-      std::cout << q << ", ";
-      std::vector<int> gammaQ = graph[q];
-      std::vector<int> SUBGq = intersectionOfSets(SUBG, gammaQ);
-      std::vector<int> CANDq = intersectionOfSets(CAND, gammaQ);
-      expandTomitaList(SUBGq, CANDq, Q, graph, stockCliques);
-      std::vector<int> singleq = {q};
+      Q.insert(q);
+      //std::cout << q << ", ";
+      std::set<u64> gammaQ = adj[q];
+      std::set<u64> SUBGq = intersectionOfSets(SUBG, gammaQ);
+      std::set<u64> CANDq = intersectionOfSets(CAND, gammaQ);
+      expandTomita(SUBGq, CANDq, Q,stockCliques);
+      std::set<u64> singleq = {q};
       // CAND.pop_back(q);
       // Q.pop_back(q);
       // Q = diffOfSets(Q,singleq);
       CAND = diffOfSets(CAND, singleq);
-      std::cout << "back, ";
+      //std::cout << "back, ";
       Q = diffOfSets(Q, singleq);
       EXTu = diffOfSets(CAND, gammaPivot);
       // std::cout << "back, ";
     }
   }
-
 }
 
 
-void getAllMaxCliques(std::set<u64> vertices,
-             std::set<std::set<u64>> &cliques){
+void GraphList::getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) {
   std::cout << " Start of clique finding !"
             << "\n\n";
-  std::vector<int> Q;
-  expandTomitaList(vertices, vertices, Q, graph, cliques);
+  std::set<u64> Q;
+  expandTomita(vertices, vertices, Q, cliques);
   std::cout << " End of clique finding !"
             << "\n";
 }
