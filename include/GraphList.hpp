@@ -31,7 +31,7 @@ public:
 
   void changeToComplementary() override;
 
-  bool isClique(std::set<u64>& edgeSets) override; // Vérifie si l'ensemble donné en parametre est bien un clique ou pas
+  bool isClique(std::set<u64>& edgeSets) override; // Vérifie si l'ensemble donné en parametre est bien une clique ou pas
   u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) override; // Choisir un pivot parmi les sommet éligible afin de
                                                                           // minimiser le nombre de sommet à axplorer pendant 
                                                                           // la recherche des cliques maximales
