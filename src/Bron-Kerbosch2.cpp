@@ -13,7 +13,7 @@ void Graph::bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X)
     std::set<u64> r,p1,p2,x,u1;
 
     if(P.empty() && X.empty())
-        cliques.insert(R);
+        cliques1.insert(R);
 
     for(auto k : P)
     {
@@ -45,7 +45,7 @@ void Graph::prepareBron2()
 
   bronKerbosch2(R, P, X);
 }
-
+/*
 // Enumère tout les sets indépendants maximaux du graphe
 std::set<std::set<u64>> Graph::getMaxIndSets3() {
   //
@@ -65,3 +65,4 @@ std::set<std::set<u64>> Graph::getMaxIndSets3() {
 
   return maxIndSets;
 }
+*/

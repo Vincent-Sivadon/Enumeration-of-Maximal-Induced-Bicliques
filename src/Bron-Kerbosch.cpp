@@ -28,6 +28,8 @@ std::set<u64> Graph::inter(std::set<u64> set, u64 v)
     return intersection;
 }
 
+std::set<std::set<u64>> cliques1;
+
 std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
 {
 
@@ -48,7 +50,7 @@ std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, st
         }
     }
 
-    return cliques1;
+  return cliques1;
 }
 
 void Graph::prepareBron()
