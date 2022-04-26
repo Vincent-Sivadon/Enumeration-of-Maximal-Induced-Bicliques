@@ -78,9 +78,7 @@ TEST(GraphLstTest, getMaxIndSets2) {
   // TEST 1
   auto hex = Graph::makeHexagone<GraphList>();
   // TEST 1
-   std::set<u64> R = {};
-   std::set<u64> P = {1,2,3,4};
-   std::set<u64> X = {};
+   std::set<u64> R,P,X; 
 
    hex->Graph::prepareBron(); 
    std::set<std::set<u64>> cliques1 = hex->Graph::bronKerbosch(R, P, X);
