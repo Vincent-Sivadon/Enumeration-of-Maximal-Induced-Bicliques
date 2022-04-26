@@ -6,6 +6,7 @@
 
 #include <omp.h>
 #include <algorithm>
+#include <mpi.h>
 
 /* =============================== SETS =============================== */
 
@@ -413,7 +414,6 @@ std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i) {
 }
 
 // Enumère tout les bicliques maximales du graphe
-
 std::set<std::set<u64>> Graph::getBicliques() {
   //
   Tree suffixTree;
@@ -451,18 +451,28 @@ std::set<std::set<u64>> Graph::getBicliques() {
   // On isole les branches maximale de l'arbre de suffix
   std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
 
-  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+  //std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
 
   return bicliques;
 }
 
 std::set<std::set<u64>> Graph::getBicliquesParallel() {
-  // Will store maximal induces bicliques
-  std::set<std::set<u64>> bicliques;
+
+  Tree suffixTree;
+
+  int nproc, rank;
+  MPI_Init( NULL , NULL);
+  MPI_Comm_size( MPI_COMM_WORLD , &nproc);
+  MPI_Comm_rank( MPI_COMM_WORLD , &rank);
+
+  u64 Q = N / nproc;
+  u64 R = N % nproc;
+  u64 nb_iter = (rank < R ? Q+1 : Q);
+  u64 i_first = (rank < R ? rank*(Q+1) : (rank-R)*Q + R*(Q+1));
 
   // For every nodes
 #pragma omp parallel for
-  for (u64 i = 0; i < N; i++) {
+  for (u64 i = i_first; i < i_first + nb_iter; i++) {
     // Construct the subgraph G_i
     auto subgraph_i = genSubgraph(i);
 
@@ -481,13 +491,27 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
       globalMaxIndSets.insert(tmp);
     }
 
-    for (const auto &biclique : globalMaxIndSets)
-      if (isBicliqueMaximale(biclique))
-#pragma omp critical
-      {
-        bicliques.insert(biclique);
-      }
+    // Add maxIndSet
+    for (const auto &maxIndSet : globalMaxIndSets)
+      if (isProper(maxIndSet))
+      #pragma omp critical
+        suffixTree.insert(maxIndSet);
   }
+
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::string filename("bicliques" + std::to_string(rank));
+  FILE *fp = fopen(filename.c_str(), "w");
+  for (const auto& biclique : bicliques)
+  {
+    for (const auto& node : biclique)
+      fprintf(fp, "%llu ", node);
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  MPI_Finalize();
 
   return bicliques;
 }

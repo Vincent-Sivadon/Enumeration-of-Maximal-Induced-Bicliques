@@ -15,6 +15,6 @@ add_library(
   ${INCLUDE_DIR}/ReadFile.hpp
   Visualisation.cpp)
 
-target_link_libraries(Graph PUBLIC SDL2 OpenMP::OpenMP_CXX)
+target_link_libraries(Graph PUBLIC SDL2 OpenMP::OpenMP_CXX MPI::MPI_CXX)
 target_include_directories(Graph PUBLIC ${CMAKE_CURRENT_INCLUDE_DIR})
 target_compile_options(Graph PUBLIC -g)

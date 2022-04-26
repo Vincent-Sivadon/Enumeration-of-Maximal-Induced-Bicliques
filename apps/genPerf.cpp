@@ -28,6 +28,44 @@ double perf(int N) {
 }
 
 template<typename T>
+double perfBronKerbosh(int N) {
+  double time = 0;
+
+  // On moyenne sur 10 samples
+  for (int i = 0; i < 10; i++) {
+    std::unique_ptr<Graph> g = std::make_unique<T>(N);
+    g->randomize();
+
+    double before = omp_get_wtime();
+    //std::set<std::set<u64>> bicliques = g->getBicliquesBronKerbosch();
+    double after = omp_get_wtime();
+
+    time += (after - before);
+  }
+
+  return time / 10;
+}
+
+template<typename T>
+double perfTomita(int N) {
+  double time = 0;
+
+  // On moyenne sur 10 samples
+  for (int i = 0; i < 10; i++) {
+    std::unique_ptr<Graph> g = std::make_unique<T>(N);
+    g->randomize();
+
+    double before = omp_get_wtime();
+    //std::set<std::set<u64>> bicliques = g->getBicliquesTomita();
+    double after = omp_get_wtime();
+
+    time += (after - before);
+  }
+
+  return time / 10;
+}
+
+template<typename T>
 double perfParallel(int N) {
   double time = 0;
 
@@ -63,14 +101,17 @@ int main(int argc, char **argv) {
 
   // Pour chaque taille n
   for (const auto &n : sizes) {
-    double matTime = perf<GraphMat>(n);
-    double matParallelTime = perfParallel<GraphMat>(n);
+    double mat = perf<GraphMat>(n);
+    double mat_parallel = perfParallel<GraphMat>(n);
+    double list = perf<GraphList>(n);
+    double list_parallel = perfParallel<GraphList>(n);
 
-    double lstTime = perf<GraphList>(n);
-    double lstParallelTime = perfParallel<GraphList>(n);
-
-    std::cout << n << " " << lstTime << " " << lstParallelTime << " " << matTime << " "
-              << matParallelTime << std::endl;
+    std::cout << n << " "
+              << list << " "
+              << list_parallel << " "
+              << mat << " "
+              << mat_parallel
+              << std::endl;
   }
 
   return 0;

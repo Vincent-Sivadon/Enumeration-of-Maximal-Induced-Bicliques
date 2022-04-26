@@ -7,6 +7,12 @@ project(
 # Find dependencies
 find_package(OpenMP REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(MPI)
+if (MPI_FOUND)
+else (MPI_FOUND)
+  set(MPI_CXX_COMPILER /usr/local/mpich-3.4.1/bin/mpicc)
+  find_package(MPI REQUIRED)
+endif (MPI_FOUND)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
