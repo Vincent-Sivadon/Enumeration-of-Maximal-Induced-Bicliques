@@ -117,16 +117,16 @@ std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, st
   return cliques1;
 }
 
-std::set<u64> Graph::prepareBron()
+std::set<u64> Graph::prepareBron(std::set<u64> R, std::set<u64> P, std::set<u64> X)
 {
-  std::set<u64> R, P, X;
-
+  
   for(auto i = 0; i < N; i++)
     P.insert(i);
 
   bronKerbosch(R, P, X);
 
-  return R, P, X;
+  return P;
+
 }
 
 // Enumère tout les sets indépendants maximaux du graphe

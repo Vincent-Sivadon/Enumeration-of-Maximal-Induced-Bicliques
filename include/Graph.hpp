@@ -105,7 +105,7 @@ public:
     std::set<u64> u(std::set<u64> uni, u64 v);               // Retourne l'union des mêmes arguments. 
 
     // Bron Kerbosch algorithm 1
-    std::set<u64> prepareBron() ;
+    std::set<u64> prepareBron(std::set<u64> R, std::set<u64> P, std::set<u64> X);
     std::set<std::set<u64>> bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X) ; // Algorithme permettant de générer les ensembles indépendants maximaux. 
     std::set<std::set<u64>> cliques1; // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
 

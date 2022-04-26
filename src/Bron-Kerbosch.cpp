@@ -4,6 +4,8 @@
 
 #include "Graph.hpp"
 
+
+
 /* ========================== BRON-KERBOSCH ========================== */
 
 // L'algorithme de Bron Kerbosch utilise l'union et l'intersection
@@ -28,7 +30,6 @@ std::set<u64> Graph::inter(std::set<u64> set, u64 v)
     return intersection;
 }
 
-std::set<std::set<u64>> cliques1;
 
 std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
 {
@@ -53,7 +54,8 @@ std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, st
   return cliques1;
 }
 
-void Graph::prepareBron()
+
+std::set<u64> Graph::prepareBron()
 {
   std::set<u64> R, P, X;
 
@@ -61,6 +63,8 @@ void Graph::prepareBron()
     P.insert(i);
 
   bronKerbosch(R, P, X);
+
+  return R,P,X;
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
