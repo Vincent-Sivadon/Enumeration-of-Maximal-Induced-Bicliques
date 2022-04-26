@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   g->randomize();
 
   double start = omp_get_wtime();
-  std::set<std::set<u64>> bicliques = g->getBicliques();
+  std::set<std::set<u64>> bicliques = g->getBicliquesParallel();
   double end = omp_get_wtime();
 
   std::cout << "Perf : " << end - start << std::endl;
