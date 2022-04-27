@@ -1,4 +1,5 @@
 #include "GraphList.hpp"
+#include <omp.h>
 
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void GraphList::connect(u64 i, u64 j) {
@@ -131,6 +132,12 @@ void GraphList::degenOrder(std::vector<u64> &orderedVertices) {
       }
     }
   }
+
+  for (u64 i = 0; i < orderedVertices.size(); i++) {
+    auto nh = adj.extract(orderedVertices[i]);
+    nh.key() = i;
+    adj.insert(std::move(nh));
+  }
 }
 
 void GraphList::changeToComplementary() {
@@ -146,31 +153,28 @@ void GraphList::changeToComplementary() {
 }
 
 
-bool GraphList::isClique(std::set<u64>& edgeSets)
-{
+bool GraphList::isClique(std::set<u64> &edgeSets) {
   u64 n = edgeSets.size();
   bool status = true;
   if (n < 3) return false;
 
   for (auto i : edgeSets) {
-    std::map<u64,std::set<u64>>::iterator it;
-    for(it = adj.begin(); it != adj.end(); it++)
-    {
-      if ((it->first == i) && (it->second.size() != (n-1))) {
+    std::map<u64, std::set<u64>>::iterator it;
+    for (it = adj.begin(); it != adj.end(); it++) {
+      if ((it->first == i) && (it->second.size() != (n - 1))) {
         status = false;
         break;
       }
     }
 
-  return status;
-}
+    return status;
+  }
 }
 
-
-u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB)
-{
-  int  pivot = -1;
- int maxSize = -1;
+/*
+u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
+  int pivot = -1;
+  int maxSize = -1;
 
   for (const auto &u : SUB) {
     std::set<u64> gammaU = adj[u];
@@ -222,12 +226,57 @@ void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
 }
 
 
-void getAllMaxCliques(std::set<u64> vertices,
-             std::set<std::set<u64>> &cliques){
+void getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) {
   std::cout << " Start of clique finding !"
             << "\n\n";
   std::vector<int> Q;
   expandTomitaList(vertices, vertices, Q, graph, cliques);
   std::cout << " End of clique finding !"
             << "\n";
+}*/
+
+std::set<std::set<u64>> GraphList::getBicliques_ALGO_2() {
+  //
+  Tree suffixTree;
+
+  double getMaxIndSetsTIME = 0;
+  std::vector<u64> orderedVertices;
+
+  degenOrder(orderedVertices);
+
+  //
+  for (u64 i = 0; i < N; i++) {
+    // Construct the subgraph G_i
+    auto subgraph_i = genSubgraphGik(i);
+
+    // Get all maximal independent sets of every subgraph Gik
+    for (auto &it : subgraph_i) {
+      std::set<std::set<u64>> IndSets;
+      std::set<u64> tmpSet;
+      double start = omp_get_wtime();
+      std::set<std::set<u64>> maxIndSets = it->getMaxIndSets(IndSets, tmpSet);
+      double end = omp_get_wtime();
+      getMaxIndSetsTIME += end - start;
+
+      // Rename the nodes
+      std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
+      std::set<u64> tmp;
+      for (const auto &maxIndSet : maxIndSets) {
+        // Add the sets with parent graph indices
+        tmp.clear();
+        for (const auto &el : maxIndSet) tmp.insert(el + i);
+        globalMaxIndSets.insert(tmp);
+      }
+
+      // Add maxIndSet
+      for (const auto &maxIndSet : globalMaxIndSets) suffixTree.insert(maxIndSet);
+    }
+  }
+
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+
+  return bicliques;
 }

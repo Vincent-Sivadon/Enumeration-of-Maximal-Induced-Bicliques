@@ -1,4 +1,5 @@
 #include "GraphMat.hpp"
+#include <omp.h>
 
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void GraphMat::connect(u64 i, u64 j) {
@@ -130,8 +131,7 @@ void GraphMat::changeToComplementary() {
 }
 
 //
-bool GraphMat::isClique(std::set<u64>& edgeSets)
-{
+bool GraphMat::isClique(std::set<u64> &edgeSets) {
   int n = edgeSets.size();
   bool status = true;
   if (n < 3) return false;
@@ -140,12 +140,57 @@ bool GraphMat::isClique(std::set<u64>& edgeSets)
     u64 nbVoisins = 0;
     for (int j = 0; j < N; j++)
       if (adj[i * N + j] == 1) nbVoisins++;
-    
-    if(nbVoisins != n-1)
-    {
+
+    if (nbVoisins != n - 1) {
       status = false;
       break;
     }
-    }
+  }
   return status;
+}
+
+std::set<std::set<u64>> GraphMat::getBicliques_ALGO_2() {
+  //
+  Tree suffixTree;
+
+  double getMaxIndSetsTIME = 0;
+  std::vector<u64> orderedVertices;
+
+  degenOrder(orderedVertices);
+
+  //
+  for (u64 i = 0; i < N; i++) {
+    // Construct the subgraph G_i
+    auto subgraph_i = genSubgraphGik(i);
+
+    // Get all maximal independent sets of every subgraph Gik
+    for (auto &it : subgraph_i) {
+      std::set<std::set<u64>> IndSets;
+      std::set<u64> tmpSet;
+      double start = omp_get_wtime();
+      std::set<std::set<u64>> maxIndSets = it->getMaxIndSets(IndSets, tmpSet);
+      double end = omp_get_wtime();
+      getMaxIndSetsTIME += end - start;
+
+      // Rename the nodes
+      std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
+      std::set<u64> tmp;
+      for (const auto &maxIndSet : maxIndSets) {
+        // Add the sets with parent graph indices
+        tmp.clear();
+        for (const auto &el : maxIndSet) tmp.insert(el + i);
+        globalMaxIndSets.insert(tmp);
+      }
+
+      // Add maxIndSet
+      for (const auto &maxIndSet : globalMaxIndSets) suffixTree.insert(maxIndSet);
+    }
+  }
+
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+
+  return bicliques;
 }

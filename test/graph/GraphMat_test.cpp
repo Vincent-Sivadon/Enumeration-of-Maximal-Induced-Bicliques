@@ -2,8 +2,8 @@
 #include <gtest/gtest.h>
 
 TEST(GraphMatTest, areConnected) {
-  auto h2o = Graph::makeH2O<GraphMat>();
-  auto methane = Graph::makeMethane<GraphMat>();
+  auto h2o = makeH2O<GraphMat>();
+  auto methane = makeMethane<GraphMat>();
 
   assert(true == h2o->areConnected(0, 1));
   assert(true == h2o->areConnected(0, 2));
@@ -15,9 +15,9 @@ TEST(GraphMatTest, areConnected) {
 }
 
 TEST(GraphMatTest, genSubgraph) {
-  auto h2o = Graph::makeH2O<GraphMat>();
+  auto h2o = makeH2O<GraphMat>();
 
-  auto hex = Graph::makeHexagone<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
 
   hex->connect(0, 3);
   hex->connect(4, 2);
@@ -27,8 +27,7 @@ TEST(GraphMatTest, genSubgraph) {
   u64 N = subgraph_h2o0->getSize();
 
   for (u64 i = 0; i < subgraph_h2o0->getSize(); i++)
-    for (u64 j = 0; j < subgraph_h2o0->getSize(); j++)
-      assert(false == subgraph_h2o0->areConnected(i, j));
+    for (u64 j = 0; j < subgraph_h2o0->getSize(); j++) assert(false == subgraph_h2o0->areConnected(i, j));
 
   // TEST 2
   auto subgraph_hex0 = hex->genSubgraph(0);
@@ -44,7 +43,7 @@ TEST(GraphMatTest, genSubgraph) {
 }
 
 TEST(GraphMatTest, getBicliques) {
-  auto hex = Graph::makeHexagone<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
 
   hex->connect(0, 3);
   hex->connect(4, 2);
@@ -59,9 +58,26 @@ TEST(GraphMatTest, getBicliques) {
   for (auto &set : hex_bicliques) assert(expected.find(set) != expected.end());
 }
 
+
+TEST(GraphMatTest, getBicliques_ALGO_2) {
+  auto hex = makeHexagone<GraphMat>();
+
+  hex->connect(0, 3);
+  hex->connect(4, 2);
+  hex->connect(0, 2);
+
+  std::set<std::set<u64>> hex_bicliques = hex->getBicliques_ALGO_2();
+
+  std::set<std::set<u64>> expected = {{0, 1, 3, 5}, {0, 2, 4, 5}, {0, 3, 4, 5}};
+
+  printSets(hex_bicliques);
+
+  for (auto &set : hex_bicliques) assert(expected.find(set) != expected.end());
+}
+
 TEST(GraphMatTest, getMaxIndSets) {
   // TEST 1
-  auto hex = Graph::makeHexagone<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
   std::set<std::set<u64>> IndSets;
   std::set<u64> tmpSet;
   std::set<std::set<u64>> maxIndSets = hex->getMaxIndSets(IndSets, tmpSet);
@@ -69,15 +85,15 @@ TEST(GraphMatTest, getMaxIndSets) {
   for (auto &set : maxIndSets) assert(expected.find(set) != expected.end());
 
   // TEST 2
-  auto meth = Graph::makeMethane<GraphMat>();
+  auto meth = makeMethane<GraphMat>();
   std::set<std::set<u64>> maxIndSets2 = meth->getMaxIndSets(IndSets, tmpSet);
   std::set<u64> expected2 = {1, 2, 3, 4};
   for (auto &set : maxIndSets2) assert(set == expected2);
 }
 
 TEST(GraphMatTest, isProper) {
-  auto hex = Graph::makeHexagone<GraphMat>();
-  auto methane = Graph::makeMethane<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
+  auto methane = makeMethane<GraphMat>();
 
   // TEST 1
   assert(false == methane->isProper({1, 2, 3, 4}));
@@ -103,9 +119,9 @@ TEST(GraphMatTest, midDist) {
 }
 
 TEST(GraphMatTest, Dijkstra) {
-  auto methane = Graph::makeMethane<GraphMat>();
-  auto h2o = Graph::makeH2O<GraphMat>();
-  auto hex = Graph::makeHexagone<GraphMat>();
+  auto methane = makeMethane<GraphMat>();
+  auto h2o = makeH2O<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
 
   // TEST 1
   std::vector<u64> dist = methane->shortestPaths(1);

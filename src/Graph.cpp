@@ -45,8 +45,7 @@ void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, 
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets,
-                                             std::set<u64> &tmpSet) {
+std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet) {
   //
   IndSets.clear();
   tmpSet.clear();
@@ -213,80 +212,70 @@ std::unique_ptr<Graph> Graph::genSubgraph(u64 i) {
   return subgraph;
 }
 
+// fonction utilitaire pour stocker les sommets à distance un et deux
+std::vector<std::vector<u64>> Graph::tables_of_neighbors(u64 i) {
+  std::vector<u64> dist = shortestPaths(i);
+  std::vector<u64> neighbors_dist1;
+
+  std::vector<std::vector<u64>> tables;
+
+  tables.push_back(dist);
+
+
+  for (u64 i = 0; i < dist.size(); i++) {
+    if (dist[i] == 1) { neighbors_dist1.push_back(i); }
+  }
+
+  tables.push_back(neighbors_dist1);
+
+  return tables;
+}
+
 // Fonction qui génére tous les sous graphes Gik pour un graphe Gi donné
 
 std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i) {
-  std::vector<u64> dist = shortestPaths(i);
+  std::vector<std::vector<u64>> tables = tables_of_neighbors(i);
+  std::vector<u64> dist1;
+  std::vector<u64> dist = tables[0];
 
   // Initialisation du tableau contenant l'ensemble des sous graphes Gik
   std::vector<std::unique_ptr<Graph>> all_subgraph_Gik;
 
-  // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
+  for (auto const &it : tables[1]) {
+    // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
 
-  for (u64 x = i; x < N; x++)
-    for (u64 y = x + 1; y < N; y++) {
-      auto subgraph = make(0);
+    dist1 = shortestPaths(it);
+    auto subgraph = make(N);
 
-      bool are_connected = areConnected(x, y);
+    for (u64 x = i; x < N; x++)
+      for (u64 y = x + 1; y < N; y++) {
+        bool are_connected = areConnected(x, y);
 
-      // Conditions  de construction des arretes
+        // Conditions  de construction des arretes
 
-      bool x_dist1 = dist[x] == 1;
-      bool y_dist1 = dist[y] == 1;
-      bool x_dist2 = dist[x] == 2;
-      bool y_dist2 = dist[y] == 2;
+        bool x_dist1 = dist[x] == 1;
+        bool y_dist1 = dist[y] == 1;
+        bool x_dist2 = dist[x] == 2;
+        bool y_dist2 = dist[y] == 2;
+        bool x_dist1_it = dist1[x] == 1;
+        bool y_dist1_it = dist1[y] == 1;
 
-      bool cond1 = x_dist1 && y_dist1 && are_connected;
-
-      // Si x est à distance un de i, on peut créer un sous graph Gik à partir
-      // de x
-      if (x_dist1) {
-        // On détermine l'ensemble des sommets à distance un de x
-        std::vector<u64> dist1 = shortestPaths(x);
-
-        // On boucle sur l'ensemble des sommets à distance un de x
-        for (auto const &it : dist1) {
-          // on vérifie les sommets à distance un de x
-          bool u_dist1 = dist1[it] == 1;
-
-          // Les conditions de contructions des arrêtes
-          bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
-
-          bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
-
-          if (cond1 || cond2 || cond3) subgraph->connect(x, y);
-        }
-
-        // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des
-        // sous graph Gik
-
-        all_subgraph_Gik.push_back(std::move(subgraph));
-      }
-
-      // On effectue les mêmes instructions qu'avec le premier if mais cette
-      // fois ci on vérifie si y appartient à l'ensemble à distance 1 de i
-
-      else if (y_dist1) {
-        std::vector<u64> dist2 = shortestPaths(y);
+        bool cond1 = x_dist1 && y_dist1 && are_connected;
 
         // Conditon de verification pour les arretes
 
-        for (auto const &it : dist2) {
-          bool u_dist1 = dist2[it] == 1;
+        bool cond2 = x_dist2 && y_dist2 && x_dist1_it && y_dist1_it && are_connected;
 
-          bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
+        bool cond3 = x_dist1 && y_dist2 && y_dist1_it && !are_connected;
+        bool cond4 = y_dist1 && x_dist2 && x_dist1_it && !are_connected;
 
-          bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
-
-          if (cond1 || cond2 || cond3)
-            // Add node x and y with new indices to the pairs of the subgraph
-            subgraph->connect(x, y);
-        }
-
-        all_subgraph_Gik.push_back(std::move(subgraph));
+        if (cond1 || cond2 || cond3 || cond4) subgraph->connect(x, y);
       }
-    }
 
+    // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des
+    // sous graph Gik
+    all_subgraph_Gik.push_back(std::move(subgraph));
+  }
   return all_subgraph_Gik;
 }
 
@@ -413,8 +402,7 @@ void printSets(std::set<std::set<u64>> sets) {
 }
 
 // calcul la différence ensembliste A\B
-std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B)
-{
+std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B) {
   std::set<u64>::iterator it;
   std::set<u64> output;
   for (auto i : A) {
@@ -425,8 +413,7 @@ std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B)
 }
 
 // calcul de l'intersection de deux ensembles
-std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
-{
+std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B) {
   std::set<u64>::iterator it;
   std::set<u64> output;
   for (auto i : B) {
@@ -437,8 +424,7 @@ std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
 }
 
 // calcul de la réunion de deux ensembles
-std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B)
-{
+std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B) {
   std::set<u64>::iterator it;
   std::set<u64> output = A;
 
@@ -447,12 +433,11 @@ std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B)
     if (it == A.end()) A.insert(i);
   }
   return output;
-} 
+}
 
 // Opère un choix aléatoire d'élément du set v
-u64 randchoice(std::set<u64> v) 
-{
-   std::random_device r_device;
+u64 randchoice(std::set<u64> v) {
+  std::random_device r_device;
   std::mt19937 engine{r_device()};
   std::uniform_int_distribution<u64> dist(0, v.size() - 1);
 

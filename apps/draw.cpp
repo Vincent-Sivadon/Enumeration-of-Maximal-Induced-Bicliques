@@ -11,7 +11,7 @@
 
 // Dessine un hexagone
 int main() {
-  std::unique_ptr<GraphList> g = Graph::makeHexagone<GraphList>();
+  std::unique_ptr<GraphList> g = makeHexagone<GraphList>();
   g->connect(0, 3);
   g->connect(4, 2);
   g->connect(0, 2);
