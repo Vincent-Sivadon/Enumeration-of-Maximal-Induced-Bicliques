@@ -5,6 +5,8 @@
 #include "Graph.hpp"
 
 #include <omp.h>
+#include <algorithm>
+#include <mpi.h>
 
 /* =============================== SETS =============================== */
 
@@ -64,6 +66,127 @@ std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets, s
     if (set.size() == maxSize) maxIndSets.insert(set);
 
   return maxIndSets;
+}
+
+/* ========================== BRON-KERBOSCH ========================== */
+
+// L'algorithme de Bron Kerbosch utilise l'union et l'intersection
+//d'ensembles, on commence donc par implémenter une fonction union et inter. 
+
+std::set<u64> Graph::u(std::set<u64> uni, u64 v)
+{
+    uni.insert(v);
+    return uni;
+}
+
+/*Pour la fonction intersection, 
+il faut obtenir le set et les voisions du second élément*/
+
+std::set<u64> Graph::inter(std::set<u64> set, u64 v)
+{
+    std::set<u64> intersection;
+
+    for(auto k=set.begin(); k != set.end(); k++)
+        if (areConnected(v, *k)) 
+            intersection.insert(v);        
+    return intersection;
+}
+
+std::set<std::set<u64>> cliques1;
+
+std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
+{
+
+    std::set<u64> r,p,x;
+
+    if(P.empty() && X.empty())
+        cliques1.insert(R);
+    else 
+    {
+        for(auto v : P)
+        {
+            r = u(R,v);
+            p = inter(P, v);
+            x = inter(X, v);
+            bronKerbosch(r,p,x);
+            P.erase(v);
+            X.insert(v);
+        }
+    }
+
+  return cliques1;
+}
+
+std::set<u64> Graph::prepareBron(std::set<u64> R, std::set<u64> P, std::set<u64> X)
+{
+  
+  for(auto i = 0; i < N; i++)
+    P.insert(i);
+
+  bronKerbosch(R, P, X);
+
+  return P;
+
+}
+
+// Enumère tout les sets indépendants maximaux du graphe
+std::set<std::set<u64>> Graph::getMaxIndSets2(std::set<std::set<u64>> cliques) {
+  //
+  std::map<u64, std::set<u64>> IndSets;
+    std::set<std::set<u64>> maxIndSets;
+
+    // Maximal set size
+    u64 maxSize = 0;
+
+    for(auto i : cliques)
+        if(i.size() > maxSize)
+            maxSize = i.size();
+
+    for(auto i : cliques)
+        if(i.size() == maxSize)
+            maxIndSets.insert(i);
+
+  return maxIndSets;
+}
+
+/*
+    - Seconde implémentation de Bron-Kerbosch
+*/
+
+
+/* ========================== BRON-KERBOSCH 2 ========================== */
+
+std::set<std::set<u64>> cliques2;
+
+std::set<std::set<u64>> Graph::bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X)
+{
+
+    std::set<u64> r,p1,p2,x,u1;
+
+    if(P.empty() && X.empty())
+        cliques2.insert(R);
+
+    for(auto k : P)
+    {
+        u1 = u(X, k);
+    }
+
+    for(auto i : u1)
+    {
+        p1 = inter(P, i);
+    }
+
+    for(auto v : p1)
+        {
+            r = u(R,v);
+            p2 = inter(P, v);
+            x = inter(X, v);
+            bronKerbosch2(r,p2,x);
+            P.erase(v);
+            X.insert(v);
+        }
+
+  return cliques2;
 }
 
 /* ============================= UTILITAIRE ============================= */
@@ -280,7 +403,6 @@ std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i) {
 }
 
 // Enumère tout les bicliques maximales du graphe
-
 std::set<std::set<u64>> Graph::getBicliques() {
   //
   Tree suffixTree;
@@ -318,18 +440,28 @@ std::set<std::set<u64>> Graph::getBicliques() {
   // On isole les branches maximale de l'arbre de suffix
   std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
 
-  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+  //std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
 
   return bicliques;
 }
 
 std::set<std::set<u64>> Graph::getBicliquesParallel() {
-  // Will store maximal induces bicliques
-  std::set<std::set<u64>> bicliques;
+
+  Tree suffixTree;
+
+  int nproc, rank;
+  MPI_Init( NULL , NULL);
+  MPI_Comm_size( MPI_COMM_WORLD , &nproc);
+  MPI_Comm_rank( MPI_COMM_WORLD , &rank);
+
+  u64 Q = N / nproc;
+  u64 R = N % nproc;
+  u64 nb_iter = (rank < R ? Q+1 : Q);
+  u64 i_first = (rank < R ? rank*(Q+1) : (rank-R)*Q + R*(Q+1));
 
   // For every nodes
 #pragma omp parallel for
-  for (u64 i = 0; i < N; i++) {
+  for (u64 i = i_first; i < i_first + nb_iter; i++) {
     // Construct the subgraph G_i
     auto subgraph_i = genSubgraph(i);
 
@@ -348,13 +480,27 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
       globalMaxIndSets.insert(tmp);
     }
 
-    for (const auto &biclique : globalMaxIndSets)
-      if (isBicliqueMaximale(biclique))
-#pragma omp critical
-      {
-        bicliques.insert(biclique);
-      }
+    // Add maxIndSet
+    for (const auto &maxIndSet : globalMaxIndSets)
+      if (isProper(maxIndSet))
+      #pragma omp critical
+        suffixTree.insert(maxIndSet);
   }
+
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::string filename("bicliques" + std::to_string(rank));
+  FILE *fp = fopen(filename.c_str(), "w");
+  for (const auto& biclique : bicliques)
+  {
+    for (const auto& node : biclique)
+      fprintf(fp, "%llu ", node);
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  MPI_Finalize();
 
   return bicliques;
 }
@@ -402,7 +548,12 @@ void printSets(std::set<std::set<u64>> sets) {
 }
 
 // calcul la différence ensembliste A\B
+<<<<<<< HEAD
 std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B) {
+=======
+std::set<u64> Graph::diffOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+>>>>>>> 6eb13b22e810efb75837a71e44051252d300f3b0
   std::set<u64>::iterator it;
   std::set<u64> output;
   for (auto i : A) {
@@ -413,7 +564,12 @@ std::set<u64> diffOfSets(std::set<u64> &A, std::set<u64> &B) {
 }
 
 // calcul de l'intersection de deux ensembles
+<<<<<<< HEAD
 std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B) {
+=======
+std::set<u64> Graph::intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+>>>>>>> 6eb13b22e810efb75837a71e44051252d300f3b0
   std::set<u64>::iterator it;
   std::set<u64> output;
   for (auto i : B) {
@@ -424,7 +580,12 @@ std::set<u64> intersectionOfSets(std::set<u64> &A, std::set<u64> &B) {
 }
 
 // calcul de la réunion de deux ensembles
+<<<<<<< HEAD
 std::set<u64> unionOfSets(std::set<u64> &A, std::set<u64> &B) {
+=======
+std::set<u64> Graph::unionOfSets(std::set<u64> &A, std::set<u64> &B)
+{
+>>>>>>> 6eb13b22e810efb75837a71e44051252d300f3b0
   std::set<u64>::iterator it;
   std::set<u64> output = A;
 

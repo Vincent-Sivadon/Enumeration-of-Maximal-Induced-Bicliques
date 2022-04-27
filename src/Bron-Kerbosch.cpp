@@ -4,6 +4,8 @@
 
 #include "Graph.hpp"
 
+
+
 /* ========================== BRON-KERBOSCH ========================== */
 
 // L'algorithme de Bron Kerbosch utilise l'union et l'intersection
@@ -28,13 +30,14 @@ std::set<u64> Graph::inter(std::set<u64> set, u64 v)
     return intersection;
 }
 
-void Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
+
+std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
 {
 
     std::set<u64> r,p,x;
 
     if(P.empty() && X.empty())
-        cliques.insert(R);
+        cliques1.insert(R);
     else 
     {
         for(auto v : P)
@@ -47,9 +50,12 @@ void Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
             X.insert(v);
         }
     }
+
+  return cliques1;
 }
 
-void Graph::prepareBron()
+
+std::set<u64> Graph::prepareBron()
 {
   std::set<u64> R, P, X;
 
@@ -57,10 +63,12 @@ void Graph::prepareBron()
     P.insert(i);
 
   bronKerbosch(R, P, X);
+
+  return R,P,X;
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets2() {
+std::set<std::set<u64>> Graph::getMaxIndSets2(std::set<std::set<u64>> cliques) {
   //
   std::map<u64, std::set<u64>> IndSets;
     std::set<std::set<u64>> maxIndSets;

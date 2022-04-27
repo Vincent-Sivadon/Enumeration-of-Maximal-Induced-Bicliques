@@ -147,6 +147,7 @@ bool GraphMat::isClique(std::set<u64> &edgeSets) {
     }
   }
   return status;
+<<<<<<< HEAD
 }
 
 std::set<std::set<u64>> GraphMat::getBicliques_ALGO_2() {
@@ -193,4 +194,90 @@ std::set<std::set<u64>> GraphMat::getBicliques_ALGO_2() {
   std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
 
   return bicliques;
+=======
+} 
+
+u64 GraphMat::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
+  int pivot = -1;
+  int maxSize = -1;
+
+  for (const auto &u : SUB) {
+
+
+    std::set<u64> gammaU;
+
+    for (u64 i = 0; i < N; i++)
+    {
+      if (adj[u*N + i] == 1)
+        gammaU.insert(i);
+    }
+    std::set<u64> inter = intersectionOfSets(gammaU, CAND);
+    u64 sizeOfInter = inter.size();
+
+    if (sizeOfInter >= maxSize) {
+      pivot = u;
+      maxSize = sizeOfInter;
+    }
+  }
+
+  return pivot;
+}
+
+//
+
+
+
+ void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
+                  std::set<std::set<u64>> &stockCliques) {
+  if (SUBG.empty()) {
+     
+    if (isClique(Q)) { stockCliques.insert(Q); };
+     //std::cout << " clique, ";
+  } else {
+    u64 currentPivot = ChooseMyPivot(SUBG, CAND);
+
+    std::set<u64> gammaPivot;
+
+    for(u64 i = 0; i< N; i++)
+    {
+      if(adj[currentPivot*N + i] == 1)
+        gammaPivot.insert(i);
+    }
+    std::set<u64> EXTu = diffOfSets(CAND, gammaPivot);
+    while (not EXTu.empty()) {
+      u64 q = *(EXTu.begin());
+      // int q = randchoice(EXTu);
+      Q.insert(q);
+      //std::cout << q << ", ";
+      std::set<u64> gammaQ ;
+      for(u64 i = 0; i< N; i++)
+    {
+      if(adj[currentPivot*N + i] == 1)
+        gammaQ.insert(i);
+    }
+      std::set<u64> SUBGq = intersectionOfSets(SUBG, gammaQ);
+      std::set<u64> CANDq = intersectionOfSets(CAND, gammaQ);
+      expandTomita(SUBGq, CANDq, Q,stockCliques);
+      std::set<u64> singleq = {q};
+      // CAND.pop_back(q);
+      // Q.pop_back(q);
+      // Q = diffOfSets(Q,singleq);
+      CAND = diffOfSets(CAND, singleq);
+      //std::cout << "back, ";
+      Q = diffOfSets(Q, singleq);
+      EXTu = diffOfSets(CAND, gammaPivot);
+      // std::cout << "back, ";
+    }
+  }
+}
+
+
+void GraphMat::getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) {
+  std::cout << " Start of clique finding !"
+            << "\n\n";
+  std::set<u64> Q;
+  expandTomita(vertices, vertices, Q, cliques);
+  std::cout << " End of clique finding !"
+            << "\n";
+>>>>>>> 6eb13b22e810efb75837a71e44051252d300f3b0
 }
