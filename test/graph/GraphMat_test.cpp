@@ -97,7 +97,7 @@ TEST(GraphMatTest, getMaxIndSets) {
    std::set<u64> P = {1,2,3,4};
    std::set<u64> X; X.empty();
 
-   prepareBron(); 
+   prepareBron();
    bronKerbosch(R, P, X);
 }*/
 

@@ -21,8 +21,6 @@ public:
   void disconnect(u64 i,
                   u64 j) override;   // supprimer le lien entre deux sommets i et j
 
-  
-
 
   /* =========== VISUALISATION =========== */
   void print() const override;
@@ -36,26 +34,17 @@ public:
   void changeToComplementary() override;
   std::set<std::set<u64>> getBicliques_ALGO_2() override;
 
-<<<<<<< HEAD
-  bool isClique(std::set<u64> &edgeSets) override;   // Vérifie si l'ensemble donné en parametre est bien un clique ou pas
-  // u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) override; // Choisir un pivot parmi
+  bool isClique(std::set<u64> &edgeSets) override;                       // Vérifie si l'ensemble donné en parametre est bien un clique ou pas
+  u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) override;   // Choisir un pivot parmi
   // les sommet éligible afin de
   // minimiser le nombre de sommet à axplorer pendant
   // la recherche des cliques maximales
-=======
-  bool isClique(std::set<u64>& edgeSets) override; // Vérifie si l'ensemble donné en parametre est bien une clique ou pas
-  u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) override; // Choisir un pivot parmi les sommet éligible afin de
-                                                                          // minimiser le nombre de sommet à axplorer pendant 
-                                                                          // la recherche des cliques maximales
->>>>>>> 6eb13b22e810efb75837a71e44051252d300f3b0
 
-  // void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
-  // std::set<std::set<u64>> &stockCliques) override;                           // Procédure
+  void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q, std::set<std::set<u64>> &stockCliques) override;   // Procédure
   // récursive de recherche par arbre couvrant des
   // cliques
 
-  // void getAllMaxCliques(std::set<u64> vertices,
-  // std::set<std::set<u64>> &cliques) override;  // Calcul effectif des cliques maximales
+  void getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) override;   // Calcul effectif des cliques maximales
 protected:
   std::unique_ptr<Graph> make(u64 n) override;
 };

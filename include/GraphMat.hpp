@@ -22,7 +22,6 @@ public:
                   u64 j) override;   // supprimer le lien entre deux sommets i et j
 
 
-
   /* =========== VISUALISATION =========== */
   void print() const override;
 
@@ -40,15 +39,12 @@ public:
                                                      // Choisir un pivot parmi les sommet éligible afin de
                                                      // minimiser le nombre de sommet à axplorer pendant
                                                      // la recherche des cliques maximales
-
-  // void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64>
-  // &Q,std::set<std::set<u64>> &stockCliques) override;  // Procédure récursive de recherche par
+  u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) override;
+  void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q, std::set<std::set<u64>> &stockCliques) override;   // Procédure récursive de recherche par
   // arbre couvrant des
   // cliques
 
-  // void getAllMaxCliques(
-  // std::set<u64> vertices,
-  // std::set<std::set<u64>> &cliques) override;   // Calcul effectif des cliques maximales
+  void getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) override;   // Calcul effectif des cliques maximales
 
 protected:
   std::unique_ptr<Graph> make(u64 n) override;

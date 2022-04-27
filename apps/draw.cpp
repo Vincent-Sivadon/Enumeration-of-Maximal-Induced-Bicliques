@@ -15,8 +15,8 @@ int main() {
   g->connect(0, 3);
   g->connect(4, 2);
   g->connect(0, 2);
-  std::set<std::set<u64>> bicliques = g->getBicliques();
-  g->drawBiclique(*bicliques.begin());
+  std::set<std::set<u64>> bicliques = g->getBicliques_ALGO_2();
+  // g->drawBiclique(*bicliques.begin());
 
   return 0;
 }
