@@ -28,8 +28,10 @@ public:
   static GraphMat random(u64 N);
   std::vector<u64> findDegrees() override;
   void deleteVertex(u64 i) override;
+  
   void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) override;
   void degenOrder(std::vector<u64> &orderedVertices) override;
+  bool isGraphEmpty() override;
   std::set<std::set<u64>> getBicliques_ALGO_2() override;
 
   void changeToComplementary() override;

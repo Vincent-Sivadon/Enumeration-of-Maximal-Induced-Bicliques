@@ -48,19 +48,6 @@ std::vector<int> GraphList::verticesdegrees() const {
   return vertDeg;
 }
 
-// Supprimé le lien entre deux sommets i et j
-void GraphList::disconnect(u64 i, u64 j) {
-  /*// parcourir la liste des voisins du premier sommet à la recherche du second
-  puis le supprimer dès qu'on l'aura trouver for (int k = 0; k < adj[i].size();
-  k++)
-  {
-      if (adj[i][k] == j)
-      {
-          adj[i].erase(adj[i].begin + k);
-          break;
-      }
-  }*/
-}
 
 std::vector<u64> GraphList::findDegrees() {
   std::vector<u64> vertDeg(N);
@@ -74,7 +61,6 @@ std::vector<u64> GraphList::findDegrees() {
 void GraphList::deleteVertex(u64 i) {
   std::set<u64> voisins;
   voisins = adj[i];
-
   adj.erase(i);
 
   for (const auto &node : voisins) adj[node].erase(i);
@@ -93,11 +79,31 @@ void GraphList::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
   }
   minDeg = vertDeg[vertexMinDeg];
 
-  for (u64 i = 0; i < N; i++)
-    if (vertDeg[i] < minDeg) {
+  for (u64 i = 0; i < N; i++) {
+    if ((vertDeg[i] < minDeg) && !(adj[i].empty())) {
       minDeg = vertDeg[i];
       vertexMinDeg = i;
     }
+  }
+}
+
+bool GraphList::isGraphEmpty() {
+  auto degrees = findDegrees();
+  return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e) { return e == 0; });
+}
+
+// Supprimé le lien entre deux sommets i et j
+void GraphList::disconnect(u64 a, u64 b) {
+  std::set<u64>::iterator it1;
+  std::set<u64>::iterator it2;
+
+  it1 = std::find(adj[a].begin(), adj[a].end(), b);
+
+  if (it1 != adj[a].end()) adj[a].erase(it1);
+
+  it2 = std::find(adj[b].begin(), adj[b].cend(), a);
+
+  if (it2 != adj[b].cend()) adj[b].erase(it2);
 }
 
 //
@@ -105,39 +111,45 @@ void GraphList::degenOrder(std::vector<u64> &orderedVertices) {
   // Allocation
   orderedVertices.resize(N);
   std::vector<int> checkTab(N);
-  for (int i = 0; i < N; i++) checkTab[i] = 0;
+  for (u64 i = 0; i < N; i++) checkTab[i] = 0;
   int nbRestant = N;
   u64 tmp = 0;
   u64 vertexMinDeg, minDeg;
 
-  for (int i = 0; i < N; i++) {
+
+  for (u64 i = 0; i < N; i++)
+  {
     if (nbRestant > 2) {
       findMinDegree(vertexMinDeg, minDeg);
-      orderedVertices[i] = vertexMinDeg;
+      orderedVertices[i]= vertexMinDeg;
+      //orderedVertices.push_back(vertexMinDeg);
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
-      deleteVertex(i);
+      deleteVertex(vertexMinDeg);
+      // for (auto u : adj[vertexMinDeg]) { disconnect(vertexMinDeg, u); }
     }
 
     else if (nbRestant == 2) {
       findMinDegree(vertexMinDeg, minDeg);
       orderedVertices[i] = vertexMinDeg;
+      // orderedVertices.push_back(vertexMinDeg);
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
       auto it = std::find(checkTab.begin(), checkTab.end(), 0);
       auto val = it - checkTab.begin();
       if (it != checkTab.end()) {
         orderedVertices[i + 1] = val;
+        // orderedVertices.push_back(val);
         break;
       }
     }
   }
 
-  for (u64 i = 0; i < orderedVertices.size(); i++) {
-    auto nh = adj.extract(orderedVertices[i]);
-    nh.key() = i;
-    adj.insert(std::move(nh));
-  }
+  // for (u64 i = 0; i < orderedVertices.size(); i++) {
+  //   auto nh = adj.extract(orderedVertices[i]);
+  //   nh.key() = i;
+  //   adj.insert(std::move(nh));
+  // }
 }
 
 void GraphList::changeToComplementary() {

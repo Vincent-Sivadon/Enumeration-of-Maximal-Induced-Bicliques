@@ -68,6 +68,23 @@ static std::unique_ptr<T> makeHexagone() {
   return res;
 }
 
+// Génère graph test pour la fonction degenOrder
+template<typename T>
+static std::unique_ptr<T> makeDegenOrderGraph() {
+  auto res = std::make_unique<T>(5);
+
+  res->connect(0, 1);
+  res->connect(0, 4);
+  res->connect(1, 4);
+  res->connect(1, 3);
+  res->connect(1, 2);
+  res->connect(2, 3);
+  res->connect(3, 4);
+
+  return res;
+}
+
+
 class Graph {
 public:
   Graph(u64 N) : N(N){};
@@ -147,6 +164,7 @@ public:
   virtual void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) = 0;   // Permet de trouver le sommet courant de degré minimal dans le graphe
   virtual void degenOrder(std::vector<u64> &orderedVertices) = 0;   // permet d'avoir l'ordre de
                                                                     // dégénérescence dans le graphe
+ virtual bool isGraphEmpty() = 0;  // vérifie si le graphe est vide ou non
 
   void randomize();   // Permet de génerer aléatoirement un graphe
 

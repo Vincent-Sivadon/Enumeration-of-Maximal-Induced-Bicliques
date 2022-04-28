@@ -24,12 +24,12 @@ void GraphMat::print() const {
 
 std::unique_ptr<Graph> GraphMat::make(u64 n) { return std::make_unique<GraphMat>(n); }
 
-GraphMat GraphMat::random(u64 N) {
-  GraphMat res(N);
-  res.randomize();
+// GraphMat GraphMat::random(u64 N) {
+//   GraphMat res(N);
+//   res.randomize();
 
-  return res;
-}
+//   return res;
+// }
 
 // Permet de connaitre le degré de tous les sommets du graphe
 std::vector<int> GraphMat::verticesdegrees() const {
@@ -91,6 +91,14 @@ void GraphMat::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
       vertexMinDeg = i;
     }
 }
+
+bool GraphMat::isGraphEmpty()
+{
+  auto degrees = findDegrees();
+    return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e)
+                       { return e == 0; });
+}
+
 
 void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
   // Allocation

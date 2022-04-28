@@ -29,6 +29,7 @@ public:
   std::vector<u64> findDegrees() override;
   void deleteVertex(u64 i) override;
   void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) override;
+  bool isGraphEmpty() override;
   void degenOrder(std::vector<u64> &orderedVertices) override;
 
   void changeToComplementary() override;
