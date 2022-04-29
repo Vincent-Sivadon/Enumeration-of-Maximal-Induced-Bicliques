@@ -41,14 +41,6 @@ GraphList GraphList::random(u64 N) {
 }
 
 // Permet de connaitre le degré de tous les sommets du graphe
-std::vector<int> GraphList::verticesdegrees() const {
-  std::vector<int> vertDeg(N);
-
-  for (auto &i : adj) vertDeg.push_back(i.second.size());
-  return vertDeg;
-}
-
-
 std::vector<u64> GraphList::findDegrees() {
   std::vector<u64> vertDeg(N);
 

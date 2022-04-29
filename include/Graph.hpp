@@ -93,9 +93,9 @@ public:
   virtual void connect(u64 i, u64 j) = 0;   // Crée un lien entre deux sommets i et j
                                             // (lors de la construction d'un graphe)
 
-  virtual bool areConnected(u64 i, u64 j) = 0;            // Retourne un booléen indiquant si les
-                                                          // sommets i et j sont connectés
-  virtual std::vector<int> verticesdegrees() const = 0;   // Permet de connaitre Le degré de chaque sommet dans le graphe
+  virtual bool areConnected(u64 i, u64 j) = 0;   // Retourne un booléen indiquant si les
+                                                 // sommets i et j sont connectés
+
 
   virtual void disconnect(u64 i, u64 j) = 0;   // supprimer le lien entre deux sommets i et j
 
@@ -164,7 +164,7 @@ public:
   virtual void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) = 0;   // Permet de trouver le sommet courant de degré minimal dans le graphe
   virtual void degenOrder(std::vector<u64> &orderedVertices) = 0;   // permet d'avoir l'ordre de
                                                                     // dégénérescence dans le graphe
- virtual bool isGraphEmpty() = 0;  // vérifie si le graphe est vide ou non
+  virtual bool isGraphEmpty() = 0;                                  // vérifie si le graphe est vide ou non
 
   void randomize();   // Permet de génerer aléatoirement un graphe
 

@@ -31,17 +31,6 @@ std::unique_ptr<Graph> GraphMat::make(u64 n) { return std::make_unique<GraphMat>
 //   return res;
 // }
 
-// Permet de connaitre le degré de tous les sommets du graphe
-std::vector<int> GraphMat::verticesdegrees() const {
-  std::vector<int> vertDeg(N);
-  int ctn = 0;
-  for (int i = 0; i < N; i++)
-    for (int j = 0; j < N; j++)
-      if (adj[i * N + j] == 1) ctn++;
-  vertDeg.push_back(ctn);
-
-  return vertDeg;
-}
 
 // Supprimé le lien entre deux sommets i et j
 void GraphMat::disconnect(u64 i, u64 j) {
@@ -50,6 +39,7 @@ void GraphMat::disconnect(u64 i, u64 j) {
 }
 
 
+// Permet de connaitre le degré de tous les sommets du graphe
 std::vector<u64> GraphMat::findDegrees() {
   std::vector<u64> vertDeg(N);
 
@@ -67,11 +57,22 @@ std::vector<u64> GraphMat::findDegrees() {
 void GraphMat::deleteVertex(u64 i) {
   // Search for all i neighboors
   for (int k = 0; k < N; k++) {
-    if (adj[i * N + k] == 1) adj[i * N + k] = 0;
-    if (adj[k * N + i] == 1) adj[k * N + i] = 0;
+    if ((adj[i * N + k] == 1)&& k !=i) adj[i * N + k] = 0;
+    if ((adj[k * N + i] == 1)&& k!= i) adj[k * N + i] = 0;
   }
 }
 
+
+bool GraphMat::isNeighborhEmpty(u64 i)
+{
+  int cnt = 0;
+  for(u64 j = 0; j < N; j++) 
+  {
+    if(adj[i*N +j ] == 1)
+      cnt++;
+  }
+  return (cnt <= 0);
+}
 //
 void GraphMat::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
   std::vector<u64> vertDeg = findDegrees();
@@ -86,7 +87,7 @@ void GraphMat::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
   minDeg = vertDeg[vertexMinDeg];
 
   for (u64 i = 0; i < N; i++)
-    if (vertDeg[i] < minDeg) {
+    if ((vertDeg[i] < minDeg) && !(isNeighborhEmpty(i))) {
       minDeg = vertDeg[i];
       vertexMinDeg = i;
     }
@@ -115,7 +116,7 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
       orderedVertices[i] = vertexMinDeg;
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
-      deleteVertex(i);
+      deleteVertex(vertexMinDeg);
     }
 
     else if (nbRestant == 2) {
@@ -123,8 +124,7 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
       orderedVertices[i] = vertexMinDeg;
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
-      std::vector<int>::iterator it;
-      it = std::find(checkTab.begin(), checkTab.end(), 0);
+      auto it = std::find(checkTab.begin(), checkTab.end(), 0);
       auto val = it - checkTab.begin();
       if (it != checkTab.end()) {
         orderedVertices[i + 1] = val;

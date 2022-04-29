@@ -244,11 +244,12 @@ TEST(GraphLstTest, minDeg) {
 }
 
 TEST(GraphLstTest, degenOrder) {
-  // auto dgOrderGraph = makeDegenOrderGraph<GraphList>();
-  // std::vector<u64> orderOfDegen;
-  // std::vector<u64> expectedOrderOfDegen = {0, 2, 1, 3, 4};
-  // dgOrderGraph->degenOrder(orderOfDegen);
-  // assert(orderOfDegen == expectedOrderOfDegen);
+  // TEST 0
+  auto dgOrderGraph = makeDegenOrderGraph<GraphList>();
+  std::vector<u64> orderOfDegen;
+  std::vector<u64> expectedOrderOfDegen = {0, 2, 1, 3, 4};
+  dgOrderGraph->degenOrder(orderOfDegen);
+  assert(orderOfDegen == expectedOrderOfDegen);
 
   auto methane = makeMethane<GraphList>();
   auto h2o = makeH2O<GraphList>();
@@ -266,7 +267,7 @@ TEST(GraphLstTest, degenOrder) {
   h2o->degenOrder(orderOfDegen2);
   assert(orderOfDegen2 == expectedOrderOfDegen2);
 
-  // // TEST 3
+  // TEST 3
   std::vector<u64> orderOfDegen3(6);
   std::vector<u64> expectedOrderOfDegen3 = {1,2,3,0,4};
   methane->degenOrder(orderOfDegen3);

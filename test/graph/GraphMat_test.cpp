@@ -167,3 +167,73 @@ TEST(GraphMatTest, getMaxBranches) {
 
   for (auto &set : bicliques) assert(expected.find(set) != expected.end());
 }
+
+TEST(GraphMatTest, findDegrees) {
+  auto methane = makeMethane<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
+
+  // TEST 1
+  std::vector<u64> deg = methane->findDegrees();
+  std::vector<u64> expected = {4, 1, 1, 1, 1};
+  assert(deg == expected);
+
+  // TEST 2
+  std::vector<u64> deg2 = hex->findDegrees();
+  std::vector<u64> expected2 = {2, 2, 2, 2, 2, 2};
+  assert(deg2 == expected2);
+}
+
+
+TEST(GraphMatTest, minDeg) {
+  auto methane = makeMethane<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
+
+  // TEST 1
+  u64 vertex1, degree1;
+  u64 expectedVert = 1, expectedDeg = 1;
+  methane->findMinDegree(vertex1, degree1);
+  assert(expectedDeg == degree1);
+  assert(expectedVert == vertex1);
+
+
+  // TEST 2
+  u64 vertex2, degree2;
+  u64 expectedVert2 = 0, expectedDeg2 = 2;
+  hex->findMinDegree(vertex2, degree2);
+  assert(expectedDeg2 == degree2);
+  assert(expectedVert2 == vertex2);
+}
+
+
+TEST(GraphMatTest, degenOrder) {
+  // TEST 0
+  auto dgOrderGraph = makeDegenOrderGraph<GraphMat>();
+  std::vector<u64> orderOfDegen;
+  std::vector<u64> expectedOrderOfDegen = {0, 2, 1, 3, 4};
+  dgOrderGraph->degenOrder(orderOfDegen);
+  assert(orderOfDegen == expectedOrderOfDegen);
+
+  auto methane = makeMethane<GraphMat>();
+  auto h2o = makeH2O<GraphMat>();
+  auto hex = makeHexagone<GraphMat>();
+
+  //TEST 1
+  std::vector<u64> orderOfDegen1(6);
+  std::vector<u64> expectedOrderOfDegen1 = {0,1,2,3,4,5};
+  hex->degenOrder(orderOfDegen1);
+  assert(orderOfDegen1 == expectedOrderOfDegen1);
+
+  // TEST 2
+  std::vector<u64> orderOfDegen2(3);
+  std::vector<u64> expectedOrderOfDegen2 = {1,0,2};
+  h2o->degenOrder(orderOfDegen2);
+  assert(orderOfDegen2 == expectedOrderOfDegen2);
+
+  // TEST 3
+  std::vector<u64> orderOfDegen3(6);
+  std::vector<u64> expectedOrderOfDegen3 = {1,2,3,0,4};
+  methane->degenOrder(orderOfDegen3);
+  
+  assert(orderOfDegen3 == expectedOrderOfDegen3);
+
+}

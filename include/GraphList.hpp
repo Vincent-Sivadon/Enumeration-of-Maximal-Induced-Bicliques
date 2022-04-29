@@ -17,7 +17,7 @@ public:
   /* ======== CONNECTIONS ENTRE SOMMETS ======== */
   void connect(u64 i, u64 j) override;
   bool areConnected(u64 i, u64 j) override;
-  std::vector<int> verticesdegrees() const override;   // Permet de connaitre Le degré de chaque sommet dans le graphe
+  
   void disconnect(u64 i,
                   u64 j) override;   // supprimer le lien entre deux sommets i et j
 
