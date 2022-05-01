@@ -4,12 +4,10 @@
 
 #include "Graph.hpp"
 #include "GraphList.hpp"
-
-#include <gtest/gtest.h>
 #include <assert.h>
 
 
-int main(){
+int main() {
   // TEST 1
   auto hex = Graph::makeHexagone<GraphList>();
   
@@ -30,7 +28,7 @@ int main(){
   
 
   // TEST 2
-  auto meth = Graph::makeMethane<GraphList>();
+  auto meth = makeMethane<GraphList>();
 
   //P = meth -> Graph::prepareBron(R,P,X);
 

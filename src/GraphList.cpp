@@ -1,4 +1,5 @@
 #include "GraphList.hpp"
+#include <omp.h>
 
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void GraphList::connect(u64 i, u64 j) {
@@ -40,27 +41,6 @@ GraphList GraphList::random(u64 N) {
 }
 
 // Permet de connaitre le degré de tous les sommets du graphe
-std::vector<int> GraphList::verticesdegrees() const {
-  std::vector<int> vertDeg(N);
-
-  for (auto &i : adj) vertDeg.push_back(i.second.size());
-  return vertDeg;
-}
-
-// Supprimé le lien entre deux sommets i et j
-void GraphList::disconnect(u64 i, u64 j) {
-  /*// parcourir la liste des voisins du premier sommet à la recherche du second
-  puis le supprimer dès qu'on l'aura trouver for (int k = 0; k < adj[i].size();
-  k++)
-  {
-      if (adj[i][k] == j)
-      {
-          adj[i].erase(adj[i].begin + k);
-          break;
-      }
-  }*/
-}
-
 std::vector<u64> GraphList::findDegrees() {
   std::vector<u64> vertDeg(N);
 
@@ -73,7 +53,6 @@ std::vector<u64> GraphList::findDegrees() {
 void GraphList::deleteVertex(u64 i) {
   std::set<u64> voisins;
   voisins = adj[i];
-
   adj.erase(i);
 
   for (const auto &node : voisins) adj[node].erase(i);
@@ -92,11 +71,31 @@ void GraphList::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
   }
   minDeg = vertDeg[vertexMinDeg];
 
-  for (u64 i = 0; i < N; i++)
-    if (vertDeg[i] < minDeg) {
+  for (u64 i = 0; i < N; i++) {
+    if ((vertDeg[i] < minDeg) && !(adj[i].empty())) {
       minDeg = vertDeg[i];
       vertexMinDeg = i;
     }
+  }
+}
+
+bool GraphList::isGraphEmpty() {
+  auto degrees = findDegrees();
+  return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e) { return e == 0; });
+}
+
+// Supprimé le lien entre deux sommets i et j
+void GraphList::disconnect(u64 a, u64 b) {
+  std::set<u64>::iterator it1;
+  std::set<u64>::iterator it2;
+
+  it1 = std::find(adj[a].begin(), adj[a].end(), b);
+
+  if (it1 != adj[a].end()) adj[a].erase(it1);
+
+  it2 = std::find(adj[b].begin(), adj[b].cend(), a);
+
+  if (it2 != adj[b].cend()) adj[b].erase(it2);
 }
 
 //
@@ -104,33 +103,45 @@ void GraphList::degenOrder(std::vector<u64> &orderedVertices) {
   // Allocation
   orderedVertices.resize(N);
   std::vector<int> checkTab(N);
-  for (int i = 0; i < N; i++) checkTab[i] = 0;
+  for (u64 i = 0; i < N; i++) checkTab[i] = 0;
   int nbRestant = N;
   u64 tmp = 0;
   u64 vertexMinDeg, minDeg;
 
-  for (int i = 0; i < N; i++) {
+
+  for (u64 i = 0; i < N; i++)
+  {
     if (nbRestant > 2) {
       findMinDegree(vertexMinDeg, minDeg);
-      orderedVertices[i] = vertexMinDeg;
+      orderedVertices[i]= vertexMinDeg;
+      //orderedVertices.push_back(vertexMinDeg);
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
-      deleteVertex(i);
+      deleteVertex(vertexMinDeg);
+      // for (auto u : adj[vertexMinDeg]) { disconnect(vertexMinDeg, u); }
     }
 
     else if (nbRestant == 2) {
       findMinDegree(vertexMinDeg, minDeg);
       orderedVertices[i] = vertexMinDeg;
+      // orderedVertices.push_back(vertexMinDeg);
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
       auto it = std::find(checkTab.begin(), checkTab.end(), 0);
       auto val = it - checkTab.begin();
       if (it != checkTab.end()) {
         orderedVertices[i + 1] = val;
+        // orderedVertices.push_back(val);
         break;
       }
     }
   }
+
+  // for (u64 i = 0; i < orderedVertices.size(); i++) {
+  //   auto nh = adj.extract(orderedVertices[i]);
+  //   nh.key() = i;
+  //   adj.insert(std::move(nh));
+  // }
 }
 
 void GraphList::changeToComplementary() {
@@ -156,13 +167,12 @@ bool GraphList::isClique(std::set<u64> &edgeSets) {
     for (it = adj.begin(); it != adj.end(); it++) {
       if ((it->first == i) && (it->second.size() != (n - 1))) {
         status = false;
-         //  return status;
+        //  return status;
       }
     }
 
-
+    return status;
   }
-return status;
 }
 
 
@@ -187,13 +197,10 @@ u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
 //
 
 
-
- void GraphList::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
-                  std::set<std::set<u64>> &stockCliques) {
+void GraphList::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q, std::set<std::set<u64>> &stockCliques) {
   if (SUBG.empty()) {
-     
     if (isClique(Q)) { stockCliques.insert(Q); };
-     //std::cout << " clique, ";
+    // std::cout << " clique, ";
   } else {
     u64 currentPivot = ChooseMyPivot(SUBG, CAND);
     std::set<u64> gammaPivot = adj[currentPivot];
@@ -202,17 +209,17 @@ u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
       u64 q = *(EXTu.begin());
       // int q = randchoice(EXTu);
       Q.insert(q);
-      //std::cout << q << ", ";
+      // std::cout << q << ", ";
       std::set<u64> gammaQ = adj[q];
       std::set<u64> SUBGq = intersectionOfSets(SUBG, gammaQ);
       std::set<u64> CANDq = intersectionOfSets(CAND, gammaQ);
-      expandTomita(SUBGq, CANDq, Q,stockCliques);
+      expandTomita(SUBGq, CANDq, Q, stockCliques);
       std::set<u64> singleq = {q};
       // CAND.pop_back(q);
       // Q.pop_back(q);
       // Q = diffOfSets(Q,singleq);
       CAND = diffOfSets(CAND, singleq);
-      //std::cout << "back, ";
+      // std::cout << "back, ";
       Q = diffOfSets(Q, singleq);
       EXTu = diffOfSets(CAND, gammaPivot);
       // std::cout << "back, ";
@@ -228,4 +235,50 @@ void GraphList::getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>>
   expandTomita(vertices, vertices, Q, cliques);
   std::cout << " End of clique finding !"
             << "\n";
+}
+
+std::set<std::set<u64>> GraphList::getBicliques_ALGO_2() {
+  //
+  Tree suffixTree;
+
+  double getMaxIndSetsTIME = 0;
+  std::vector<u64> orderedVertices;
+
+  degenOrder(orderedVertices);
+
+  //
+  for (u64 i = 0; i < N; i++) {
+    // Construct the subgraph G_i
+    auto subgraph_i = genSubgraphGik(i);
+
+    // Get all maximal independent sets of every subgraph Gik
+    for (auto &it : subgraph_i) {
+      std::set<std::set<u64>> IndSets;
+      std::set<u64> tmpSet;
+      double start = omp_get_wtime();
+      std::set<std::set<u64>> maxIndSets = it->getMaxIndSets(IndSets, tmpSet);
+      double end = omp_get_wtime();
+      getMaxIndSetsTIME += end - start;
+
+      // Rename the nodes
+      std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
+      std::set<u64> tmp;
+      for (const auto &maxIndSet : maxIndSets) {
+        // Add the sets with parent graph indices
+        tmp.clear();
+        for (const auto &el : maxIndSet) tmp.insert(el + i);
+        globalMaxIndSets.insert(tmp);
+      }
+
+      // Add maxIndSet
+      for (const auto &maxIndSet : globalMaxIndSets) suffixTree.insert(maxIndSet);
+    }
+  }
+
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+
+  return bicliques;
 }

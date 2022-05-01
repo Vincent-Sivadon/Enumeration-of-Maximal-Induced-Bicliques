@@ -1,4 +1,5 @@
 #include "GraphMat.hpp"
+#include <omp.h>
 
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void GraphMat::connect(u64 i, u64 j) {
@@ -23,24 +24,13 @@ void GraphMat::print() const {
 
 std::unique_ptr<Graph> GraphMat::make(u64 n) { return std::make_unique<GraphMat>(n); }
 
-GraphMat GraphMat::random(u64 N) {
-  GraphMat res(N);
-  res.randomize();
+// GraphMat GraphMat::random(u64 N) {
+//   GraphMat res(N);
+//   res.randomize();
 
-  return res;
-}
+//   return res;
+// }
 
-// Permet de connaitre le degré de tous les sommets du graphe
-std::vector<int> GraphMat::verticesdegrees() const {
-  std::vector<int> vertDeg(N);
-  int ctn = 0;
-  for (int i = 0; i < N; i++)
-    for (int j = 0; j < N; j++)
-      if (adj[i * N + j] == 1) ctn++;
-  vertDeg.push_back(ctn);
-
-  return vertDeg;
-}
 
 // Supprimé le lien entre deux sommets i et j
 void GraphMat::disconnect(u64 i, u64 j) {
@@ -49,6 +39,7 @@ void GraphMat::disconnect(u64 i, u64 j) {
 }
 
 
+// Permet de connaitre le degré de tous les sommets du graphe
 std::vector<u64> GraphMat::findDegrees() {
   std::vector<u64> vertDeg(N);
 
@@ -66,11 +57,22 @@ std::vector<u64> GraphMat::findDegrees() {
 void GraphMat::deleteVertex(u64 i) {
   // Search for all i neighboors
   for (int k = 0; k < N; k++) {
-    if (adj[i * N + k] == 1) adj[i * N + k] = 0;
-    if (adj[k * N + i] == 1) adj[k * N + i] = 0;
+    if ((adj[i * N + k] == 1)&& k !=i) adj[i * N + k] = 0;
+    if ((adj[k * N + i] == 1)&& k!= i) adj[k * N + i] = 0;
   }
 }
 
+
+bool GraphMat::isNeighborhEmpty(u64 i)
+{
+  int cnt = 0;
+  for(u64 j = 0; j < N; j++) 
+  {
+    if(adj[i*N +j ] == 1)
+      cnt++;
+  }
+  return (cnt <= 0);
+}
 //
 void GraphMat::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
   std::vector<u64> vertDeg = findDegrees();
@@ -85,11 +87,19 @@ void GraphMat::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
   minDeg = vertDeg[vertexMinDeg];
 
   for (u64 i = 0; i < N; i++)
-    if (vertDeg[i] < minDeg) {
+    if ((vertDeg[i] < minDeg) && !(isNeighborhEmpty(i))) {
       minDeg = vertDeg[i];
       vertexMinDeg = i;
     }
 }
+
+bool GraphMat::isGraphEmpty()
+{
+  auto degrees = findDegrees();
+    return std::all_of(degrees.cbegin(), degrees.cend(), [](auto const &e)
+                       { return e == 0; });
+}
+
 
 void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
   // Allocation
@@ -106,7 +116,7 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
       orderedVertices[i] = vertexMinDeg;
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
-      deleteVertex(i);
+      deleteVertex(vertexMinDeg);
     }
 
     else if (nbRestant == 2) {
@@ -114,8 +124,7 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
       orderedVertices[i] = vertexMinDeg;
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
-      std::vector<int>::iterator it;
-      it = std::find(checkTab.begin(), checkTab.end(), 0);
+      auto it = std::find(checkTab.begin(), checkTab.end(), 0);
       auto val = it - checkTab.begin();
       if (it != checkTab.end()) {
         orderedVertices[i + 1] = val;
@@ -130,8 +139,7 @@ void GraphMat::changeToComplementary() {
 }
 
 //
-bool GraphMat::isClique(std::set<u64>& edgeSets)
-{
+bool GraphMat::isClique(std::set<u64> &edgeSets) {
   int n = edgeSets.size();
   bool status = true;
   if (n < 3) return false;
@@ -140,29 +148,70 @@ bool GraphMat::isClique(std::set<u64>& edgeSets)
     u64 nbVoisins = 0;
     for (int j = 0; j < N; j++)
       if (adj[i * N + j] == 1) nbVoisins++;
-    
-    if(nbVoisins != n-1)
-    {
+
+    if (nbVoisins != n - 1) {
       status = false;
       break;
     }
-    }
+  }
   return status;
-} 
+}
+
+std::set<std::set<u64>> GraphMat::getBicliques_ALGO_2() {
+  //
+  Tree suffixTree;
+
+  double getMaxIndSetsTIME = 0;
+  std::vector<u64> orderedVertices;
+
+  degenOrder(orderedVertices);
+
+  //
+  for (u64 i = 0; i < N; i++) {
+    // Construct the subgraph G_i
+    auto subgraph_i = genSubgraphGik(i);
+
+    // Get all maximal independent sets of every subgraph Gik
+    for (auto &it : subgraph_i) {
+      std::set<std::set<u64>> IndSets;
+      std::set<u64> tmpSet;
+      double start = omp_get_wtime();
+      std::set<std::set<u64>> maxIndSets = it->getMaxIndSets(IndSets, tmpSet);
+      double end = omp_get_wtime();
+      getMaxIndSetsTIME += end - start;
+
+      // Rename the nodes
+      std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
+      std::set<u64> tmp;
+      for (const auto &maxIndSet : maxIndSets) {
+        // Add the sets with parent graph indices
+        tmp.clear();
+        for (const auto &el : maxIndSet) tmp.insert(el + i);
+        globalMaxIndSets.insert(tmp);
+      }
+
+      // Add maxIndSet
+      for (const auto &maxIndSet : globalMaxIndSets) suffixTree.insert(maxIndSet);
+    }
+  }
+
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+
+  return bicliques;
+}
 
 u64 GraphMat::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
   int pivot = -1;
   int maxSize = -1;
 
   for (const auto &u : SUB) {
-
-
     std::set<u64> gammaU;
 
-    for (u64 i = 0; i < N; i++)
-    {
-      if (adj[u*N + i] == 1)
-        gammaU.insert(i);
+    for (u64 i = 0; i < N; i++) {
+      if (adj[u * N + i] == 1) gammaU.insert(i);
     }
     std::set<u64> inter = intersectionOfSets(gammaU, CAND);
     u64 sizeOfInter = inter.size();
@@ -179,44 +228,37 @@ u64 GraphMat::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
 //
 
 
-
- void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q,
-                  std::set<std::set<u64>> &stockCliques) {
+void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q, std::set<std::set<u64>> &stockCliques) {
   if (SUBG.empty()) {
-     
     if (isClique(Q)) { stockCliques.insert(Q); };
-     //std::cout << " clique, ";
+    // std::cout << " clique, ";
   } else {
     u64 currentPivot = ChooseMyPivot(SUBG, CAND);
 
     std::set<u64> gammaPivot;
 
-    for(u64 i = 0; i< N; i++)
-    {
-      if(adj[currentPivot*N + i] == 1)
-        gammaPivot.insert(i);
+    for (u64 i = 0; i < N; i++) {
+      if (adj[currentPivot * N + i] == 1) gammaPivot.insert(i);
     }
     std::set<u64> EXTu = diffOfSets(CAND, gammaPivot);
     while (not EXTu.empty()) {
       u64 q = *(EXTu.begin());
       // int q = randchoice(EXTu);
       Q.insert(q);
-      //std::cout << q << ", ";
-      std::set<u64> gammaQ ;
-      for(u64 i = 0; i< N; i++)
-    {
-      if(adj[currentPivot*N + i] == 1)
-        gammaQ.insert(i);
-    }
+      // std::cout << q << ", ";
+      std::set<u64> gammaQ;
+      for (u64 i = 0; i < N; i++) {
+        if (adj[currentPivot * N + i] == 1) gammaQ.insert(i);
+      }
       std::set<u64> SUBGq = intersectionOfSets(SUBG, gammaQ);
       std::set<u64> CANDq = intersectionOfSets(CAND, gammaQ);
-      expandTomita(SUBGq, CANDq, Q,stockCliques);
+      expandTomita(SUBGq, CANDq, Q, stockCliques);
       std::set<u64> singleq = {q};
       // CAND.pop_back(q);
       // Q.pop_back(q);
       // Q = diffOfSets(Q,singleq);
       CAND = diffOfSets(CAND, singleq);
-      //std::cout << "back, ";
+      // std::cout << "back, ";
       Q = diffOfSets(Q, singleq);
       EXTu = diffOfSets(CAND, gammaPivot);
       // std::cout << "back, ";

@@ -4,9 +4,9 @@
 
 #include "Graph.hpp"
 
-#include <omp.h>
 #include <algorithm>
 #include <mpi.h>
+#include <omp.h>
 
 /* =============================== SETS =============================== */
 
@@ -47,8 +47,7 @@ void Graph::getIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet, 
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets,
-                                             std::set<u64> &tmpSet) {
+std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets, std::set<u64> &tmpSet) {
   //
   IndSets.clear();
   tmpSet.clear();
@@ -72,15 +71,14 @@ std::set<std::set<u64>> Graph::getMaxIndSets(std::set<std::set<u64>> &IndSets,
 /* ========================== BRON-KERBOSCH ========================== */
 
 // L'algorithme de Bron Kerbosch utilise l'union et l'intersection
-//d'ensembles, on commence donc par implémenter une fonction union et inter. 
+// d'ensembles, on commence donc par implémenter une fonction union et inter.
 
-std::set<u64> Graph::u(std::set<u64> uni, u64 v)
-{
-    uni.insert(v);
-    return uni;
+std::set<u64> Graph::u(std::set<u64> uni, u64 v) {
+  uni.insert(v);
+  return uni;
 }
 
-/*Pour la fonction intersection, 
+/*Pour la fonction intersection,
 il faut obtenir le set et les voisions du second élément*/
 
 std::set<u64> Graph::inter(std::set<u64>& set, u64 v)
@@ -139,18 +137,16 @@ return P;
 std::set<std::set<u64>> Graph::getMaxIndSets2(std::set<std::set<u64>> cliques) {
   //
   std::map<u64, std::set<u64>> IndSets;
-    std::set<std::set<u64>> maxIndSets;
+  std::set<std::set<u64>> maxIndSets;
 
-    // Maximal set size
-    u64 maxSize = 0;
+  // Maximal set size
+  u64 maxSize = 0;
 
-    for(auto i : cliques)
-        if(i.size() > maxSize)
-            maxSize = i.size();
+  for (auto i : cliques)
+    if (i.size() > maxSize) maxSize = i.size();
 
-    for(auto i : cliques)
-        if(i.size() == maxSize)
-            maxIndSets.insert(i);
+  for (auto i : cliques)
+    if (i.size() == maxSize) maxIndSets.insert(i);
 
   return maxIndSets;
 }
@@ -164,33 +160,23 @@ std::set<std::set<u64>> Graph::getMaxIndSets2(std::set<std::set<u64>> cliques) {
 
 /*std::set<std::set<u64>> cliques2;
 
-std::set<std::set<u64>> Graph::bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X)
-{
+std::set<std::set<u64>> Graph::bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X) {
+  std::set<u64> r, p1, p2, x, u1;
 
-    std::set<u64> r,p1,p2,x,u1;
+  if (P.empty() && X.empty()) cliques2.insert(R);
 
-    if(P.empty() && X.empty())
-        cliques2.insert(R);
+  for (auto k : P) { u1 = u(X, k); }
 
-    for(auto k : P)
-    {
-        u1 = u(X, k);
-    }
+  for (auto i : u1) { p1 = inter(P, i); }
 
-    for(auto i : u1)
-    {
-        p1 = inter(P, i);
-    }
-
-    for(auto v : p1)
-        {
-            r = u(R,v);
-            p2 = inter(P, v);
-            x = inter(X, v);
-            bronKerbosch2(r,p2,x);
-            P.erase(v);
-            X.insert(v);
-        }
+  for (auto v : p1) {
+    r = u(R, v);
+    p2 = inter(P, v);
+    x = inter(X, v);
+    bronKerbosch2(r, p2, x);
+    P.erase(v);
+    X.insert(v);
+  }
 
   return cliques2;
 }*/
@@ -341,80 +327,70 @@ std::unique_ptr<Graph> Graph::genSubgraph(u64 i) {
   return subgraph;
 }
 
+// fonction utilitaire pour stocker les sommets à distance un et deux
+std::vector<std::vector<u64>> Graph::tables_of_neighbors(u64 i) {
+  std::vector<u64> dist = shortestPaths(i);
+  std::vector<u64> neighbors_dist1;
+
+  std::vector<std::vector<u64>> tables;
+
+  tables.push_back(dist);
+
+
+  for (u64 i = 0; i < dist.size(); i++) {
+    if (dist[i] == 1) { neighbors_dist1.push_back(i); }
+  }
+
+  tables.push_back(neighbors_dist1);
+
+  return tables;
+}
+
 // Fonction qui génére tous les sous graphes Gik pour un graphe Gi donné
 
 std::vector<std::unique_ptr<Graph>> Graph::genSubgraphGik(u64 i) {
-  std::vector<u64> dist = shortestPaths(i);
+  std::vector<std::vector<u64>> tables = tables_of_neighbors(i);
+  std::vector<u64> dist1;
+  std::vector<u64> dist = tables[0];
 
   // Initialisation du tableau contenant l'ensemble des sous graphes Gik
   std::vector<std::unique_ptr<Graph>> all_subgraph_Gik;
 
-  // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
+  for (auto const &it : tables[1]) {
+    // Boucles qui balayent sur toutes les paires de noeuds dans le graphe initial
 
-  for (u64 x = i; x < N; x++)
-    for (u64 y = x + 1; y < N; y++) {
-      auto subgraph = make(0);
+    dist1 = shortestPaths(it);
+    auto subgraph = make(N);
 
-      bool are_connected = areConnected(x, y);
+    for (u64 x = i; x < N; x++)
+      for (u64 y = x + 1; y < N; y++) {
+        bool are_connected = areConnected(x, y);
 
-      // Conditions  de construction des arretes
+        // Conditions  de construction des arretes
 
-      bool x_dist1 = dist[x] == 1;
-      bool y_dist1 = dist[y] == 1;
-      bool x_dist2 = dist[x] == 2;
-      bool y_dist2 = dist[y] == 2;
+        bool x_dist1 = dist[x] == 1;
+        bool y_dist1 = dist[y] == 1;
+        bool x_dist2 = dist[x] == 2;
+        bool y_dist2 = dist[y] == 2;
+        bool x_dist1_it = dist1[x] == 1;
+        bool y_dist1_it = dist1[y] == 1;
 
-      bool cond1 = x_dist1 && y_dist1 && are_connected;
-
-      // Si x est à distance un de i, on peut créer un sous graph Gik à partir
-      // de x
-      if (x_dist1) {
-        // On détermine l'ensemble des sommets à distance un de x
-        std::vector<u64> dist1 = shortestPaths(x);
-
-        // On boucle sur l'ensemble des sommets à distance un de x
-        for (auto const &it : dist1) {
-          // on vérifie les sommets à distance un de x
-          bool u_dist1 = dist1[it] == 1;
-
-          // Les conditions de contructions des arrêtes
-          bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
-
-          bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
-
-          if (cond1 || cond2 || cond3) subgraph->connect(x, y);
-        }
-
-        // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des
-        // sous graph Gik
-
-        all_subgraph_Gik.push_back(std::move(subgraph));
-      }
-
-      // On effectue les mêmes instructions qu'avec le premier if mais cette
-      // fois ci on vérifie si y appartient à l'ensemble à distance 1 de i
-
-      else if (y_dist1) {
-        std::vector<u64> dist2 = shortestPaths(y);
+        bool cond1 = x_dist1 && y_dist1 && are_connected;
 
         // Conditon de verification pour les arretes
 
-        for (auto const &it : dist2) {
-          bool u_dist1 = dist2[it] == 1;
+        bool cond2 = x_dist2 && y_dist2 && x_dist1_it && y_dist1_it && are_connected;
 
-          bool cond2 = x_dist2 && u_dist1 && y_dist2 && are_connected;
+        bool cond3 = x_dist1 && y_dist2 && y_dist1_it && !are_connected;
+        bool cond4 = y_dist1 && x_dist2 && x_dist1_it && !are_connected;
 
-          bool cond3 = x_dist1 && u_dist1 && y_dist2 && !are_connected;
-
-          if (cond1 || cond2 || cond3)
-            // Add node x and y with new indices to the pairs of the subgraph
-            subgraph->connect(x, y);
-        }
-
-        all_subgraph_Gik.push_back(std::move(subgraph));
+        if (cond1 || cond2 || cond3 || cond4) subgraph->connect(x, y);
       }
-    }
 
+    // On ajoute le sous graph obtenu aux tableaux contenant l'ensemble des
+    // sous graph Gik
+    all_subgraph_Gik.push_back(std::move(subgraph));
+  }
   return all_subgraph_Gik;
 }
 
@@ -456,24 +432,23 @@ std::set<std::set<u64>> Graph::getBicliques() {
   // On isole les branches maximale de l'arbre de suffix
   std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
 
-  //std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
+  // std::cout << "getMaxIndSets Time : " << getMaxIndSetsTIME << std::endl;
 
   return bicliques;
 }
 
 std::set<std::set<u64>> Graph::getBicliquesParallel() {
-
   Tree suffixTree;
 
   int nproc, rank;
-  MPI_Init( NULL , NULL);
-  MPI_Comm_size( MPI_COMM_WORLD , &nproc);
-  MPI_Comm_rank( MPI_COMM_WORLD , &rank);
+  MPI_Init(NULL, NULL);
+  MPI_Comm_size(MPI_COMM_WORLD, &nproc);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   u64 Q = N / nproc;
   u64 R = N % nproc;
-  u64 nb_iter = (rank < R ? Q+1 : Q);
-  u64 i_first = (rank < R ? rank*(Q+1) : (rank-R)*Q + R*(Q+1));
+  u64 nb_iter = (rank < R ? Q + 1 : Q);
+  u64 i_first = (rank < R ? rank * (Q + 1) : (rank - R) * Q + R * (Q + 1));
 
   // For every nodes
 #pragma omp parallel for
@@ -499,7 +474,7 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
     // Add maxIndSet
     for (const auto &maxIndSet : globalMaxIndSets)
       if (isProper(maxIndSet))
-      #pragma omp critical
+#pragma omp critical
         suffixTree.insert(maxIndSet);
   }
 
@@ -508,10 +483,8 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
 
   std::string filename("bicliques" + std::to_string(rank));
   FILE *fp = fopen(filename.c_str(), "w");
-  for (const auto& biclique : bicliques)
-  {
-    for (const auto& node : biclique)
-      fprintf(fp, "%llu ", node);
+  for (const auto &biclique : bicliques) {
+    for (const auto &node : biclique) fprintf(fp, "%llu ", node);
     fprintf(fp, "\n");
   }
   fclose(fp);
@@ -564,8 +537,7 @@ void printSets(std::set<std::set<u64>> sets) {
 }
 
 // calcul la différence ensembliste A\B
-std::set<u64> Graph::diffOfSets(std::set<u64> &A, std::set<u64> &B)
-{
+std::set<u64> Graph::diffOfSets(std::set<u64> &A, std::set<u64> &B) {
   std::set<u64>::iterator it;
   std::set<u64> output;
   for (auto i : A) {
@@ -576,8 +548,7 @@ std::set<u64> Graph::diffOfSets(std::set<u64> &A, std::set<u64> &B)
 }
 
 // calcul de l'intersection de deux ensembles
-std::set<u64> Graph::intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
-{
+std::set<u64> Graph::intersectionOfSets(std::set<u64> &A, std::set<u64> &B) {
   std::set<u64>::iterator it;
   std::set<u64> output;
   for (auto i : B) {
@@ -588,8 +559,7 @@ std::set<u64> Graph::intersectionOfSets(std::set<u64> &A, std::set<u64> &B)
 }
 
 // calcul de la réunion de deux ensembles
-std::set<u64> Graph::unionOfSets(std::set<u64> &A, std::set<u64> &B)
-{
+std::set<u64> Graph::unionOfSets(std::set<u64> &A, std::set<u64> &B) {
   std::set<u64>::iterator it;
   std::set<u64> output = A;
 
@@ -598,12 +568,11 @@ std::set<u64> Graph::unionOfSets(std::set<u64> &A, std::set<u64> &B)
     if (it == A.end()) A.insert(i);
   }
   return output;
-} 
+}
 
 // Opère un choix aléatoire d'élément du set v
-u64 randchoice(std::set<u64> v) 
-{
-   std::random_device r_device;
+u64 Graph::randchoice(std::set<u64> v) {
+  std::random_device r_device;
   std::mt19937 engine{r_device()};
   std::uniform_int_distribution<u64> dist(0, v.size() - 1);
 
