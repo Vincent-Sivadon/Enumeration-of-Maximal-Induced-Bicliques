@@ -83,51 +83,56 @@ std::set<u64> Graph::u(std::set<u64> uni, u64 v)
 /*Pour la fonction intersection, 
 il faut obtenir le set et les voisions du second élément*/
 
-std::set<u64> Graph::inter(std::set<u64> set, u64 v)
+std::set<u64> Graph::inter(std::set<u64>& set, u64 v)
 {
     std::set<u64> intersection;
+    
+    
+    for(auto k = set.begin(); k != set.end(); k++)
+        if (!areConnected(v, *k)) 
+        set.erase(*k);
+            //set_intersection(set.begin(), set.end(), v.begin(), v.end(), std::back_insert_iterator(l));
 
-    for(auto k=set.begin(); k != set.end(); k++)
-        if (areConnected(v, *k)) 
-            intersection.insert(v);        
     return intersection;
 }
 
-std::set<std::set<u64>> cliques1;
 
-std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, std::set<u64> X)
+std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X)
 {
 
     std::set<u64> r,p,x;
+    
 
-    if(P.empty() && X.empty())
+    if(P.empty()){
         cliques1.insert(R);
-    else 
-    {
-        for(auto v : P)
+    }
+    
+        for(u64 v : P)
         {
+          //std::cout << v << std::endl;
             r = u(R,v);
             p = inter(P, v);
             x = inter(X, v);
-            bronKerbosch(r,p,x);
+            bronKerbosch(R,P,X);
             P.erase(v);
             X.insert(v);
-        }
-    }
-
+            
+        }     
   return cliques1;
 }
 
-std::set<u64> Graph::prepareBron(std::set<u64> R, std::set<u64> P, std::set<u64> X)
+std::set<u64> Graph::prepareBron()
 {
+  std::set<u64> R;
+  std::set<u64> X;
+  std::set<u64> P;
   
-  for(auto i = 0; i < N; i++)
+  for(u64 i = 0; i < N; i++)
     P.insert(i);
 
-  bronKerbosch(R, P, X);
+    std::cout << "size of graph: " << P.size() << std::endl;
 
-  return P;
-
+return P;
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
@@ -157,7 +162,7 @@ std::set<std::set<u64>> Graph::getMaxIndSets2(std::set<std::set<u64>> cliques) {
 
 /* ========================== BRON-KERBOSCH 2 ========================== */
 
-std::set<std::set<u64>> cliques2;
+/*std::set<std::set<u64>> cliques2;
 
 std::set<std::set<u64>> Graph::bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X)
 {
@@ -188,7 +193,7 @@ std::set<std::set<u64>> Graph::bronKerbosch2(std::set<u64> R, std::set<u64> P, s
         }
 
   return cliques2;
-}
+}*/
 
 /* ============================= UTILITAIRE ============================= */
 

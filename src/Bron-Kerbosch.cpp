@@ -36,10 +36,13 @@ std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, st
 
     std::set<u64> r,p,x;
 
-    if(P.empty() && X.empty())
+    for(auto i = 0; i < N; i++)
+    P.insert(i);
+
+    if(P.empty() && X.empty()){
         cliques1.insert(R);
-    else 
-    {
+    }
+    
         for(auto v : P)
         {
             r = u(R,v);
@@ -49,7 +52,7 @@ std::set<std::set<u64>> Graph::bronKerbosch(std::set<u64> R, std::set<u64> P, st
             P.erase(v);
             X.insert(v);
         }
-    }
+    
 
   return cliques1;
 }
