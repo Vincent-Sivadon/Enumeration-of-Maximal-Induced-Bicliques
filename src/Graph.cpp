@@ -113,21 +113,16 @@ void Graph::bronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X)
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-std::set<std::set<u64>> Graph::getMaxIndSets2(std::set<std::set<u64>> cliques) {
-  //
-  std::map<u64, std::set<u64>> IndSets;
-  std::set<std::set<u64>> maxIndSets;
+void Graph::getMaxIndSetsBK()
+{
+   std::set<u64> R;
+   std::set<u64> X;
+   std::set<u64> P;
+   for (int i=0 ; i<N ; i++)
+      P.insert(i);
 
-  // Maximal set size
-  u64 maxSize = 0;
-
-  for (auto i : cliques)
-    if (i.size() > maxSize) maxSize = i.size();
-
-  for (auto i : cliques)
-    if (i.size() == maxSize) maxIndSets.insert(i);
-
-  return maxIndSets;
+   changeToComplementary();
+   bronKerbosch(R, P, X);
 }
 
 /*
@@ -444,6 +439,61 @@ std::set<std::set<u64>> Graph::getBicliquesParallel() {
     std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
     std::set<u64> tmp;
     for (const auto &maxIndSet : maxIndSets) {
+      // Add the sets with parent graph indices
+      tmp.clear();
+      for (const auto &el : maxIndSet) tmp.insert(el + i);
+      globalMaxIndSets.insert(tmp);
+    }
+
+    // Add maxIndSet
+    for (const auto &maxIndSet : globalMaxIndSets)
+      if (isProper(maxIndSet))
+#pragma omp critical
+        suffixTree.insert(maxIndSet);
+  }
+
+  // On isole les branches maximale de l'arbre de suffix
+  std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+  std::string filename("bicliques" + std::to_string(rank));
+  FILE *fp = fopen(filename.c_str(), "w");
+  for (const auto &biclique : bicliques) {
+    for (const auto &node : biclique) fprintf(fp, "%llu ", node);
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  MPI_Finalize();
+
+  return bicliques;
+}
+
+std::set<std::set<u64>> Graph::getBicliquesParallelBK() {
+  Tree suffixTree;
+
+  int nproc, rank;
+  MPI_Init(NULL, NULL);
+  MPI_Comm_size(MPI_COMM_WORLD, &nproc);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  u64 Q = N / nproc;
+  u64 R = N % nproc;
+  u64 nb_iter = (rank < R ? Q + 1 : Q);
+  u64 i_first = (rank < R ? rank * (Q + 1) : (rank - R) * Q + R * (Q + 1));
+
+  // For every nodes
+#pragma omp parallel for
+  for (u64 i = i_first; i < i_first + nb_iter; i++) {
+    // Construct the subgraph G_i
+    auto subgraph_i = genSubgraph(i);
+
+    // Get all maximal independent sets of G_i
+    subgraph_i->getMaxIndSetsBK();
+
+    // Rename the nodes
+    std::set<std::set<u64>> globalMaxIndSets;   // sets with parent graph indices
+    std::set<u64> tmp;
+    for (const auto &maxIndSet : subgraph_i->cliques) {
       // Add the sets with parent graph indices
       tmp.clear();
       for (const auto &el : maxIndSet) tmp.insert(el + i);

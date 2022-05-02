@@ -111,7 +111,7 @@ public:
   virtual std::set<std::set<u64>> getMaxIndSets(std::set<std::set<u64>> &IndSets,
                                                 std::set<u64> &tmpSet);   // Enumère tous les sets indépendants maximaux
 
-  std::set<std::set<u64>> getMaxIndSets2(std::set<std::set<u64>> cliques);
+  void getMaxIndSetsBK();
 
   /* ============ BRON-KERBOSCH ========== */                
     //Inter and union functions for Bron Kerbosch
@@ -154,6 +154,7 @@ public:
   std::set<std::set<u64>> getBicliques();   // Enumère tout les bicliques maximales du graphe
   virtual std::set<std::set<u64>> getBicliques_ALGO_2() = 0;
   std::set<std::set<u64>> getBicliquesParallel();                   // version parallèle OpenMP
+  std::set<std::set<u64>> getBicliquesParallelBK();                   // version parallèle OpenMP 
   virtual std::vector<u64> findDegrees() = 0;                       // Permet de connaitre le degré de tous les sommet à un instant donné
   virtual void deleteVertex(u64 i) = 0;                             //   supprime le sommet dont l'identifiant est passer en argument du graphe
   virtual void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) = 0;   // Permet de trouver le sommet courant de degré minimal dans le graphe
