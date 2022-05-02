@@ -41,11 +41,11 @@ public:
   // minimiser le nombre de sommet à axplorer pendant
   // la recherche des cliques maximales
 
-  void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q, std::set<std::set<u64>> &stockCliques) override;   // Procédure
+  void expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q) override;   // Procédure
   // récursive de recherche par arbre couvrant des
   // cliques
 
-  void getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) override;   // Calcul effectif des cliques maximales
+  void getAllMaxCliques(std::set<u64> vertices) override;   // Calcul effectif des cliques maximales
 
 
   std::set<u64> getListOfNeighboors(u64 i) override;

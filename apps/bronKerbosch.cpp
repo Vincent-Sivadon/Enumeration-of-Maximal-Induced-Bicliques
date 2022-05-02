@@ -10,7 +10,7 @@
 
 int main() {
   // TEST 1
-  std::unique_ptr<GraphMat> hex = makeHexagone<GraphMat>();
+  std::unique_ptr<GraphList> hex = makeHexagone<GraphList>();
   
    std::set<u64> R;
    std::set<u64> X;
@@ -19,7 +19,8 @@ int main() {
       P.insert(i);
 
    hex->changeToComplementary();
-   hex->bronKerbosch(R, P, X);
+   hex->getAllMaxCliques(P);
+   //hex->bronKerbosch(R, P, X);
    printSets(hex->cliques);
 
   return 0;

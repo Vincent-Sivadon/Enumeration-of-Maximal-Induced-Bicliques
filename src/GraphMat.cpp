@@ -230,9 +230,9 @@ u64 GraphMat::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
 //
 
 
-void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q, std::set<std::set<u64>> &stockCliques) {
+void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q) {
   if (SUBG.empty()) {
-    if (isClique(Q)) { stockCliques.insert(Q); };
+    if (isClique(Q)) { cliques.insert(Q); };
     // std::cout << " clique, ";
   } else {
     u64 currentPivot = ChooseMyPivot(SUBG, CAND);
@@ -254,7 +254,7 @@ void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u
       }
       std::set<u64> SUBGq = intersectionOfSets(SUBG, gammaQ);
       std::set<u64> CANDq = intersectionOfSets(CAND, gammaQ);
-      expandTomita(SUBGq, CANDq, Q, stockCliques);
+      expandTomita(SUBGq, CANDq, Q);
       std::set<u64> singleq = {q};
       // CAND.pop_back(q);
       // Q.pop_back(q);
@@ -269,13 +269,9 @@ void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u
 }
 
 
-void GraphMat::getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) {
-  std::cout << " Start of clique finding !"
-            << "\n\n";
+void GraphMat::getAllMaxCliques(std::set<u64> vertices) {
   std::set<u64> Q;
-  expandTomita(vertices, vertices, Q, cliques);
-  std::cout << " End of clique finding !"
-            << "\n";
+  expandTomita(vertices, vertices, Q);
 }
 
 

@@ -18,5 +18,8 @@ target_compile_options(getBicliques PUBLIC -ggdb3 -Ofast)
 add_executable(complementary complementary.cpp)
 target_link_libraries(complementary PUBLIC Graph)
 
-add_executable(bron-kerbosch Bron-Kerbosch.cpp)
-target_link_libraries(bron-kerbosch PUBLIC Graph)
+add_executable(genPerfIndSets genPerfIndSets.cpp)
+target_link_libraries(genPerfIndSets PUBLIC Graph)
+
+add_executable(bronKerbosch bronKerbosch.cpp)
+target_link_libraries(bronKerbosch PUBLIC Graph)

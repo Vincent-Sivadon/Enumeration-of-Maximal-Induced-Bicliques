@@ -150,7 +150,8 @@ void GraphList::changeToComplementary() {
     newNeighboors.clear();
     for (int j = 0; j < N; j++) {
       // If vertex j is not in neighboors of i, than insert in newNeighboors
-      if (adj[i].find(j) == adj[i].end()) newNeighboors.insert(j);
+      if (adj[i].find(j) == adj[i].end() && i != j)
+        newNeighboors.insert(j);
     }
     adj[i] = newNeighboors;
   }
@@ -197,9 +198,9 @@ u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
 //
 
 
-void GraphList::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q, std::set<std::set<u64>> &stockCliques) {
+void GraphList::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q) {
   if (SUBG.empty()) {
-    if (isClique(Q)) { stockCliques.insert(Q); };
+    if (isClique(Q)) { cliques.insert(Q); };
     // std::cout << " clique, ";
   } else {
     u64 currentPivot = ChooseMyPivot(SUBG, CAND);
@@ -213,7 +214,7 @@ void GraphList::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<
       std::set<u64> gammaQ = adj[q];
       std::set<u64> SUBGq = intersectionOfSets(SUBG, gammaQ);
       std::set<u64> CANDq = intersectionOfSets(CAND, gammaQ);
-      expandTomita(SUBGq, CANDq, Q, stockCliques);
+      expandTomita(SUBGq, CANDq, Q);
       std::set<u64> singleq = {q};
       // CAND.pop_back(q);
       // Q.pop_back(q);
@@ -228,13 +229,9 @@ void GraphList::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<
 }
 
 
-void GraphList::getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) {
-  std::cout << " Start of clique finding !"
-            << "\n\n";
+void GraphList::getAllMaxCliques(std::set<u64> vertices) {
   std::set<u64> Q;
-  expandTomita(vertices, vertices, Q, cliques);
-  std::cout << " End of clique finding !"
-            << "\n";
+  expandTomita(vertices, vertices, Q);
 }
 
 std::set<std::set<u64>> GraphList::getBicliques_ALGO_2() {
