@@ -282,3 +282,9 @@ std::set<std::set<u64>> GraphList::getBicliques_ALGO_2() {
 
   return bicliques;
 }
+
+
+std::set<u64> GraphList::getListOfNeighboors(u64 i)
+{
+  return adj[i];
+}

@@ -135,7 +135,9 @@ void GraphMat::degenOrder(std::vector<u64> &orderedVertices) {
 }
 
 void GraphMat::changeToComplementary() {
-  for (int i = 0; i < N * N; i++) adj[i] == 0 ? adj[i] = 1 : adj[i] = 0;
+  for (int i=0 ; i<N ; i++)
+    for (int j=0 ; j<N ; j++)
+      (adj[i*N + j] == 0 && i!=j) ? adj[i*N + j] = 1 : adj[i*N + j] = 0;
 }
 
 //
@@ -274,4 +276,15 @@ void GraphMat::getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> 
   expandTomita(vertices, vertices, Q, cliques);
   std::cout << " End of clique finding !"
             << "\n";
+}
+
+
+std::set<u64> GraphMat::getListOfNeighboors(u64 i)
+{
+  std::set<u64> neighboors;
+  for (int j=0 ; j<N ; j++)
+    if (adj[i*N+j] == 1)
+      neighboors.insert(j);
+    
+  return neighboors;
 }

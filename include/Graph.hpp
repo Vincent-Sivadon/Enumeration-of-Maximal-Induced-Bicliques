@@ -116,16 +116,11 @@ public:
   /* ============ BRON-KERBOSCH ========== */                
     //Inter and union functions for Bron Kerbosch
     std::set<u64> inter(std::set<u64>& set, u64 v);           // Retourne l'intersection entre le sommet et l'ensemble de sommets entrés. 
-    std::set<u64> u(std::set<u64> uni, u64 v);               // Retourne l'union des mêmes arguments. 
+    std::set<u64> u(std::set<u64>& uni, u64 v);               // Retourne l'union des mêmes arguments. 
 
-    // Bron Kerbosch algorithm 1
-    std::set<u64> prepareBron();
-    std::set<std::set<u64>> bronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) ; // Algorithme permettant de générer les ensembles indépendants maximaux. 
-    std::set<std::set<u64>> cliques1; // Variabe globale permettant de stocker les ensembles maximaux indépendants. 
-
-  // Bron Kerbosch algorithm 2
-  std::set<std::set<u64>> bronKerbosch2(std::set<u64> R, std::set<u64> P, std::set<u64> X);   // Algorithme permettant de générer les ensembles indépendants maximaux.
-  std::set<std::set<u64>> cliques2;                                                           // Variabe globale permettant de stocker les ensembles maximaux indépendants.
+    // Bron Kerbosch
+    std::set<std::set<u64>> cliques; // Variabe globale permettant de stocker les ensembles maximaux indépendants.                                                         // Variabe globale permettant de stocker les ensembles maximaux indépendants.
+    void bronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) ; // Algorithme permettant de générer les ensembles indépendants maximaux. 
 
 
   /* =========== VISUALISATION =========== */
@@ -188,6 +183,8 @@ public:
 
   virtual void getAllMaxCliques(std::set<u64> vertices,
                                 std::set<std::set<u64>> &cliques) = 0;   // Calcul effectif des cliques maximales
+
+  virtual std::set<u64> getListOfNeighboors(u64 i) = 0;
 
 protected:
   u64 N;

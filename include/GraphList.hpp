@@ -46,6 +46,9 @@ public:
   // cliques
 
   void getAllMaxCliques(std::set<u64> vertices, std::set<std::set<u64>> &cliques) override;   // Calcul effectif des cliques maximales
+
+
+  std::set<u64> getListOfNeighboors(u64 i) override;
 protected:
   std::unique_ptr<Graph> make(u64 n) override;
 };
