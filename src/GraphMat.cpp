@@ -136,7 +136,7 @@ void GraphMat::bronKerbosch2(std::set<u64>& R, std::set<u64>& P, std::set<u64>& 
 
   if (P.empty() && X.empty()) cliques2.insert(R);
 
-
+//Choisir un sommet pivot u dans P ⋃ X
 for (const auto& i : X)
     u1.push_back(i); 
   const auto k = P.begin(); 
@@ -144,12 +144,12 @@ for (const auto& i : X)
 
   u64 u2 = findMaxDegreeMat(u1);
 
-  p1 = P;
-  p1.erase(u2);
+  for (auto it = P.begin(); it != P.end(); ++it)
+    if(!areConnected(u2, *it))
+      {p1.insert(*it);}
+      //std::cout<<*it<<std::endl;}
 
-  while(!p1.empty()) {
-
-    const auto v = p1.begin();
+  for (auto v = p1.begin(); v != p1.end(); ++v) {
 
     r = u(R, *v);
     p2 = inter(P, *v);
