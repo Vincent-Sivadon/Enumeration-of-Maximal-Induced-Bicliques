@@ -49,6 +49,7 @@ std::vector<u64> GraphList::findDegrees() {
   return vertDeg;
 }
 
+
 //
 void GraphList::deleteVertex(u64 i) {
   std::set<u64> voisins;
@@ -78,6 +79,107 @@ void GraphList::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
     }
   }
 }
+
+/* Fonction utilitaire Bron Kerbosch*/
+
+//Nécessité de calculer le sommet de plus grand degré pour le choix du pivot
+
+u64 GraphList::findMaxDegreeLst(std::set<u64> set) {
+  std::vector<u64> vertDeg = findDegrees();
+  u64 vertexMaxDeg = 0;
+  u64 maxDeg = 0;
+
+  for (const auto& i : set) {
+    if (vertDeg[i] <= 0) continue;
+    vertexMaxDeg = i;
+    break;
+  }
+  maxDeg = vertDeg[vertexMaxDeg];
+
+  for (const auto& i : set) {
+    if ((vertDeg[i] > maxDeg) ) {
+      maxDeg = vertDeg[i];
+      vertexMaxDeg = i;
+    }
+  }
+  return vertexMaxDeg;
+}
+u64 GraphList::findMaxDegreeMat(std::vector<u64> set) {
+  std::vector<u64> vertDeg = findDegrees();
+  u64 vertexMaxDeg = 0;
+  u64 maxDeg = 0;
+
+  for (const auto& i : set) {
+    if (vertDeg[i] <= 0) continue;
+    vertexMaxDeg = i;
+    break;
+  }
+  maxDeg = vertDeg[vertexMaxDeg];
+
+  for (const auto& i : set) {
+    if ((vertDeg[i] > maxDeg) && !(set.empty())) {
+      maxDeg = vertDeg[i];
+      vertexMaxDeg = i;
+    }
+  }
+  return vertexMaxDeg;
+}
+
+/*
+    - Seconde implémentation de Bron-Kerbosch
+*/
+
+
+/* ========================== BRON-KERBOSCH 2 ========================== */
+
+
+void GraphList::bronKerbosch2(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) {
+  std::set<u64> r, p1, p2, x, u1;
+
+  if (P.empty() && X.empty()) cliques2.insert(R);
+
+
+  //Choisir un sommet pivot u dans P ⋃ X
+  for (auto k = P.begin(); k != P.end(); ++k)  
+    {u1 = u(X, *k); }
+    //std::cout<<*k<<std::endl;}
+
+  u64 u2 = findMaxDegreeLst(u1);
+  //std::cout<<u2<<std::endl;
+  
+
+  for (auto it = P.begin(); it != P.end(); ++it)
+    if(!areConnected(u2, *it))
+      {p1.insert(*it);}
+      //std::cout<<*it<<std::endl;}
+
+  for (auto v = p1.begin(); v != p1.end(); ++v) {
+
+    r = R; r.insert(*v);
+    p2 = inter(P, *v);
+    x = inter(X, *v);
+
+    bronKerbosch2(r, p2, x);
+
+    P.erase(*v);
+    X.insert(*v);
+  }
+
+}
+
+// Enumère tout les sets indépendants maximaux du graphe
+void GraphList::getMaxIndSetsBK2()
+{
+   std::set<u64> R;
+   std::set<u64> X;
+   std::set<u64> P;
+   for (int i=0 ; i<N ; i++)
+      P.insert(i);
+
+   changeToComplementary();
+   bronKerbosch2(R, P, X);
+}
+
 
 bool GraphList::isGraphEmpty() {
   auto degrees = findDegrees();

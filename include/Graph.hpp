@@ -120,8 +120,13 @@ public:
 
     // Bron Kerbosch
     std::set<std::set<u64>> cliques; // Variabe globale permettant de stocker les ensembles maximaux indépendants.                                                         // Variabe globale permettant de stocker les ensembles maximaux indépendants.
-    void bronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) ; // Algorithme permettant de générer les ensembles indépendants maximaux. 
+    void bronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) ; // Algorithme permettant de générer les ensembles indépendants maximaux.      
 
+    std::set<std::set<u64>> cliques2; // Variabe globale permettant de stocker les ensembles maximaux indépendants.   
+    virtual void bronKerbosch2(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) = 0;  
+    virtual void getMaxIndSetsBK2() = 0;      
+    virtual u64 findMaxDegreeLst(std::set<u64> set) = 0;
+    virtual u64 findMaxDegreeMat(std::vector<u64> set) = 0;
 
   /* =========== VISUALISATION =========== */
   virtual void print() const = 0;   // Affiche le graphe dans le terminal (à des fins de debug)
@@ -158,7 +163,7 @@ public:
   virtual std::vector<u64> findDegrees() = 0;                       // Permet de connaitre le degré de tous les sommet à un instant donné
   virtual void deleteVertex(u64 i) = 0;                             //   supprime le sommet dont l'identifiant est passer en argument du graphe
   virtual void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) = 0;   // Permet de trouver le sommet courant de degré minimal dans le graphe
-  virtual void degenOrder(std::vector<u64> &orderedVertices) = 0;   // permet d'avoir l'ordre de
+    virtual void degenOrder(std::vector<u64> &orderedVertices) = 0;   // permet d'avoir l'ordre de
                                                                     // dégénérescence dans le graphe
   virtual bool isGraphEmpty() = 0;                                  // vérifie si le graphe est vide ou non
 

@@ -28,6 +28,14 @@ public:
   static GraphList random(u64 N);
   std::vector<u64> findDegrees() override;
   void deleteVertex(u64 i) override;
+  
+
+  std::set<std::set<u64>> cliques2; // Variabe globale permettant de stocker les ensembles maximaux indépendants.  
+  void bronKerbosch2(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) override;
+  void getMaxIndSetsBK2() override;
+  u64 findMaxDegreeLst(std::set<u64> set) override;
+  u64 findMaxDegreeMat(std::vector<u64> set) override;
+
   void findMinDegree(u64 &vertexMinDeg, u64 &minDeg) override;
   bool isGraphEmpty() override;
   void degenOrder(std::vector<u64> &orderedVertices) override;

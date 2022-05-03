@@ -1,5 +1,6 @@
 #include "GraphMat.hpp"
 #include <omp.h>
+#include "vector"
 
 // Crée un lien entre deux sommets i et j (lors de la construction d'un graphe)
 void GraphMat::connect(u64 i, u64 j) {
@@ -73,6 +74,110 @@ bool GraphMat::isNeighborhEmpty(u64 i)
   }
   return (cnt <= 0);
 }
+
+/* Fonction utilitaire Bron Kerbosch*/
+
+//Nécessité de calculer le sommet de plus grand degré pour le choix du pivot
+
+u64 GraphMat::findMaxDegreeMat(std::vector<u64> set) {
+  std::vector<u64> vertDeg = findDegrees();
+  u64 vertexMaxDeg = 0;
+  u64 maxDeg = 0;
+
+  for(const auto& i : set) {
+    if (vertDeg[i] <= 0) continue;
+    vertexMaxDeg = i;
+    break;
+  }
+  maxDeg = vertDeg[vertexMaxDeg];
+
+  for(const auto& i : set) {
+    if ((vertDeg[i] > maxDeg) && !(isNeighborhEmpty(i))) {
+      maxDeg = vertDeg[i];
+      vertexMaxDeg = i;
+    }
+  }
+  return vertexMaxDeg;
+}
+
+u64 GraphMat::findMaxDegreeLst(std::set<u64> set) {
+  std::vector<u64> vertDeg = findDegrees();
+  u64 vertexMaxDeg = 0;
+  u64 maxDeg = 0;
+
+  for(const auto& i : set) {
+    if (vertDeg[i] <= 0) continue;
+    vertexMaxDeg = i;
+    break;
+  }
+  maxDeg = vertDeg[vertexMaxDeg];
+
+  for(const auto& i : set) {
+    if ((vertDeg[i] > maxDeg) && !(isNeighborhEmpty(i))) {
+      maxDeg = vertDeg[i];
+      vertexMaxDeg = i;
+    }
+  }
+  return vertexMaxDeg;
+}
+
+
+/*
+    - Seconde implémentation de Bron-Kerbosch
+*/
+
+
+/* ========================== BRON-KERBOSCH 2 ========================== */
+
+
+void GraphMat::bronKerbosch2(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) {
+  std::set<u64> r, p1, p2, x; 
+  std::vector<u64> u1;
+
+  if (P.empty() && X.empty()) cliques2.insert(R);
+
+
+for (const auto& i : X)
+    u1.push_back(i); 
+  const auto k = P.begin(); 
+    u1.push_back(*k);
+
+  u64 u2 = findMaxDegreeMat(u1);
+
+  p1 = P;
+  p1.erase(u2);
+
+  while(!p1.empty()) {
+
+    const auto v = p1.begin();
+
+    r = u(R, *v);
+    p2 = inter(P, *v);
+    x = inter(X, *v);
+
+    bronKerbosch2(r, p2, x);
+
+    P.erase(*v);
+    X.insert(*v);
+  }
+
+}
+
+// Enumère tout les sets indépendants maximaux du graphe
+void GraphMat::getMaxIndSetsBK2()
+{
+   std::set<u64> R;
+   std::set<u64> X;
+   std::set<u64> P;
+   for (int i=0 ; i<N ; i++)
+      P.insert(i);
+
+   changeToComplementary();
+   bronKerbosch2(R, P, X);
+}
+
+
+
 //
 void GraphMat::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
   std::vector<u64> vertDeg = findDegrees();
