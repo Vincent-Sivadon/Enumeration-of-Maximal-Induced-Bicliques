@@ -482,7 +482,7 @@ std::set<std::set<u64>> Graph::getBicliquesParallelBK() {
   u64 i_first = (rank < R ? rank * (Q + 1) : (rank - R) * Q + R * (Q + 1));
 
   // For every nodes
-#pragma omp parallel for
+//#pragma omp parallel for schedule(dynamic)
   for (u64 i = i_first; i < i_first + nb_iter; i++) {
     // Construct the subgraph G_i
     auto subgraph_i = genSubgraph(i);
@@ -539,7 +539,7 @@ void Graph::randomize() {
       double r = (double) rand() / (double) RAND_MAX;
 
       // Connecte i et j si r<0.5
-      if (r < 0.5) connect(i, j);
+      if (r < 0.003) connect(i, j);
     }
 }
 

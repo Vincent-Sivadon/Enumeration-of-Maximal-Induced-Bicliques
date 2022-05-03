@@ -18,7 +18,6 @@ int main(int argc, char *argv[]) {
   }
   u64 N = atoll(argv[1]);
 
-  //std::unique_ptr<Graph> g = initFromFile<GraphMat>(argv[1]);
   std::unique_ptr<Graph> g = std::make_unique<GraphMat>(N);
   g->randomize();
 
