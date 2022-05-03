@@ -1,25 +1,26 @@
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# ===== Apps  ===== #
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-add_executable(draw draw.cpp)
-target_link_libraries(draw PUBLIC Graph)
+file(GLOB SRCS "*.cpp")
 
-add_executable(genPerf genPerf.cpp)
-target_link_libraries(genPerf PUBLIC Graph)
+# For every app
+foreach(source_file ${SRCS})
+  # file ( GLOB ... ) gives absolute paths, we then transform it in relative
+  # paths for example :
+  # "/home/vincents/Documents/Projet/Enumeration-of-Maximal-Induced-Bicliques/examples/src/areConnectedTests.cpp"
+  # changed in : "app"
+  string(REPLACE ".cpp" "" app_name ${source_file})
+  string(REPLACE ${CMAKE_CURRENT_SOURCE_DIR}/ "" app_name
+                 ${app_name})
+        
 
-add_executable(readFile readFile.cpp)
-target_link_libraries(readFile PUBLIC Graph)
+  # on créé l'executable
+  add_executable(${app_name} ${source_file})
 
-add_executable(getBicliques getBicliques.cpp)
-target_link_libraries(getBicliques PUBLIC Graph)
-target_compile_options(getBicliques PUBLIC -ggdb3 -Ofast)
+  # on link les librairies
+  target_link_libraries(${app_name} Graph)
+  target_include_directories(${app_name} PUBLIC ${CMAKE_SOURCE_DIR}/include)
+  target_compile_options(${app_name} PUBLIC -std=c++17 -Ofast)
 
-add_executable(complementary complementary.cpp)
-target_link_libraries(complementary PUBLIC Graph)
-
-add_executable(genPerfIndSets genPerfIndSets.cpp)
-target_link_libraries(genPerfIndSets PUBLIC Graph)
-
-add_executable(bronKerbosch bronKerbosch.cpp)
-target_link_libraries(bronKerbosch PUBLIC Graph)
+endforeach(source_file ${SRCS})

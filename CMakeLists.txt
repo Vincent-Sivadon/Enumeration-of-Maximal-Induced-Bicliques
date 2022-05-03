@@ -20,14 +20,23 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
+# Liste des fichiers sources
+file(GLOB SRCS "src/*.cpp")
+file(GLOB HDRS "include/*.cpp")
+
+add_library(Graph SHARED ${SRCS} ${HDRS})
+target_link_libraries(Graph PUBLIC OpenMP::OpenMP_CXX MPI::MPI_CXX)
+target_include_directories(Graph PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_compile_options(Graph PUBLIC -g)
+
+
 add_subdirectory(extern)
 
 # Build la librairie "graphes"
-add_subdirectory(src)
 add_subdirectory(apps)
 
 enable_testing()
 add_subdirectory(test)
 
 # "make plot" va afficher le graphe des perfs
-add_custom_target(plot COMMAND sh ../plot/plot.sh)
+# add_custom_target(plot COMMAND sh ../plot/plot.sh)

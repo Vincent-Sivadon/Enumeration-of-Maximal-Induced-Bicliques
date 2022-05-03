@@ -4,6 +4,7 @@
 
 #include <vector>
 
+/*
 // Run through file to get number of nodes
 u64 getNumberOfNodes(std::string filename) {
   u64 max = 0;
@@ -40,3 +41,4 @@ void connectFromLine(std::string line, std::unique_ptr<Graph> &g) {
 
   g->connect(i, j);
 }
+*/

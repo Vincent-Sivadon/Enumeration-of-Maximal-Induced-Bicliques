@@ -3,14 +3,12 @@
 #pragma once
 
 #include "Graph.hpp"
-#include "GraphList.hpp"
-#include "GraphMat.hpp"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-
+/*
 // Run through file to get number of nodes
 u64 getNumberOfNodes(std::string filename);
 
@@ -32,3 +30,4 @@ std::unique_ptr<Graph> initFromFile(std::string filename) {
 
   return g;
 }
+*/
