@@ -215,6 +215,7 @@ TEST(GraphLstTest, getMaxBranches) {
 TEST(GraphLstTest, findDegrees) {
   auto methane = makeMethane<GraphList>();
   auto hex = makeHexagone<GraphList>();
+  auto tom = makeTomitaGraph<GraphList>();
 
   // TEST 1
   std::vector<u64> deg = methane->findDegrees();
@@ -225,6 +226,11 @@ TEST(GraphLstTest, findDegrees) {
   std::vector<u64> deg2 = hex->findDegrees();
   std::vector<u64> expected2 = {2, 2, 2, 2, 2, 2};
   assert(deg2 == expected2);
+
+  // TEST 3
+  std::vector<u64> deg3 = tom->findDegrees();
+  std::vector<u64> expected3 = {2,3,4,5,2,4,3,4,3};
+  assert(deg3 == expected3);
 }
 
 TEST(GraphLstTest, minDeg) {
@@ -277,5 +283,60 @@ TEST(GraphLstTest, degenOrder) {
   methane->degenOrder(orderOfDegen3);
   
   assert(orderOfDegen3 == expectedOrderOfDegen3);
+
+}
+
+
+TEST(GraphLstTest, isClique) {
+  auto methane = makeMethane<GraphList>();
+  auto hex = makeHexagone<GraphList>();
+  auto tom = makeTomitaGraph<GraphList>();
+
+
+  // TEST 1
+  std::set<u64> met_set = {0,2};  
+  assert(false == methane->isClique(met_set));
+
+  // // TEST 2
+  std::set<u64> tom_set1 = {0,8,1};
+  std::set<u64> tom_set2 = {3,7,6,5};
+
+  assert(true == tom->isClique(tom_set1));
+  assert(true == tom->isClique(tom_set2));
+}
+
+TEST(GraphLstTest, getCliques) {
+  auto methane = makeMethane<GraphList>();
+  auto hex = makeHexagone<GraphList>();
+  auto tom = makeTomitaGraph<GraphList>();
+
+
+  // TEST 1
+
+  std::set<std::set<u64>> get_cliques = {{0, 8, 1}, {1, 8, 2}, {3, 4, 5}, {3, 7, 2}, {3, 7, 6, 5}};
+  std::set<u64> vertices = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+  tom->getAllMaxCliques(vertices);
+  // auto setss=  *(tom->cliques).begin();
+  // assert(*(get_cliques.begin()) == *(tom->cliques).begin());
+
+  auto it11 = get_cliques.begin();
+  auto it21 = (tom->cliques).begin();
+  assert(*it11 == *it21);
+
+  auto it12 = it11++;
+  auto it22 = it21++;
+  assert(*it12 == *it22);
+
+  auto it13 = it12++;
+  auto it23 = it22++;
+  assert(*it13 == *it23);
+
+  auto it14 = it13++;
+  auto it24 = it23++;
+  assert(*it14 == *it24);
+
+  auto it15 = it14++;
+  auto it25 = it24++;
+  assert(*it15 == *it25);
 
 }

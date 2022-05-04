@@ -82,22 +82,22 @@ void GraphList::findMinDegree(u64 &vertexMinDeg, u64 &minDeg) {
 
 /* Fonction utilitaire Bron Kerbosch*/
 
-//Nécessité de calculer le sommet de plus grand degré pour le choix du pivot
+// Nécessité de calculer le sommet de plus grand degré pour le choix du pivot
 
 u64 GraphList::findMaxDegreeLst(std::set<u64> set) {
   std::vector<u64> vertDeg = findDegrees();
   u64 vertexMaxDeg = 0;
   u64 maxDeg = 0;
 
-  for (const auto& i : set) {
+  for (const auto &i : set) {
     if (vertDeg[i] <= 0) continue;
     vertexMaxDeg = i;
     break;
   }
   maxDeg = vertDeg[vertexMaxDeg];
 
-  for (const auto& i : set) {
-    if ((vertDeg[i] > maxDeg) ) {
+  for (const auto &i : set) {
+    if ((vertDeg[i] > maxDeg)) {
       maxDeg = vertDeg[i];
       vertexMaxDeg = i;
     }
@@ -109,14 +109,14 @@ u64 GraphList::findMaxDegreeMat(std::vector<u64> set) {
   u64 vertexMaxDeg = 0;
   u64 maxDeg = 0;
 
-  for (const auto& i : set) {
+  for (const auto &i : set) {
     if (vertDeg[i] <= 0) continue;
     vertexMaxDeg = i;
     break;
   }
   maxDeg = vertDeg[vertexMaxDeg];
 
-  for (const auto& i : set) {
+  for (const auto &i : set) {
     if ((vertDeg[i] > maxDeg) && !(set.empty())) {
       maxDeg = vertDeg[i];
       vertexMaxDeg = i;
@@ -133,29 +133,27 @@ u64 GraphList::findMaxDegreeMat(std::vector<u64> set) {
 /* ========================== BRON-KERBOSCH 2 ========================== */
 
 
-void GraphList::bronKerbosch2(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X) {
+void GraphList::bronKerbosch2(std::set<u64> &R, std::set<u64> &P, std::set<u64> &X) {
   std::set<u64> r, p1, p2, x, u1;
 
   if (P.empty() && X.empty()) cliques2.insert(R);
 
 
-  //Choisir un sommet pivot u dans P ⋃ X
-  for (auto k = P.begin(); k != P.end(); ++k)  
-    {u1 = u(X, *k); }
-    //std::cout<<*k<<std::endl;}
+  // Choisir un sommet pivot u dans P ⋃ X
+  for (auto k = P.begin(); k != P.end(); ++k) { u1 = u(X, *k); }
+  // std::cout<<*k<<std::endl;}
 
   u64 u2 = findMaxDegreeLst(u1);
-  //std::cout<<u2<<std::endl;
-  
+  // std::cout<<u2<<std::endl;
+
 
   for (auto it = P.begin(); it != P.end(); ++it)
-    if(!areConnected(u2, *it))
-      {p1.insert(*it);}
-      //std::cout<<*it<<std::endl;}
+    if (!areConnected(u2, *it)) { p1.insert(*it); }
+  // std::cout<<*it<<std::endl;}
 
   for (auto v = p1.begin(); v != p1.end(); ++v) {
-
-    r = R; r.insert(*v);
+    r = R;
+    r.insert(*v);
     p2 = inter(P, *v);
     x = inter(X, *v);
 
@@ -164,20 +162,17 @@ void GraphList::bronKerbosch2(std::set<u64>& R, std::set<u64>& P, std::set<u64>&
     P.erase(*v);
     X.insert(*v);
   }
-
 }
 
 // Enumère tout les sets indépendants maximaux du graphe
-void GraphList::getMaxIndSetsBK2()
-{
-   std::set<u64> R;
-   std::set<u64> X;
-   std::set<u64> P;
-   for (int i=0 ; i<N ; i++)
-      P.insert(i);
+void GraphList::getMaxIndSetsBK2() {
+  std::set<u64> R;
+  std::set<u64> X;
+  std::set<u64> P;
+  for (int i = 0; i < N; i++) P.insert(i);
 
-   changeToComplementary();
-   bronKerbosch2(R, P, X);
+  changeToComplementary();
+  bronKerbosch2(R, P, X);
 }
 
 
@@ -211,12 +206,11 @@ void GraphList::degenOrder(std::vector<u64> &orderedVertices) {
   u64 vertexMinDeg, minDeg;
 
 
-  for (u64 i = 0; i < N; i++)
-  {
+  for (u64 i = 0; i < N; i++) {
     if (nbRestant > 2) {
       findMinDegree(vertexMinDeg, minDeg);
-      orderedVertices[i]= vertexMinDeg;
-      //orderedVertices.push_back(vertexMinDeg);
+      orderedVertices[i] = vertexMinDeg;
+      // orderedVertices.push_back(vertexMinDeg);
       nbRestant -= 1;
       checkTab[vertexMinDeg] = 1;
       deleteVertex(vertexMinDeg);
@@ -252,8 +246,7 @@ void GraphList::changeToComplementary() {
     newNeighboors.clear();
     for (int j = 0; j < N; j++) {
       // If vertex j is not in neighboors of i, than insert in newNeighboors
-      if (adj[i].find(j) == adj[i].end() && i != j)
-        newNeighboors.insert(j);
+      if (adj[i].find(j) == adj[i].end() && i != j) newNeighboors.insert(j);
     }
     adj[i] = newNeighboors;
   }
@@ -265,18 +258,28 @@ bool GraphList::isClique(std::set<u64> &edgeSets) {
   bool status = true;
   if (n < 3) return false;
 
-  for (auto i : edgeSets) {
-    std::map<u64, std::set<u64>>::iterator it;
-    for (it = adj.begin(); it != adj.end(); it++) {
-      if ((it->first == i) && (it->second.size() != (n - 1))) {
-        status = false;
-        //  return status;
-      }
-    }
+  // for (auto i : edgeSets) {
+  //   std::map<u64, std::set<u64>>::iterator it;
+  //   for (it = adj.begin(); it != adj.end(); it++) {
+  //     if ((it->first == i) && (it->second.size() != (n - 1))) {
+  //       status = false;
+  //       //  return status;
+  //     }
+  //   }
 
-    return status;
+  for (auto i : edgeSets) {
+    for (auto j : edgeSets) {
+      if ((i != j) && !areConnected(i,j))
+        {
+          status = false;
+          break;
+        }
+    }
   }
+
+  return status;
 }
+
 
 
 u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
@@ -383,7 +386,4 @@ std::set<std::set<u64>> GraphList::getBicliques_ALGO_2() {
 }
 
 
-std::set<u64> GraphList::getListOfNeighboors(u64 i)
-{
-  return adj[i];
-}
+std::set<u64> GraphList::getListOfNeighboors(u64 i) { return adj[i]; }
