@@ -2,21 +2,14 @@
 
 #include <iostream>
 #include <vector>
+#include <omp.h>
 
 int main(int argc, char **argv) {
+    Graph g = make_hexagone();
+    g.Connect(2, 4);
+    g.Connect(0, 3);
 
-  Graph g(5);
-  g.Connect(0, 1);
-  g.Connect(0, 4);
-  g.Connect(1, 4);
-  g.Connect(1, 3);
-  g.Connect(1, 2);
-  g.Connect(2, 3);
-  g.Connect(3, 4);
-
-  g.ChangeToDegeneracyOrder();
-  printVec(g.sigma);
-
-
+    std::set<std::set<u64>> bicliques = g.GetBicliques();
+    printSets(bicliques);
   return 0;
 }

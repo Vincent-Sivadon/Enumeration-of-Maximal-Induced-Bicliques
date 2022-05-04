@@ -67,6 +67,7 @@ public:
 
 	// Bicliques
 	std::set<std::set<u64>> GetBicliques();
+	std::set<std::set<u64>> GetBicliques2();
 	void GetBicliquesParallel();
 
 	// Display

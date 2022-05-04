@@ -1,9 +1,12 @@
 #include "Graph.hpp"
 
 #include <stdio.h>
+#include <unistd.h>
 
 void Graph::Randomize()
 {
+	srand(getpid());
+
 	// For every pair of nodes
 	for (u64 i = 0; i < N-1; i++)
 		for (u64 j = i+1; j < N; j++) {
@@ -11,7 +14,7 @@ void Graph::Randomize()
 			double r = (double) rand() / (double) RAND_MAX;
 
 			// Connect i and j if r<0.003
-			if (r < 0.003)
+			if (r < 0.3)
 				Connect(i, j);
     }
 }
@@ -90,10 +93,10 @@ u64 Graph::GetDegree(u64 i)
 	return count;	
 }
 
-
 void Graph::ChangeToDegeneracyOrder()
 {
 	std::vector<bool> visited(N, false);
+	std::vector<u64> newadj(N*N);
 
 	for (u64 i = 0; i < N; i++)
 	{
@@ -112,10 +115,17 @@ void Graph::ChangeToDegeneracyOrder()
 			}
 		}
 
+		
 		sigma[vertex_of_min_degree] = i;	
 		visited[vertex_of_min_degree] = true;
 	}
-	
+
+	for (u64 i = 0; i < N; i++)
+		for (u64 j = 0; j < N; j++)
+			newadj[sigma[i]*N + sigma[j]] = adj[i*N + j];
+		
+
+	adj = std::move(newadj);
 }
 
 

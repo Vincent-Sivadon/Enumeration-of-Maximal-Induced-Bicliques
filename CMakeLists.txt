@@ -27,7 +27,7 @@ file(GLOB HDRS "include/*.cpp")
 add_library(Graph SHARED ${SRCS} ${HDRS})
 target_link_libraries(Graph PUBLIC OpenMP::OpenMP_CXX MPI::MPI_CXX)
 target_include_directories(Graph PUBLIC ${CMAKE_SOURCE_DIR}/include)
-target_compile_options(Graph PUBLIC -g)
+target_compile_options(Graph PUBLIC -Ofast)
 
 
 add_subdirectory(extern)

@@ -1,6 +1,15 @@
 #include <Graph.hpp>
 #include <gtest/gtest.h>
 
-TEST(Graph_Tests, areConnected) {
-  assert(1 == 1);
+TEST(Graph_Tests, GetBiclicques) {
+    Graph g = make_hexagone();
+    std::set<std::set<u64>> bicliques = g.GetBicliques();
+    std::set<std::set<u64>> expected = {
+      {0, 1, 2},
+      {1, 2, 3},
+      {2, 3, 4},
+      {3, 4, 5},
+      {0, 4, 5},
+      {0, 1, 5}
+    };
 }

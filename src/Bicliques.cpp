@@ -42,7 +42,9 @@ std::set<std::set<u64>> Graph::GetBicliques()
         // Tree tree; std::set<u64> set;
         // subgraph.GetMaxIndSets(tree, set, i);
         // std::set<std::set<u64>> max_ind_sets = tree.getMaxBranches();
+        std::cout << "-> " << std::endl;;
         subgraph.GetMaxIndSetsBK();
+        std::cout << "   <-" << std::endl;
 
         // Pour chaque maximal set indépendant
         for (auto set : subgraph.cliques)
@@ -120,4 +122,43 @@ void Graph::GetBicliquesParallel()
     fclose(fp);
 
     MPI_Finalize();
+}
+
+std::set<std::set<u64>> Graph::GetBicliques2()
+{
+    // Pour stocker les bicliques
+    Tree suffixTree;
+
+    ChangeToDegeneracyOrder();
+
+    // Pour chaque noeud du sommet
+    for (u64 i = 0; i < N; i++)
+    {
+        // S'il n'existe pas dans le graph, on passe au suivant
+        if (!NodeExists(i)) continue;
+
+        // Subgraph generation
+        std::vector<Graph> subgraphs = GenSubgraphGik(i);
+        
+        for (auto& subgraph : subgraphs)
+        {
+            // Maximal independant sets
+            subgraph.GetMaxIndSetsBK();
+
+            // Pour chaque maximal set indépendant
+            for (auto set : subgraph.cliques)
+            {
+                // Renommer les noeuds pour correspondance avec le graphe père
+                set = renameSet(set, subgraph.parentIdx);
+
+                // Check if is proper, insert bicliques if it's the case
+                suffixTree.insert(set);
+            }
+        }
+    }
+
+    // Get only maximal branches of the subtree
+    std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();
+
+    return bicliques;
 }

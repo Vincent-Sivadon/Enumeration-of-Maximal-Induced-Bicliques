@@ -5,10 +5,10 @@
 void Graph::SetParentIndices(const Graph& parentGraph, std::set<u64>& nodes_at_1, std::set<u64>& nodes_at_2, u64 pivot)
 {
     parentIdx.resize(N);
-    std::vector<bool> visited(N, false);
+    std::vector<bool> visited(parentGraph.N, false);
 
     parentIdx[0] = pivot;
-    visited[0] = true;
+    visited[pivot] = true;
 
     // Define parent indices
     for (u64 idx = 1; idx < N; idx++)
@@ -16,13 +16,13 @@ void Graph::SetParentIndices(const Graph& parentGraph, std::set<u64>& nodes_at_1
         // Search for the node in those lists that has the min sigma
         u64 min_sigma = INF;
         u64 node_of_min_sigma;
-        for (const auto& node : nodes_at_1)
+        for (const u64& node : nodes_at_1)
             if (parentGraph.sigma[node] < min_sigma && !visited[node])
             {
                 min_sigma = parentGraph.sigma[node];
                 node_of_min_sigma = node;
             }
-        for (const auto& node : nodes_at_2)
+        for (const u64& node : nodes_at_2)
             if (parentGraph.sigma[node] < min_sigma && !visited[node])
             {
                 min_sigma = parentGraph.sigma[node];
@@ -130,6 +130,7 @@ std::vector<Graph> Graph::GenSubgraphGik(u64 i)
         subgraph.SetParentIndices(*this, nodes_at_1, nodes_at_2_inter, i);
         std::map<u64,u64> child_idx = renameNodes(subgraph.parentIdx);
         
+
         // Détermination des liens entre les sites du sous-graphe
         for (const auto& x : nodes_at_1)
         {
