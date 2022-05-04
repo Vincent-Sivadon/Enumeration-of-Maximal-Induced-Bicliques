@@ -29,6 +29,8 @@ public:
 	void Disconnect(u64 i, u64 j);
 	bool AreConnected(u64 i, u64 j);
 	bool NodeExists(u64 i);
+	u64 GetDegree(u64 i);
+	void ChangeToDegeneracyOrder();
 
 	// Neighboors
 	std::set<u64> GetAllNeighboors(u64 i);

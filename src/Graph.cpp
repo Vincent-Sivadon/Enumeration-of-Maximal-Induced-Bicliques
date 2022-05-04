@@ -81,6 +81,44 @@ std::set<u64> Graph::GetNeighboorsVi(u64 i, u64 pivot)
 	return neighboors;	
 }
 
+u64 Graph::GetDegree(u64 i)
+{
+	u64 count = 0;
+	for (u64 j = 0; j < N; j++)
+		if (AreConnected(i,j) && i!=j)
+			count++;
+	return count;	
+}
+
+
+void Graph::ChangeToDegeneracyOrder()
+{
+	std::vector<bool> visited(N, false);
+
+	for (u64 i = 0; i < N; i++)
+	{
+		// Find vertex of min degree
+		u64 min_degree = INF;
+		u64 vertex_of_min_degree;
+		for (u64 k = 0; k < N; k++)
+		{
+			if (visited[k]) continue;
+
+			u64 degree = GetDegree(k);
+			if (degree<min_degree)
+			{
+				min_degree = degree;
+				vertex_of_min_degree = k;
+			}
+		}
+
+		sigma[vertex_of_min_degree] = i;	
+		visited[vertex_of_min_degree] = true;
+	}
+	
+}
+
+
 Graph make_hexagone()
 {
 	Graph g(6);
