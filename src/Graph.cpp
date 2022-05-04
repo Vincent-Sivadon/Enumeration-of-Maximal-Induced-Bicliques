@@ -14,7 +14,7 @@ void Graph::Randomize()
 			double r = (double) rand() / (double) RAND_MAX;
 
 			// Connect i and j if r<0.003
-			if (r < 0.3)
+			if (r < 0.003)
 				Connect(i, j);
     }
 }
@@ -35,7 +35,8 @@ void Graph::Disconnect(u64 i, u64 j)
 	adj[j*N + i] = 0;
 }
 
-bool Graph::AreConnected(u64 i, u64 j)
+/*
+inline bool Graph::AreConnected(u64 i, u64 j)
 {
 	i = sigma[i];
 	j = sigma[j];
@@ -43,6 +44,7 @@ bool Graph::AreConnected(u64 i, u64 j)
 		return true;
 	return false;
 }
+*/
 
 // Display graph in terminal
 void Graph::Print() const
@@ -88,7 +90,7 @@ u64 Graph::GetDegree(u64 i)
 {
 	u64 count = 0;
 	for (u64 j = 0; j < N; j++)
-		if (AreConnected(i,j) && i!=j)
+		if (AreConnected(j, i) && i!=j)
 			count++;
 	return count;	
 }
@@ -97,6 +99,11 @@ void Graph::ChangeToDegeneracyOrder()
 {
 	std::vector<bool> visited(N, false);
 	std::vector<u64> newadj(N*N);
+	std::vector<u64> degrees(N);
+
+	// Get degrees of all nodes
+	for (u64 i = 0; i < N; i++)
+		degrees[i] = GetDegree(i);
 
 	for (u64 i = 0; i < N; i++)
 	{
@@ -107,18 +114,17 @@ void Graph::ChangeToDegeneracyOrder()
 		{
 			if (visited[k]) continue;
 
-			u64 degree = GetDegree(k);
-			if (degree<min_degree)
+			if (degrees[k]<min_degree)
 			{
-				min_degree = degree;
+				min_degree = degrees[k];
 				vertex_of_min_degree = k;
 			}
 		}
 
-		
 		sigma[vertex_of_min_degree] = i;	
 		visited[vertex_of_min_degree] = true;
 	}
+
 
 	for (u64 i = 0; i < N; i++)
 		for (u64 j = 0; j < N; j++)

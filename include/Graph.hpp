@@ -11,11 +11,6 @@
 
 typedef unsigned long long u64;
 
-typedef struct {
-  int degree;
-  int vertex;
-} vertexMin;
-
 class Graph {
 public:
 	u64 N;
@@ -27,7 +22,13 @@ public:
 	// Arcs
 	void Connect(u64 i, u64 j);
 	void Disconnect(u64 i, u64 j);
-	bool AreConnected(u64 i, u64 j);
+	inline bool AreConnected(u64 i, u64 j)
+	{
+		if (adj[sigma[i]*N + sigma[j]] == 1)
+			return true;
+		return false;
+	}
+
 	bool NodeExists(u64 i);
 	u64 GetDegree(u64 i);
 	void ChangeToDegeneracyOrder();
@@ -53,6 +54,8 @@ public:
 	std::set<u64> InterSetAndNeighboors(std::set<u64>& set, u64 v);
 	void BronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X);
 	void GetMaxIndSetsBK();
+	// Tomita
+	void ExpandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q);
 
 
 public:

@@ -5,11 +5,19 @@
 #include <omp.h>
 
 int main(int argc, char **argv) {
-    Graph g = make_hexagone();
-    g.Connect(2, 4);
-    g.Connect(0, 3);
+    if (argc<2)
+    {
+      printf("Usage : %s [N]", argv[0]);
+      return 1;
+    } u64 N = atoll(argv[1]);
 
-    std::set<std::set<u64>> bicliques = g.GetBicliques();
-    printSets(bicliques);
+    Graph g(N);
+    g.Randomize();
+
+    double start = omp_get_wtime();
+    std::set<std::set<u64>> bicliques = g.GetBicliques2();
+    double end = omp_get_wtime();
+    // printSets(bicliques);
+    std::cout << "Total " << end - start << std::endl;
   return 0;
 }
