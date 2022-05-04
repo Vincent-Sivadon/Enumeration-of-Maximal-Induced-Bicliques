@@ -5,6 +5,12 @@
 
 int main(int argc, char **argv) {
   Graph g(6);
+  g.sigma[0] = 2;
+  g.sigma[1] = 5;
+  g.sigma[2] = 4;
+  g.sigma[3] = 1;
+  g.sigma[4] = 0;
+  g.sigma[5] = 3;
   g.Connect(0,1);
   g.Connect(0,5);
   g.Connect(1,2);

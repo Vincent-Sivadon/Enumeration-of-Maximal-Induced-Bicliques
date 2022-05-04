@@ -36,16 +36,12 @@ void Graph::SetParentIndices(const Graph& parentGraph, std::set<u64>& nodes_at_1
 Graph Graph::GenSubgraph(u64 i)
 {
     // Ensemble des sommets à distance 1 et 2
-    std::set<u64> nodes_at_1 = GetNeighboorsVi(i);
+    std::set<u64> nodes_at_1 = GetNeighboorsVi(i, i);
     std::set<u64> nodes_at_2;
     for(const auto& node : nodes_at_1)
-        for (const auto& node2 : GetNeighboorsVi(node))
+        for (const auto& node2 : GetNeighboorsVi(node, i))
             nodes_at_2.insert(node2);
-
-    for (const auto& node : nodes_at_1)
-        std::cout << node << " ";
-    std::cout << std::endl;
-
+            
     u64 subgraphSize = nodes_at_1.size() + nodes_at_2.size() + 1;
     Graph subgraph(subgraphSize);
 

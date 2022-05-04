@@ -47,7 +47,7 @@ void Graph::Print() const
 	for (u64 i = 0; i < N; i++)
 	{
 		for (u64 j = 0; j < N; j++)
-			std::cout << adj[sigma[i]*N + sigma[j]] << " ";
+			std::cout << adj[i*N + j] << " ";
 		std::cout << std::endl;
 	}
 	
@@ -71,11 +71,11 @@ std::set<u64> Graph::GetAllNeighboors(u64 i)
 }
 
 // Get all neighboors from the vertices following i in sigma order
-std::set<u64> Graph::GetNeighboorsVi(u64 i)
+std::set<u64> Graph::GetNeighboorsVi(u64 i, u64 pivot)
 {
 	std::set<u64> neighboors;
 	for (u64 j = 0; j < N; j++)
-		if (sigma[j]>=sigma[i] && AreConnected(i,j) && NodeExists(j))
+		if (sigma[j]>=sigma[pivot] && AreConnected(i,j) && NodeExists(j) && j!=pivot)
 			neighboors.insert(j);
 
 	return neighboors;	

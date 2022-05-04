@@ -19,18 +19,18 @@ class Graph {
 private:
 	u64 N;
 	std::vector<u64> adj;
-	std::vector<u64> sigma;
 
 	void Disconnect(u64 i, u64 j);
 	bool AreConnected(u64 i, u64 j);
 	bool NodeExists(u64 i);
 	std::set<u64> GetAllNeighboors(u64 i);
-	std::set<u64> GetNeighboorsVi(u64 i);
+	std::set<u64> GetNeighboorsVi(u64 i, u64 pivot);
 
 	// Subgraph
 	void SetParentIndices(const Graph& parentGraphraph, std::set<u64>& nodes_at_1, std::set<u64>& nodes_at_2, u64 pivot);
 
 public:
+	std::vector<u64> sigma;
 	std::vector<u64> parentIdx;
 	Graph GenSubgraph(u64 i);
 
