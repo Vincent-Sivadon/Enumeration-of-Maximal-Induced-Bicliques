@@ -66,7 +66,7 @@ std::set<u64> Graph::GetAllNeighboors(u64 i)
 	std::set<u64> neighboors;
 	for (u64 j = 0; j < N; j++)
 		if (AreConnected(i,j) && NodeExists(i))
-			neighboors.insert(i);
+			neighboors.insert(j);
 	return neighboors;	
 }
 

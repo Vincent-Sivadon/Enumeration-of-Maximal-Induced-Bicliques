@@ -48,19 +48,30 @@ std::map<u64,u64> renameNodes(std::vector<u64>& indices)
 
 Graph Graph::GenSubgraph(u64 i)
 {
-    // Ensemble des sommets à distance 1 et 2
-    std::set<u64> nodes_at_1 = GetNeighboorsVi(i, i);
+    // Ensemble des voisins à distance 1
+    std::set<u64> neighboors = GetAllNeighboors(i);
+
+    // On ne garde que ceux qui sont supérieur dans sigma
+    std::set<u64> nodes_at_1;
+    for (const u64& node : neighboors)
+        if (sigma[node]>=sigma[i] && node!=i)
+            nodes_at_1.insert(node);
+
+    // Ensemble des voisins à distance 2
     std::set<u64> nodes_at_2;
-    for(const auto& node : nodes_at_1)
+    for(const auto& node : neighboors)
         for (const auto& node2 : GetNeighboorsVi(node, i))
             nodes_at_2.insert(node2);
 
+    // Création du sous-graphe
     u64 subgraphSize = nodes_at_1.size() + nodes_at_2.size() + 1;
     Graph subgraph(subgraphSize);
 
+    // Nommage des sites pour correspondance avec le graphe original
     subgraph.SetParentIndices(*this, nodes_at_1, nodes_at_2, i);
     std::map<u64,u64> child_idx = renameNodes(subgraph.parentIdx);
-            
+    
+    // Détermination des liens entre les sites du sous-graphe
     for (const auto& x : nodes_at_1)
     {
         for (const auto& y : nodes_at_1)

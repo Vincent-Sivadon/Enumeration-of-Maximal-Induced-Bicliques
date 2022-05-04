@@ -36,7 +36,7 @@ add_subdirectory(extern)
 add_subdirectory(apps)
 
 enable_testing()
-add_subdirectory(test)
+# add_subdirectory(test)
 
 # "make plot" va afficher le graphe des perfs
 # add_custom_target(plot COMMAND sh ../plot/plot.sh)
