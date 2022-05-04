@@ -37,6 +37,8 @@ public:
 	// Subgraph
 	void SetParentIndices(const Graph& parentGraphraph, std::set<u64>& nodes_at_1, std::set<u64>& nodes_at_2, u64 pivot);
 	Graph GenSubgraph(u64 i);
+	std::vector<Graph> GenSubgraphGik(u64 i);
+
 
 	// Independant Sets
 	// ----------------
