@@ -22,6 +22,7 @@ public:
 	std::vector<u64> adj;
 	std::vector<u64> sigma;
 	std::vector<u64> parentIdx;
+	std::set<std::set<u64>> cliques;
 
 	// Arcs
 	void Connect(u64 i, u64 j);
@@ -38,9 +39,16 @@ public:
 	Graph GenSubgraph(u64 i);
 
 	// Independant Sets
+	// ----------------
+	// Normal version
 	bool IsConnectedToSet(u64 i, const std::set<u64>& set);
 	bool IsProper(std::set<u64>& set);
 	void GetMaxIndSets(Tree& tree, std::set<u64>& tmp_set, u64 i);
+	// Bron-Kerbosch version
+	void ChangeToComplementary();	
+	std::set<u64> InterSetAndNeighboors(std::set<u64>& set, u64 v);
+	void BronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X);
+	void GetMaxIndSetsBK();
 
 
 public:
@@ -55,6 +63,7 @@ public:
 
 	// Bicliques
 	std::set<std::set<u64>> GetBicliques();
+	void GetBicliquesParallel();
 
 	// Display
 	void Print() const;
