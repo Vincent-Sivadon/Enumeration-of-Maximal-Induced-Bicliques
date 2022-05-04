@@ -80,3 +80,16 @@ std::set<u64> Graph::GetNeighboorsVi(u64 i, u64 pivot)
 
 	return neighboors;	
 }
+
+Graph make_hexagone()
+{
+	Graph g(6);
+	g.Connect(0,1);
+	g.Connect(0,5);
+	g.Connect(1,2);
+	g.Connect(2,3);
+	g.Connect(3,4);
+	g.Connect(4,5);
+
+    return g;
+}

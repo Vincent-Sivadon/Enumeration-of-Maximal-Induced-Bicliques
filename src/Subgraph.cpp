@@ -1,5 +1,7 @@
 #include "Graph.hpp"
 
+#include <map>
+
 void Graph::SetParentIndices(const Graph& parentGraph, std::set<u64>& nodes_at_1, std::set<u64>& nodes_at_2, u64 pivot)
 {
     parentIdx.resize(N);
@@ -33,6 +35,17 @@ void Graph::SetParentIndices(const Graph& parentGraph, std::set<u64>& nodes_at_1
     }
 }
 
+// Rename nodes we've extracted from the parent graph
+std::map<u64,u64> renameNodes(std::vector<u64>& indices)
+{
+    std::map<u64,u64> childIndices;
+
+    for (u64 i = 0; i < indices.size(); i++)
+        childIndices.insert(std::make_pair(indices[i], i));
+
+    return childIndices;    
+}
+
 Graph Graph::GenSubgraph(u64 i)
 {
     // Ensemble des sommets à distance 1 et 2
@@ -41,25 +54,26 @@ Graph Graph::GenSubgraph(u64 i)
     for(const auto& node : nodes_at_1)
         for (const auto& node2 : GetNeighboorsVi(node, i))
             nodes_at_2.insert(node2);
-            
+
     u64 subgraphSize = nodes_at_1.size() + nodes_at_2.size() + 1;
     Graph subgraph(subgraphSize);
 
     subgraph.SetParentIndices(*this, nodes_at_1, nodes_at_2, i);
-    
+    std::map<u64,u64> child_idx = renameNodes(subgraph.parentIdx);
+            
     for (const auto& x : nodes_at_1)
     {
         for (const auto& y : nodes_at_1)
-            if (x != y && AreConnected(x, y))
-                subgraph.Connect(x,y);
+            if (AreConnected(x, y))
+                subgraph.Connect(child_idx[x],child_idx[y]);
         for (const auto& y : nodes_at_2)
             if (!AreConnected(x,y))
-                subgraph.Connect(x,y);
+                subgraph.Connect(child_idx[x],child_idx[y]);
     }
     for (const auto& x : nodes_at_2)
         for (const auto& y : nodes_at_2)
-            if (x != y && AreConnected(x,y))
-                subgraph.Connect(x,y);            
+            if (AreConnected(x,y))
+                subgraph.Connect(child_idx[x],child_idx[y]);
 
     return subgraph;
 }

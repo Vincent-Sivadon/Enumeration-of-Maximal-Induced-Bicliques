@@ -3,6 +3,7 @@
 #define INF 0x3f3f3f3f
 
 #include "SuffixTree.hpp"
+#include "Utility.hpp"
 
 #include <vector>
 #include <set>
@@ -16,24 +17,33 @@ typedef struct {
 } vertexMin;
 
 class Graph {
-private:
+public:
 	u64 N;
 	std::vector<u64> adj;
+	std::vector<u64> sigma;
+	std::vector<u64> parentIdx;
 
+	// Arcs
+	void Connect(u64 i, u64 j);
 	void Disconnect(u64 i, u64 j);
 	bool AreConnected(u64 i, u64 j);
 	bool NodeExists(u64 i);
+
+	// Neighboors
 	std::set<u64> GetAllNeighboors(u64 i);
 	std::set<u64> GetNeighboorsVi(u64 i, u64 pivot);
 
 	// Subgraph
 	void SetParentIndices(const Graph& parentGraphraph, std::set<u64>& nodes_at_1, std::set<u64>& nodes_at_2, u64 pivot);
-
-public:
-	std::vector<u64> sigma;
-	std::vector<u64> parentIdx;
 	Graph GenSubgraph(u64 i);
 
+	// Independant Sets
+	bool IsConnectedToSet(u64 i, const std::set<u64>& set);
+	bool IsProper(std::set<u64>& set);
+	void GetMaxIndSets(Tree& tree, std::set<u64>& tmp_set, u64 i);
+
+
+public:
 	Graph(u64 N) : N(N) {
 		adj.resize(N*N);
 		sigma.resize(N);
@@ -42,8 +52,9 @@ public:
 	}
 	void Randomize();
 
-	void Connect(u64 i, u64 j);
 
+	// Bicliques
+	std::set<std::set<u64>> GetBicliques();
 
 	// Display
 	void Print() const;
@@ -51,3 +62,5 @@ public:
 	// Getters
 	u64 GetSize() { return N; }
 };
+
+Graph make_hexagone();
