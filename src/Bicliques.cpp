@@ -129,19 +129,17 @@ std::set<std::set<u64>> Graph::GetBicliques2()
     Tree suffixTree;
 
     // Re-order the graph according to the degeneracy order
-    double start = omp_get_wtime();
     ChangeToDegeneracyOrder();
-    double end = omp_get_wtime();
-    std::cout << "Ordering : " << end-start << std::endl;
-
-    start = omp_get_wtime();
 
     // Pour chaque noeud du sommet
-#pragma omp parallel for schedule(guided)
+#pragma omp parallel for schedule(static)
     for (u64 i = 0; i < N; i++)
     {
+        double start = omp_get_wtime();
+
         // Subgraph generation
         std::vector<Graph> subgraphs = GenSubgraphGik(i);
+
 
         for (auto& subgraph : subgraphs)
         {
@@ -158,10 +156,10 @@ std::set<std::set<u64>> Graph::GetBicliques2()
                 suffixTree.insert(set);
             }
         }
-    }
 
-    end = omp_get_wtime();
-    std::cout << "Treatment : " << end-start << std::endl;
+        double end = omp_get_wtime();
+        std::cout << end-start << "\n";
+    }
 
     // Get only maximal branches of the subtree
     std::set<std::set<u64>> bicliques = suffixTree.getMaxBranches();

@@ -59,6 +59,7 @@ public:
 
 
 public:
+	Graph() {}
 	Graph(u64 N) : N(N) {
 		adj.resize(N*N);
 		sigma.resize(N);
@@ -76,8 +77,12 @@ public:
 	// Display
 	void Print() const;
 
+	// IO File
+	void WriteToFile(const char* filename);
+	void InitFromFile(const char* filename);
+
 	// Getters
-	u64 GetSize() { return N; }
+	u64 GetSize() const { return N; }
 };
 
 Graph make_hexagone();
