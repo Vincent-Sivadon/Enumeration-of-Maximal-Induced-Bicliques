@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 import statistics
 import sys
+
 list = []
-for arg in sys.argv:
-    if (arg == sys.argv[0]):
-        continue
-    list.insert(1,float(arg))
-m = 1. *sum(list) / len(list)
-print(m, statistics.stdev(list))
+with open(sys.argv[1]) as f:
+    for line in f:
+        list.extend(map(float, line))
+        
+m = statistics.mean(list)
+std = statistics.stdev(list)
+
+print(m, std)

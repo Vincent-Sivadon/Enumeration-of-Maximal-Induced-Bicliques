@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv) {
     Graph g;
-    g.InitFromFile("../data/facebook.csv");
+    g.InitFromFile("../networks/facebook.csv");
 
     double start = omp_get_wtime();
     std::set<std::set<u64>> bicliques = g.GetBicliques2();

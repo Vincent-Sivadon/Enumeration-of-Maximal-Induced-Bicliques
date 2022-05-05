@@ -1,52 +1,39 @@
 # Enumeration de bicliques maximales d'un gaphe
 
+![Graph](Graph.gif "Graph")
+
+# Utilisation
+* Création d'un graphe :
+    * A partir d'un fichier :
+        `Graph g; g.InitFromFile(filename)`
+    * Aléatoirement :
+        `Graph g(N); g.Randomize();`
+    * Prédéfini     :
+        * Graphe en forme d'hexagone  : `Graph g; g.MakeHexagone()`
+* Enumération des bicliques :
+    * Algorithm 1 : `set<set<u64>> bicliques = g.GetBicliques()`
+    * Algorithm 2 : `set<set<u64>> bicliques = g.GetBicliques2()`
+* Utilitaires :
+    * Ecriture des liens dans un fichier : `g.WriteToFile(filename)`
+    * Affichage dans le terminal : `g.Print()`
+
+
 # Build
 Pour constuire le projet :  
 ```
     mkdir build  
     cd build  
     cmake ..  
+    make
 ```
-Pour construire tout les exectuables : `make`  
-
-## Liste des executables
-Tout les executables vont être dans le répertoire build.  
-* draw    : dessine un graph avec un blicique coloré
-* genPerf : génère les données de mesures de performances dans data/perf.dat   
-          : taille du graphe maximale prise à 50 par défaut, mais est spécifiable par : ./genPerf [Taille Maximale]
-## Liste des macros
-Taper les commandes suivantes pour leur effet:  
-* make plot   : génère l'image perf.png et l'affiche  
-* gtest       : execute tout les tests du projet  
-* make clean  : supprime les executables  
+Chaque fichier dans le sous-dossier `apps` donnera un executable du même nom dans le sous-dossier `build`.  
 
 
-# Structure du projet
-La hiérarchie est la suivante :
-* graphes : librairie de manipulation de graphe
-    * include :
-        * graphes.hpp       : interface de la structure Graph
-        * graphesList.hpp   : implémentation de graphes sous forme de liste
-        * graphesMat.hpp    : implémentation de graphes sous forme de matrice d'adjacence
-        * suffixTree.hpp    : header de la structure d'arbre de suffix
-        * visualisation.hpp : contient l'implémentation de Graph::draw()
-   
-* src :
-         implémentation de l'arbre de suffix, de la visualisation ainsi que de la structure des graphes
-* include : 
-        contient toutes les librairies
-* tests : 
-    * graph : contient les tests de chaque fonction
-* plot  : contient les scripts et données relatifs au plot
-* apps  : contient draw.cpp et genperf.cpp
+# Structure du répertoire
+L'ensemble des fonctionnalités est réuni dans une librairie `Graph`, dont les fichiers sont dans les sous-dossiers `include` et `src`.  
+Les autres répertoires sont :
+* `apps` : contient des fichiers sources utilisant la bibliothèque `Graph`
+* `test` : tests de la librairie
+* `networks` : réseaux en .csv
+* `data` : relatif au mesures
 
-
-# Utilisation de la librairie
-* Générer un graphe :
-    * aléatoirement :
-        * Forme Liste d'Adjacence   : ̀`GraphList g = random(Taille)`
-        * Forme Matrice d'Adjacence : ̀`GraphMat g = random(Taille)`
-    * prédéfini     :
-        * Molécule de Méthane  : `Graph<GraphList> g = Méthane<GraphList>();`
-* Manipulation d'un graphe :
-    * Obtenir ses bicliques maximales : `std::set<std::set<u64>> bicliques = g.getBicliques()`

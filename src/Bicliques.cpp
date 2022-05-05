@@ -13,29 +13,15 @@ std::set<u64> renameSet(std::set<u64>& set, std::vector<u64>& indices)
     return renamedSet;        
 }
 
-bool Graph::IsProper(std::set<u64>& set)
-{
-    for (const auto& i : set)
-        for (const auto& j : set)
-            if (i!=j)
-                if (AreConnected(i, j))
-                    return true;
-
-  return false;
-}
-
+// Algorithm 1
 std::set<std::set<u64>> Graph::GetBicliques()
 {
     // Pour stocker les bicliques
     Tree suffixTree;
 
     // Pour chaque noeud du sommet
-#pragma omp parallel for schedule(static)
     for (u64 i = 0; i < N; i++)
     {
-        // S'il n'existe pas dans le graph, on passe au suivant
-        if (!NodeExists(i)) continue;
-
         // Subgraph generation
         Graph subgraph = GenSubgraph(i);
 
@@ -85,9 +71,6 @@ void Graph::GetBicliquesParallel()
 #pragma omp parallel for schedule(dynamic)
     for (u64 i = i_first; i < i_first+nb_iter; i++)
     {
-        // S'il n'existe pas dans le graph, on passe au suivant
-        if (!NodeExists(i)) continue;
-
         // Subgraph generation
         Graph subgraph = GenSubgraph(i);
 
@@ -123,6 +106,7 @@ void Graph::GetBicliquesParallel()
     MPI_Finalize();
 }
 
+// Algorithm 2
 std::set<std::set<u64>> Graph::GetBicliques2()
 {
     // Pour stocker les bicliques
@@ -135,11 +119,11 @@ std::set<std::set<u64>> Graph::GetBicliques2()
 #pragma omp parallel for schedule(static)
     for (u64 i = 0; i < N; i++)
     {
+        // Iteration performance mesuring
         double start = omp_get_wtime();
 
         // Subgraph generation
         std::vector<Graph> subgraphs = GenSubgraphGik(i);
-
 
         for (auto& subgraph : subgraphs)
         {
@@ -157,8 +141,9 @@ std::set<std::set<u64>> Graph::GetBicliques2()
             }
         }
 
+        // Iteration performance mesuring
         double end = omp_get_wtime();
-        std::cout << end-start << "\n";
+        // std::cout << end-start << "\n";
     }
 
     // Get only maximal branches of the subtree

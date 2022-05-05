@@ -1,5 +1,6 @@
 #include "Graph.hpp"
 
+// Tomita algorithm to get maximal independant sets (stored in cliques)
 void Graph::ExpandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q)
 {
     /*

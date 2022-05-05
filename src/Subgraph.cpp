@@ -2,6 +2,7 @@
 
 #include <map>
 
+// For a subgraph : to keep track of the correspondance between subgraph indices and parent indices
 void Graph::SetParentIndices(const Graph& parentGraph, std::set<u64>& nodes_at_1, std::set<u64>& nodes_at_2, u64 pivot)
 {
     parentIdx.resize(N);
@@ -46,6 +47,7 @@ std::map<u64,u64> renameNodes(std::vector<u64>& indices)
     return childIndices;    
 }
 
+// Subgraph Gi generation
 Graph Graph::GenSubgraph(u64 i)
 {
     // Ensemble des voisins à distance 1
@@ -92,6 +94,7 @@ Graph Graph::GenSubgraph(u64 i)
     return subgraph;
 }
 
+// Subgraphs Gik generation
 std::vector<Graph> Graph::GenSubgraphGik(u64 i)
 {
     // Subgraphs Gik

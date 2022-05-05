@@ -2,7 +2,9 @@
 #include <gtest/gtest.h>
 
 TEST(Graph_Tests, GetBiclicques) {
-    Graph g = make_hexagone();
+    Graph g;
+    g.MakeHexagone();
+    
     std::set<std::set<u64>> bicliques = g.GetBicliques();
     std::set<std::set<u64>> expected = {
       {0, 1, 2},
