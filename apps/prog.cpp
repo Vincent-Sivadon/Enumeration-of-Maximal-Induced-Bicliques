@@ -11,13 +11,16 @@ int main(int argc, char **argv) {
 		return 1;
     } u64 N = atoll(argv[1]);
 
-    Graph g(N);
-    g.Randomize();
+    Graph g; g.MakeHexagone();
+    g.Connect(0,3);
+    g.Connect(2,4);
 
     double start = omp_get_wtime();
     std::set<std::set<u64>> bicliques = g.GetBicliques2();
     double end = omp_get_wtime();
     std::cout << end - start << std::endl;
+
+    printSets(bicliques);
 
   return 0;
 }

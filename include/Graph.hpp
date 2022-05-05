@@ -13,7 +13,7 @@ typedef unsigned long long u64;
 
 class Graph {
 
-private:
+public:
 	u64 N;								// Size of the graph
 	std::vector<u64> adj;				// Adjacency Matrix
 	std::vector<u64> sigma;				// Ordering
@@ -70,12 +70,25 @@ private:
 	void BronKerbosch(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X);
 	// BronKerbosch function call wrapper
 	void GetMaxIndSetsBK();
-
+	// Insert graph maximal independant sets in cliques
+	void BronKerboschPivot(std::set<u64>& R, std::set<u64>& P, std::set<u64>& X);
+	// BronKerbosch function call wrapper
+	void GetMaxIndSetsBKpivot();
 
 	/************ Tomita ************/
 
+	//Calcul de l'intersection de deux ensembles
+	std::set<u64> IntersectionOfSets(std::set<u64> &A, std::set<u64> &B);
+	// Check if clique viable
+	bool IsClique(std::set<u64> &edgeSets);
+	// calcul la différence ensembliste A\B
+	std::set<u64> DiffOfSets(std::set<u64> &A, std::set<u64> &B);
+	// Choose pivot for Tomita
+	u64 ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB);
 	// Tomita algorithm to get maximal independant sets (stored in cliques)
 	void ExpandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u64> &Q);
+	// Get max ind set Tomita wrapper
+	void GetMaxIndSetsTTT();
 
 
 public:
@@ -103,8 +116,7 @@ public:
 	std::set<std::set<u64>> GetBicliques();
 	// Algorithm 2
 	std::set<std::set<u64>> GetBicliques2();
-	//
-	void GetBicliquesParallel();
+
 
 	/************ Others ************/
 
