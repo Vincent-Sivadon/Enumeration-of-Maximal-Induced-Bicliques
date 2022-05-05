@@ -266,27 +266,26 @@ TEST(GraphMatTest, getCliques) {
   std::set<std::set<u64>> get_cliques = {{0, 8, 1}, {1, 8, 2}, {3, 4, 5}, {3, 7, 2}, {3, 7, 6, 5}};
   std::set<u64> vertices = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   tom->getAllMaxCliques(vertices);
-  // auto setss=  *(tom->cliques).begin();
-  // assert(*(get_cliques.begin()) == *(tom->cliques).begin());
+
 
   auto it11 = get_cliques.begin();
   auto it21 = (tom->cliques).begin();
   assert(*it11 == *it21);
 
-  // auto it12 = it11++;
-  // auto it22 = it21++;
-  // assert(*it12 == *it22);
+  auto it12 = it11++;
+  auto it22 = it21++;
+  assert(*it12 == *it22);
 
-  // auto it13 = it12++;
-  // auto it23 = it22++;
-  // assert(*it13 == *it23);
+  auto it13 = it12++;
+  auto it23 = it22++;
+  assert(*it13 == *it23);
 
-  // auto it14 = it13++;
-  // auto it24 = it23++;
-  // assert(*it14 == *it24);
+  auto it14 = it13++;
+  auto it24 = it23++;
+  assert(*it14 == *it24);
 
-  // auto it15 = it14++;
-  // auto it25 = it24++;
-  // assert(*it15 == *it25);
+  auto it15 = it14++;
+  auto it25 = it24++;
+  assert(*it15 == *it25);
 
 }

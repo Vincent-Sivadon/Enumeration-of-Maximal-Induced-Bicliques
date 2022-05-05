@@ -258,28 +258,17 @@ bool GraphList::isClique(std::set<u64> &edgeSets) {
   bool status = true;
   if (n < 3) return false;
 
-  // for (auto i : edgeSets) {
-  //   std::map<u64, std::set<u64>>::iterator it;
-  //   for (it = adj.begin(); it != adj.end(); it++) {
-  //     if ((it->first == i) && (it->second.size() != (n - 1))) {
-  //       status = false;
-  //       //  return status;
-  //     }
-  //   }
-
   for (auto i : edgeSets) {
     for (auto j : edgeSets) {
-      if ((i != j) && !areConnected(i,j))
-        {
-          status = false;
-          break;
-        }
+      if ((i != j) && !areConnected(i, j)) {
+        status = false;
+        break;
+      }
     }
   }
 
   return status;
 }
-
 
 
 u64 GraphList::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {

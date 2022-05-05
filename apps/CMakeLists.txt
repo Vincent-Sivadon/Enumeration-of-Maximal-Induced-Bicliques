@@ -23,3 +23,4 @@ target_link_libraries(genPerfIndSets PUBLIC Graph)
 
 add_executable(bronKerbosch bronKerbosch.cpp)
 target_link_libraries(bronKerbosch PUBLIC Graph)
+

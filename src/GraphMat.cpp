@@ -308,16 +308,28 @@ std::set<std::set<u64>> GraphMat::getBicliques_ALGO_2() {
   return bicliques;
 }
 
+
+std::set<u64> GraphMat::getListOfNeighboors(u64 i)
+{
+  std::set<u64> neighboors;
+  for (int j=0 ; j<N ; j++)
+    if (adj[i*N+j] == 1)
+      neighboors.insert(j);
+    
+  return neighboors;
+}
+
 u64 GraphMat::ChooseMyPivot(std::set<u64> &CAND, std::set<u64> &SUB) {
   int pivot = -1;
   int maxSize = -1;
 
   for (const auto &u : SUB) {
-    std::set<u64> gammaU;
+    std::set<u64> gammaU = getListOfNeighboors(u);
+    //  = getListOfNeighboors(u);
 
-    for (u64 i = 0; i < N; i++) {
-      if (adj[u * N + i] == 1) gammaU.insert(i);
-    }
+    // for (u64 i = 0; i < N; i++) {
+    //   if (adj[u * N + i] == 1) gammaU.insert(i);
+    // }
     std::set<u64> inter = intersectionOfSets(gammaU, CAND);
     u64 sizeOfInter = inter.size();
 
@@ -340,21 +352,22 @@ void GraphMat::expandTomita(std::set<u64> &SUBG, std::set<u64> &CAND, std::set<u
   } else {
     u64 currentPivot = ChooseMyPivot(SUBG, CAND);
 
-    std::set<u64> gammaPivot;
+    std::set<u64> gammaPivot = getListOfNeighboors(currentPivot);
+    // = getListOfNeighboors(currentPivot);
 
-    for (u64 i = 0; i < N; i++) {
-      if (adj[currentPivot * N + i] == 1) gammaPivot.insert(i);
-    }
+    // for (u64 i = 0; i < N; i++) {
+    //   if (adj[currentPivot * N + i] == 1) gammaPivot.insert(i);
+    // }
     std::set<u64> EXTu = diffOfSets(CAND, gammaPivot);
     while (not EXTu.empty()) {
       u64 q = *(EXTu.begin());
       // int q = randchoice(EXTu);
       Q.insert(q);
       // std::cout << q << ", ";
-      std::set<u64> gammaQ;
-      for (u64 i = 0; i < N; i++) {
-        if (adj[currentPivot * N + i] == 1) gammaQ.insert(i);
-      }
+      std::set<u64> gammaQ = getListOfNeighboors(q);
+      // for (u64 i = 0; i < N; i++) {
+      //   if (adj[q * N + i] == 1) gammaQ.insert(i);
+      // }
       std::set<u64> SUBGq = intersectionOfSets(SUBG, gammaQ);
       std::set<u64> CANDq = intersectionOfSets(CAND, gammaQ);
       expandTomita(SUBGq, CANDq, Q);
@@ -378,12 +391,12 @@ void GraphMat::getAllMaxCliques(std::set<u64> vertices) {
 }
 
 
-std::set<u64> GraphMat::getListOfNeighboors(u64 i)
-{
-  std::set<u64> neighboors;
-  for (int j=0 ; j<N ; j++)
-    if (adj[i*N+j] == 1)
-      neighboors.insert(j);
+// std::set<u64> GraphMat::getListOfNeighboors(u64 i)
+// {
+//   std::set<u64> neighboors;
+//   for (int j=0 ; j<N ; j++)
+//     if (adj[i*N+j] == 1)
+//       neighboors.insert(j);
     
-  return neighboors;
-}
+//   return neighboors;
+// }
