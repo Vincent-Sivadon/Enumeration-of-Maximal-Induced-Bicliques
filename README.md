@@ -1,6 +1,9 @@
 # Enumeration de bicliques maximales d'un gaphe
 
-![Graph](Graph.gif "Graph")
+## Exemple de graphe étudié
+Visualisation d'un graphe de réseau social sur lequel tourne l'algorithme.  
+Généré avec OpenGL.
+![Graph](GraphPapers.png "Graph")
 
 # Utilisation
 * Création d'un graphe :
