@@ -2,7 +2,7 @@
 
 ## Exemple de graphe étudié
 Visualisation d'un graphe de réseau social sur lequel tourne l'algorithme.  
-Généré avec OpenGL.
+Généré avec OpenGL par simulation de forces répulsives/attractives entre les noeuds.
 ![Graph](GraphPapers.png "Graph")
 
 # Utilisation
