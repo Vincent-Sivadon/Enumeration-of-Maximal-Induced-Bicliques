@@ -1,4 +1,4 @@
-/* */
+/* Performances Max Ind Sets */
 
 #include "Graph.hpp"
 
