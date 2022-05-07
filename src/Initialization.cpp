@@ -15,7 +15,7 @@ void Graph::Randomize()
 			double r = (double) rand() / (double) RAND_MAX;
 
 			// Connect i and j if r<0.003
-			if (r < 0.003)
+			if (r < 0.001)
 				Connect(i, j);
     }
 }

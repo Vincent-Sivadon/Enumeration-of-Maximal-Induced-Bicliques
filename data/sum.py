@@ -8,7 +8,6 @@ with open(sys.argv[1]) as f:
         if "user" not in line:
             list.append(float(line.strip()))
         
-m = statistics.mean(list)
-std = statistics.stdev(list)
+s = sum(list)
 
-print(m, std)
+print(s)

@@ -63,12 +63,16 @@ void Graph::BronKerboschPivot(std::set<u64>& R, std::set<u64>& P, std::set<u64>&
         cliques.insert(R);
 
     // Choose pivot
-    std::set<u64> P_inter_X = IntersectionOfSets(P,X);
+    std::set<u64> P_u_X;
+    for (const auto& node : P)
+        P_u_X.insert(node);
+    for (const auto& node : X)
+        P_u_X.insert(node);
 
-    // Find max degree in P_inter_X
+    // Find max degree in P_u_X
     u64 max_degree = 0;
     u64 pivot;
-    for (const auto& node : P_inter_X)
+    for (const auto& node : P_u_X)
     {
         u64 degree = GetDegree(node);
         if (degree >= max_degree)
@@ -108,5 +112,5 @@ void Graph::GetMaxIndSetsBKpivot()
       P.insert(i);
 
    ChangeToComplementary();
-   BronKerbosch(R, P, X);
+   BronKerboschPivot(R, P, X);
 }
